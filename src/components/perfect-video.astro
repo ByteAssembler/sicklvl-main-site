@@ -1,0 +1,60 @@
+---
+import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
+
+interface Props extends PerfectVideoProps {}
+
+const {
+	title = "",
+    class: cls = "",
+
+    width: wid,
+    height: hei,
+
+	video,
+
+	controls,
+	playsinline = true,
+	poster,
+	disablepictureinpicture = true,
+} = Astro.props;
+
+let posterImage;
+
+if (poster) {
+	if (Array.isArray(poster)) {
+		if (poster.length === 0) {
+			posterImage = "";
+		} else if (poster.length > 0) {
+			posterImage = fileNameToBlobUrlPath(poster[0].file_name);
+		}
+	} else if (typeof poster === "object") {
+		posterImage = fileNameToBlobUrlPath(poster.file_name);
+	} else if (typeof poster === "string") {
+		posterImage = poster;
+	}
+} else {
+	if (video.thumbnail) {
+		if (video.thumbnail.length === 0) {
+			posterImage = "";
+		} else if (video.thumbnail.length > 0) {
+			posterImage = fileNameToBlobUrlPath(video.thumbnail[0].file_name);
+		}
+	} else {
+		posterImage = "";
+	}
+}
+
+
+---
+
+<video
+	title={title}
+    class={cls}
+    src={video.url}
+    width={wid ?? "auto"}
+    height={hei ?? "auto"}
+	controls={controls}
+	playsinline={playsinline}
+	poster={posterImage}
+	disablepictureinpicture={disablepictureinpicture}
+/>

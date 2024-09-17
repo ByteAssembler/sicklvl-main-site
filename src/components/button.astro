@@ -1,0 +1,65 @@
+---
+// Usefull button field properties
+interface Props extends ButtonProps {}
+
+const {
+	id = "",
+	href = "",
+	class: className = "",
+	onclick = ""
+} = Astro.props;
+---
+
+{href && (
+	<a
+		id={id}
+		href={href}
+		class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
+		onclick={onclick}
+	>
+		<slot />
+	</a>
+)}
+
+{!href && (
+	<button
+		id={id}
+		type="submit"
+		class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
+		onclick={onclick}
+	>
+		<slot />
+	</button>
+)}
+
+<style scoped>
+	button, a {
+		border: 2px solid white;
+		background-color: black;
+		color: white;
+		overflow: visible;
+		padding: 0.5rem 0.75rem;
+
+		height: 3rem;
+
+		transition: background-color 0.3s, color 0.3s;
+		text-align: center;
+	}
+
+	button:hover, button:active,
+	a:hover, a:active {
+		background-color: white;
+		color: black;
+	}
+
+	button:active,
+	button:focus-visible,
+	a:active,
+	a:focus-visible {
+		outline: 1;
+		outline-width: 1px;
+		outline-offset: 2px;
+		outline-color: white;
+		outline-style: solid;
+	}
+</style>

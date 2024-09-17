@@ -1,0 +1,138 @@
+---
+import FunctionalFieldset from "src/components/functional-fieldset.astro";
+import Button from "src/components/button.astro";
+import Layout from "src/layouts/Layout.astro";
+import { globalDB } from "src/utils/cdate";
+import { readFilesInFolder } from "src/utils/filesystem-utils";
+import { blobFolderPath } from "src/utils/file-manager";
+import { redirect } from "src/utils/minis";
+
+const porfolioPromise = globalDB.portfolio.getArray();
+const membersPromise = globalDB.users.getArray();
+const filesInBlobPromise = readFilesInFolder(blobFolderPath);
+
+const [porfolio, members, filesInBlob] = await Promise.all([porfolioPromise, membersPromise, filesInBlobPromise]);
+const porfolioSorted = porfolio.sort();
+
+const user = Astro.locals.user;
+console.log(Astro.locals);
+// if (!user) return redirect("/admin-login");
+---
+
+<Layout title="Admin Panel">
+	<main class="h-full w-full overflow-auto flex flex-wrap items-center justify-center gap-6 p-8">
+		<FunctionalFieldset
+			title="Create New Portfolio Item"
+			form
+			formAction="/api/portfolio-create"
+			formMethod="post"
+			submit
+			entries={[
+				{ type: "text", title: "Slug (URL; lovercase, no-spaces)", name: "slug", placeholder: "Enter your slug" },
+				{ type: "text", title: "Title", name: "title", placeholder: "Enter your title" },
+				{ type: "text", title: "Description", name: "description", placeholder: "Enter your description" },
+				{ type: "file", title: "Image Vertical", name: "image-vertical" },
+				{ type: "file", title: "Image Horizontal", name: "image-horizontal" },
+				{ type: "file", title: "Image Gallery", multiple: true, name: "image-gallery" },
+				{ type: "file", title: "Video Gallery", multiple: true, name: "video-gallery" },
+			]}
+		/>
+		<FunctionalFieldset title={`Files (${filesInBlob.length}x)`}>
+			<div class="max-h-[70vh] overflow-auto">
+				{filesInBlob.map((item) => (
+					<article class="flex !flex-row !gap-3 items-center">
+						{/*
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</Button>
+						*/}
+						<h2 class="px-2 truncate text-lg font-bold">
+							{item}
+						</h2>
+					</article>
+				))}
+			</div>
+		</FunctionalFieldset>
+		<FunctionalFieldset title="Portfolio Order">
+			{porfolio.map((item, index) => (
+				<article class="flex !flex-row !gap-3 items-center">
+					<form method="post" action={`/api/portfolio-delete/${item.slug}`}>
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</Button>
+					</form>
+					<form method="post" action={`/api/portfolio-move-up/${item.slug}`}>
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+						</Button>
+					</form>
+					<form method="post" action={`/api/portfolio-move-down/${item.slug}`}>
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+						</Button>
+					</form>
+					<div class="max-w-72 flex flex-col">
+						<div class="flex items-center justify-center gap-2">
+							<span class="text-sm underline underline-offset-4">#{index}</span>
+							<h2 class="truncate text-lg font-bold">
+								{item.title}
+							</h2>
+							<span class="text-xs">({item.slug})</span>
+						</div>
+						<span class="truncate text-sm font-bold">{item.description}</span>
+					</div>
+				</article>
+			))}
+		</FunctionalFieldset>
+		<FunctionalFieldset title="Members">
+			<div class="max-h-[70vh] overflow-auto">
+				{members.map((item) => (
+					<article class="flex !flex-row !gap-3 items-center">
+						{/*
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</Button>
+						*/}
+						<h2 class="px-2 truncate text-lg font-bold">
+							{item.name}
+						</h2>
+						{item.show && <span class="text-sm underline underline-offset-4">VISIBLE</span>}
+					</article>
+				))}
+			</div>
+		</FunctionalFieldset>
+		<FunctionalFieldset
+			title="Create Member"
+			form
+			formAction="/api/member-create"
+			formMethod="post"
+			submit
+			entries={[
+				{ type: "text", title: "Name", placeholder: "Enter member's name", name: "name", required: true },
+				{ type: "email", title: "Email", placeholder: "Enter member's email", name: "email", required: true },
+				{ type: "tel", title: "Telephone", placeholder: "Enter member's telephone", name: "telephone" },
+				{ type: "password", title: "Password", placeholder: "Enter members's password", name: "password", required: true },
+				{ type: "select", name: "role", title: "Role", options: [{ value: "admin", selected: true }, "user"], required: true },
+				{ type: "checkbox", title: "Show", name: "show" },
+			]}
+		/>
+		<!--
+		<FunctionalFieldset title={`Files (${filesInBlob.length}x)`}>
+			<div class="max-h-[70vh] overflow-auto">
+				{porfolioSorted.map((item) => (
+					<article class="flex !flex-row !gap-3 items-center">
+						{/*
+						<Button class="w-min">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</Button>
+						*/}
+						<h2 class="px-2 truncate text-lg font-bold">
+							{item}
+						</h2>
+					</article>
+				))}
+			</div>
+		</FunctionalFieldset>
+		-->
+	</main>
+</Layout>

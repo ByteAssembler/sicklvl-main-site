@@ -1,0 +1,126 @@
+---
+import { globalDB } from "src/utils/cdate";
+import NavigationBoxPortfolio from "./navigation-box-portfolio.astro";
+
+const portfolio = await globalDB.portfolio.getArray();
+const members = await globalDB.users.getArray();
+// const membersFiltered = members.filter(m => m.show);
+
+const membersFiltered: User[] = [
+  {
+    name: "Thom",
+    email: "thom@mail.com",
+    id: "1",
+    telephone: "123-456-7890",
+    show: true,
+    password: "password",
+    attributes: {},
+    role: "admin"
+  },
+]
+---
+
+<section class="nb fixed inset-0 z-[40] overflow-auto" id="navigation-box">
+
+
+    <div class="nb-contact lg:overflow-auto">
+      {membersFiltered
+      .map(m => Object.assign(m, { phoneCleaned: m.telephone.replaceAll('-', '').replaceAll(' ', '').trim() }))
+      .map((member) => (
+        <article class="member p-5 border-b border-[#333] flex flex-col">
+          <div>
+            <a class="h2 tracking-[5px] hover:opacity-70" href={`mailto:${member.email}`}>
+              {member.email}
+            </a>
+          </div>
+          <div>
+            <span class="font-inconsolata text-base font-normal leading-6">
+              {member.name}
+            </span>
+          </div>
+          <div>
+            <a class="font-inconsolata text-base font-normal leading-6 hover-underline" href={`tel:${member.phoneCleaned}`}>
+              {member.telephone}
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+
+    <div class="nb-info p-10 flex items-center">
+      <div class="my-auto flex flex-col gap-5">
+        <h2 class="h2">
+          The best is yet to come
+        </h2>
+        <p class="max-w-[525px] font-inconsolata text-sm leading-[130%]">
+          With a camera in each of their hands since they were young, the trio at the Seventh Movement continue to master their craft with each and every project they take on. After a decade together and six National Sports Emmys for cinematography and storytelling, the team has decided to go their separate ways. The goal was always the same: to capture incredible moving images, to tell powerful stories, and to never settle for mediocre. The team has created some memorable work and will continue to do so on their own paths. Thank you for the years of support and mentorship. Our friendships made on and off set shaped who we became
+        </p>
+        <p class="font-inconsolata text-sm leading-[130%]">
+          – Thom, Vin, and Mat
+        </p>
+      </div>
+    </div>
+
+
+    <div class="nb-showcase"></div>
+
+
+    <div class="nb-portfolio h-full w-full overflow-y-hidden overflow-x-auto LG:min-h-64">
+      <NavigationBoxPortfolio portfolio={portfolio} />
+    </div>
+
+
+</section>
+
+<style>
+  .member a {
+    transition: opacity 200ms ease;
+  }
+
+  .nb-contact { grid-area: nb-contact; }
+  .nb-info { grid-area: nb-info; }
+  .nb-showcase { grid-area: nb-showcase; }
+  .nb-portfolio { grid-area: nb-portfolio; }
+
+  #navigation-box {
+    --navigation-box-y-translate: -100%;
+    top: var(--navigation-box-y-translate);
+    transform: translateY(var(--navigation-box-y-translate));
+    transition: transform 350ms ease-in-out, top 350ms ease-in-out;
+
+    background-color: #333;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 0.9fr 1.1fr;
+    gap: 1px 1px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "nb-info nb-info nb-info nb-info nb-showcase nb-showcase"
+      "nb-contact nb-contact nb-portfolio nb-portfolio nb-portfolio nb-portfolio";
+  }
+
+  #navigation-box.open {
+
+  }
+
+  #navigation-box.closed {
+
+  }
+
+  #navigation-box > * {
+    background-color: black;
+  }
+
+  @media (max-width: 1023px) {
+    #navigation-box {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-areas:
+        "nb-info"
+        "nb-portfolio"
+        "nb-contact";
+    }
+  }
+</style>

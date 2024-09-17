@@ -1,0 +1,42 @@
+---
+import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
+
+interface Props extends PerfectImageProps {}
+
+const {
+    class: cls = "",
+    title = "",
+    alt = "",
+    decoding,
+    loading,
+    width: wid,
+    height: hei,
+    images,
+    forceSizesW
+} = Astro.props;
+
+const allowedImages = forceSizesW == null || forceSizesW.length === 0
+    ? images
+    : images.filter(({ width }) => forceSizesW.includes(width))
+        .sort((a, b) => {
+            // The order should be the same as the forceSizesW
+            return forceSizesW.indexOf(a.width) - forceSizesW.indexOf(b.width);
+        });
+
+const src = fileNameToBlobUrlPath(allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : "");
+
+const srcset = Array.isArray(allowedImages) ? allowedImages.map(({ file_name, width }) => `${fileNameToBlobUrlPath(file_name)} ${width}w`).join(", ") : "";
+
+---
+
+<img
+    title={title}
+    class={cls}
+    src={src}
+    srcset={srcset}
+    width={wid ?? "auto"}
+    height={hei ?? "auto"}
+    decoding={decoding}
+    loading={loading}
+    alt={alt}
+/>

@@ -1,0 +1,65 @@
+---
+interface Props extends InputSelectProps {}
+
+const {
+	name = "",
+	options = [],
+	required = false
+} = Astro.props;
+---
+
+<select
+	name={name}
+	class="font-inconsolata text-lg font-bold tracking-widest"
+	required={required}
+>
+	{options.map((option) => (
+		<>
+			{typeof option === "string" ? (
+				<option value={option}>{option}</option>
+			) : (
+				<option value={option.value} selected={option.selected} disabled={option.disabled}>{option.text ?? option.value}</option>
+			)}
+		</>
+	))}
+</select>
+
+
+<style scoped>
+	select {
+		border: 2px solid white;
+		background-color: black;
+		color: white;
+		overflow: visible;
+
+		min-width: 0;
+		max-width: 100%;
+		width: 100%;
+
+		color-scheme: dark;
+	}
+
+	select {
+		padding: 0.5rem 0.75rem;
+	}
+
+	select:hover, select:active {
+		background-color: white;
+		color: black;
+	}
+
+	/*
+	select:hover::placeholder, select:active::placeholder {
+		background-color: white;
+		color: black;
+	}
+	*/
+
+	select:focus-visible {
+		outline: 1;
+		outline-width: 1px;
+		outline-offset: 2px;
+		outline-color: white;
+		outline-style: solid;
+	}
+</style>

@@ -1,0 +1,259 @@
+---
+import { globalDB } from "src/utils/cdate";
+import { fileNameToBlobUrlPath } from "src/utils/file-manager";
+
+const items = await globalDB.portfolio.getArray();
+const itemCount = items.length;
+
+// NOTE: Focus animation time is 300ms
+---
+
+<section class="select-none" id="container-grid">
+	<div id="container-grid-box" class="container-grid-box-always h-full w-full absolute inset-0">
+		{items.map((item) => {
+			// Get image by 480 width
+			let image = item.image_horizontal.find((img) => img.width === 480);
+			if (!image) {
+				// Get the available image size by width closest to 480
+				image = item.image_horizontal.reduce((prev, curr) => {
+					return Math.abs(curr.width - 480) < Math.abs(prev.width - 480) ? curr : prev;
+				});
+			}
+			if (!image) {
+				// Fallback to the first image
+				image = item.image_horizontal[0];
+			}
+			if (!image) console.error('No image found for', item);
+
+			const imageURL = `url(${fileNameToBlobUrlPath(image.file_name)})`;
+
+			return (
+				<article class="not-focused" style={`background-image: ${imageURL};`}>
+					<a class="h-full w-full flex items-center justify-center" href={`/portfolio/${item.slug}`}>
+						<div class="overflow-hidden">
+							<h2 class="drop-shadow px-[5%] font-august text-center text-4xl font-bold tracking-wide overflow-hidden transition-transform">
+								{item.title}
+							</h2>
+						</div>
+					</a>
+				</article>
+			);
+		})}
+	</div>
+</section>
+
+<style is:global>
+	#container-grid {
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		position: relative;
+	}
+
+	#container-grid article {
+		width: calc(16vw * 2);
+		height: calc(9vw * 2);
+
+		object-fit: cover;
+		position: absolute;
+
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: 100% 100%;
+		/* background-size: cover; */
+
+		transition: transform 180ms ease-out, filter 300ms ease-out, background-size 300ms ease-out;
+
+		filter: brightness(0.7);
+
+		cursor: pointer;
+	}
+
+	#container-grid article.not-focused:hover {
+		filter: brightness(0.9);
+		background-size: 108% 108%;
+	}
+
+	#container-grid article.not-focused h2 {
+		transition-duration: 200ms;
+		transition-timing-function: cubic-bezier(.6,.38,.38,.94);
+		transform: translateY(100%);
+	}
+
+	#container-grid article.not-focused:hover h2 {
+		transform: translateY(0%);
+	}
+
+	#container-grid .focused {
+		transition: 300ms ease-out;
+		transform: none !important;
+
+		position: fixed !important;
+		inset: 0;
+
+		width: 100%;
+		height: 100%;
+
+		z-index: 20;
+
+		background-size: cover;
+
+		filter: brightness(0.85);
+	}
+
+	#container-grid article.focused h2 {
+		display: none;
+	}
+
+	.container-grid-box-always {
+		overflow: auto;
+
+		display: grid;
+		padding: min(calc(2.5vw * 2.5), 2rem) calc(2.5vw * 1.5);
+		grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));;
+		grid-gap: 2vw;
+		row-gap: 2.5vw;
+		align-content: start;
+		align-items: start;
+		justify-content: start;
+		justify-items: center;
+	}
+
+	.container-grid-box-always article {
+		aspect-ratio: 16 / 9;
+		width: 100% !important;
+		height: auto !important;
+
+		position: unset !important;
+		transform: none !important;
+	}
+</style>
+
+<script lang="ts" define:vars={{ itemCount }}>
+	function setup() {
+		const grid = document.getElementById('container-grid');
+		if (!grid) return;
+		const articlesInGrid = grid.querySelectorAll('article');
+
+		let hasFoundAIntersectionEvent = false;
+		let diableJsBecauseMediaQuery = false;
+		{
+			const containerGridBox = document.getElementById('container-grid-box');
+			if (!containerGridBox) return;
+
+			const mediaQuery = window.matchMedia('(max-width: 767px)');
+			function updateMediaQuery(e) {
+				if (hasFoundAIntersectionEvent) {
+					return;
+				}
+
+				if (e.matches) {
+					diableJsBecauseMediaQuery = true;
+					containerGridBox.classList.add('container-grid-box-always');
+				} else {
+					diableJsBecauseMediaQuery = false;
+					containerGridBox.classList.remove('container-grid-box-always');
+				}
+			}
+
+			// Remove instantly the always class (fallback for non-JS)
+			// containerGridBox.classList.remove('container-grid-box-always');
+			updateMediaQuery(mediaQuery);
+
+			mediaQuery.addEventListener('change', updateMediaQuery);
+		}
+		{
+			window.addEventListener("touchstart", () => {
+				hasFoundAIntersectionEvent = true;
+			});
+		}
+
+		function scaleToScreen(ele, e) {
+			ele.classList.remove('not-focused');
+			ele.classList.add('focused');
+
+			// NOTE: Focus animation time
+			setTimeout(() => {
+				// Get the URL from the anchor
+				// e is a anchor MouseEvent
+				const url = e.target.href;
+				// Open the URL in the current tab
+				window.location = url;
+			}, 300);
+		}
+
+		// URL redirect defaultPrevented
+		for (const article of articlesInGrid) {
+			const anchor = article.querySelector('a');
+			anchor.addEventListener('click', (e) => {
+				if (e.defaultPrevented) return;
+				e.preventDefault();
+				scaleToScreen(article, e);
+			});
+		}
+
+		const gridItemCount = itemCount;
+		const gridX = Math.ceil(Math.sqrt(gridItemCount));
+		const gridY = Math.ceil(gridItemCount / gridX);
+
+		const imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
+		const imgHeight = 9 * 2;  // Höhe der Bilder in vw
+		const imgXGap = 2; // Abstand zwischen den Bildern in vw
+		const imgYGap = 2.5; // Abstand zwischen den Bildern in vw
+
+		const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
+		const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
+
+		// Bilder im Raster positionieren
+		for (let i = 0; i < gridItemCount; i++) {
+			const article = articlesInGrid[i];
+			const x = i % gridX;
+			const y = Math.floor(i / gridX);
+			updateImagePosition(article, x, y, 0.5, 0.5);
+		}
+
+		// Variablen für Mausposition und Flag für Animation
+		let mouseX = 0;
+		let mouseY = 0;
+		let animationFrameRequested = false;
+
+		// Funktion, die aufgerufen wird, wenn requestAnimationFrame aktiviert wird
+		function updateImages() {
+			if (hasFoundAIntersectionEvent || diableJsBecauseMediaQuery) return; // Disable updates if media query is active
+
+			let index = 0;
+			for (const ele of articlesInGrid) {
+				const x = index % gridX;
+				const y = Math.floor(index / gridX);
+				updateImagePosition(ele, x, y, mouseX, mouseY);
+				index++;
+			}
+
+			// Animation abgeschlossen, bereit für neue Bewegungen
+			animationFrameRequested = false;
+		}
+
+		function updateImagePosition(ele, gridXPos, gridYPos, mouseX, mouseY) {
+			const translateX = gridXPos * (imgWidth + imgXGap) + (mouseX * maxTranslateX) + 25;
+			const translateY = gridYPos * (imgHeight + imgYGap) + (mouseY * maxTranslateY) + 15;
+
+			ele.style.transform = `translate(${translateX}vw, ${translateY}vw)`;
+		}
+
+		// Mausbewegung erfassen und Variablen aktualisieren
+		window.addEventListener('mousemove', (e) => {
+			if (hasFoundAIntersectionEvent || diableJsBecauseMediaQuery) return; // Disable updates if media query is active
+
+			mouseX = e.clientX / window.innerWidth;
+			mouseY = e.clientY / window.innerHeight;
+
+			// Verhindern, dass zu viele Animationen angefragt werden
+			if (!animationFrameRequested) {
+				requestAnimationFrame(updateImages);
+				animationFrameRequested = true;
+			}
+		});
+	}
+
+	setup();
+</script>

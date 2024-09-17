@@ -1,0 +1,37 @@
+---
+import Button from './button.astro';
+import Fieldset from './fieldset.astro';
+import FileUpload from './file-upload.astro';
+import Input from './input.astro';
+import Label from './label.astro';
+import PerfectImage from './perfect-image.astro';
+import PerfectVideo from './perfect-video.astro';
+import Select from './select.astro';
+
+type Props = ComponentProps;
+let props = Astro.props;
+
+const renderOther = [
+	"image",
+	"video",
+	"label",
+	"button",
+	"fieldset",
+	"file",
+	"select",
+].includes(props?.type ?? "text");
+---
+{
+	renderOther ?
+		<>
+			{props.type === "image" && <PerfectImage {...props} />}
+			{props.type === "video" && <PerfectVideo {...props} />}
+			{props.type === "label" && <Label {...props} />}
+			{props.type === "button" && <Button {...props} />}
+			{props.type === "fieldset" && <Fieldset {...props} />}
+			{props.type === "file" && <FileUpload {...props} />}
+			{props.type === "select" && <Select {...props} />}
+		</>
+		:
+		<Input {...props} type={props?.type ?? "text"} />
+}

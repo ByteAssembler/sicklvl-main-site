@@ -1,0 +1,153 @@
+/* styles.css */
+.h1-mono {
+	@apply font-inconsolata text-6xl font-bold tracking-widest;
+}
+
+.h2 {
+	@apply font-august font-bold uppercase leading-[120%] text-6xl;
+}
+
+p {
+	@apply font-inconsolata text-sm leading-[130%];
+}
+
+.hover-underline {
+	position: relative;
+	transition: width 200ms cubic-bezier(0.06, 0.86, 0.78, 0.8);
+}
+
+.hover-underline::after {
+	content: "";
+	background-color: white;
+	position: absolute;
+	bottom: -4px;
+	height: 2px;
+	left: 0;
+	width: 0;
+	transition: width 200ms cubic-bezier(0.06, 0.86, 0.78, 0.8);
+}
+
+.hover-underline:hover::after {
+	background-color: white;
+	width: 100%;
+}
+
+::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+::-webkit-scrollbar-button {
+	width: 0px;
+	height: 0px;
+}
+::-webkit-scrollbar-thumb {
+	background: #e1e1e1;
+	border: 0px none #ffffff;
+	border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.7);
+}
+::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 255, 255, 0.9);
+}
+::-webkit-scrollbar-track {
+	background: #222;
+	border: 0px none #ffffff;
+	border-radius: 50px;
+}
+::-webkit-scrollbar-track:hover,
+::-webkit-scrollbar-track:active {
+	background: #333;
+}
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+@keyframes bottom-fade-in {
+	0% {
+		transform: translateY(100%);
+		opacity: 0.7;
+	}
+	100% {
+		transform: translateY(0%);
+		opacity: 1;
+	}
+}
+
+@keyframes bottom-fade-out {
+	0% {
+		transform: translateY(0%);
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(100%);
+		opacity: 0.7;
+	}
+}
+
+.animation-bottom-fade-in {
+	animation-name: bottom-fade-in;
+
+	animation-duration: 500ms;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	animation-iteration-count: 1;
+}
+
+.animation-bottom-fade-out {
+	animation-name: bottom-fade-out;
+
+	animation-duration: 500ms;
+	animation-timing-function: ease-in;
+	animation-fill-mode: forwards;
+	animation-iteration-count: 1;
+}
+
+@keyframes top-fade-in {
+	0% {
+		transform: translateY(-150%);
+		opacity: 0;
+	}
+	1% {
+		transform: translateY(-150%);
+		opacity: 0.7;
+	}
+	100% {
+		transform: translateY(0%);
+		opacity: 1;
+	}
+}
+
+@keyframes top-fade-out {
+	0% {
+		transform: translateY(0%);
+		opacity: 1;
+	}
+	99% {
+		transform: translateY(-150%);
+		opacity: 0.7;
+	}
+	100% {
+		transform: translateY(-150%);
+		opacity: 0;
+	}
+}
+
+.animation-top-fade-in {
+	animation-name: top-fade-in;
+
+	animation-duration: 500ms;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	animation-iteration-count: 1;
+}
+
+.animation-top-fade-out {
+	animation-name: top-fade-out;
+
+	animation-duration: 500ms;
+	animation-timing-function: ease-in;
+	animation-fill-mode: forwards;
+	animation-iteration-count: 1;
+}

@@ -1,0 +1,169 @@
+---
+import PerfectImage from '../components/perfect-image.astro';
+import PerfectVideo from '../components/perfect-video.astro';
+
+import imgPlayVideoDefault from '../assets/play.png';
+import { Image } from 'astro:assets';
+
+interface Props extends PortfolioItem {}
+const props = Astro.props;
+
+const images = [
+	props.image_horizontal,
+	props.image_vertical,
+	...props.image_gallery
+];
+
+const vidoes = [
+	props.video_gallery.trailer,
+	props.video_gallery.video
+].filter((v) => v != null);
+
+const menuLine = [
+	...images,
+	...(
+		vidoes.map((v) => v.thumbnail)
+	)
+];
+---
+
+<div id="showcase" class="fixed inset-0 z-100 h-full w-full overflow-hidden">
+	<div id="showcase-main" class="h-[calc(100%-110px)] w-full pb-4 flex overflow-y-hidden overflow-x-auto">
+		{images.map((item, idx) => (
+			<div data-index={idx} class="item h-full w-screen">
+				<PerfectImage class="h-full w-full object-contain select-none" images={item} alt={props.title} />
+			</div>
+		))}
+		{vidoes.map((item, idx) => (
+			<div data-index={idx} class="item h-full w-screen">
+				<PerfectVideo class="h-full w-full object-contain select-none" video={item} controls playsinline={false} disablepictureinpicture />
+			</div>
+		))}
+	</div>
+	<div class="h-[110px] w-screen select-none overflow-hidden">
+		<div class="h-full w-fit mx-auto py-3 px-6 overflow-y-hidden overflow-x-scroll scroll-smooth snap-x snap-mandatory flex">
+			{menuLine.map((item, idx) => (
+				<button data-index={idx} class:list={[
+					"menu-item h-full snap-center my-auto mx-1.5",	{
+						selected: idx === 0,
+						"not-selected": idx !== 0
+					}
+				]}>
+					<div class="cursor-pointer h-full rounded-xl">
+						{item && <PerfectImage class="h-full w-full rounded-lg object-cover" images={item} alt={props.title} />}
+						{!item && <Image class="h-full w-full rounded-lg object-cover" src={imgPlayVideoDefault} alt={props.title} />}
+					</div>
+				</button>
+			))}
+		</div>
+	</div>
+</div>
+
+<script>
+	const showcase = document.getElementById('showcase');
+	const showcaseMain = document.getElementById('showcase-main');
+	const menuItems = showcase?.querySelectorAll('.menu-item');
+
+	function getIndex(a?: string | number | null) {
+		return Number(a || "0");
+	}
+
+	function scroll(item: Element) {
+		// Alle anderen Items als nicht ausgewählt markieren
+		menuItems?.forEach((item) => {
+			item.classList.remove('selected');
+			item.classList.add('not-selected');
+		});
+
+		// Das geklickte Item als ausgewählt markieren
+		item.classList.remove('not-selected');
+		item.classList.add('selected');
+
+		const id = getIndex(item.getAttribute('data-index'));
+
+		// Das ausgewählte Element in die Mitte scrollen
+		(item as HTMLElement).scrollIntoView({
+			behavior: 'smooth',
+			inline: 'center', // Horizontal in die Mitte scrollen
+			block: 'center'   // Vertikal in die Mitte scrollen, falls notwendig
+		});
+
+		if (showcaseMain && menuItems) {
+			// Scroll to the selected item
+			showcaseMain.scrollTo({
+				left: id * window.innerWidth,
+				behavior: 'smooth'
+			});
+		}
+	}
+
+	menuItems?.forEach((ele) => {
+		ele.addEventListener('click', (e) => {
+			scroll(e.currentTarget as HTMLElement);
+		});
+	});
+
+	showcaseMain?.addEventListener('scrollend', (e) => {
+		const id = Math.round(showcaseMain.scrollLeft / window.innerWidth);
+		if (menuItems) {
+			scroll(menuItems[id]);
+		}
+	});
+
+	showcaseMain?.addEventListener('wheel', (e) => {
+        // Scroll to the next left or right item
+		showcaseMain.scrollBy({
+			left: e.deltaY,
+			behavior: 'smooth'
+		});
+    });
+</script>
+
+<style scoped>
+	.menu-item {
+		@apply transition-all ease-out h-full py-2 min-w-fit;
+	}
+
+	.menu-item img {
+		@apply filter blur-[2px];
+	}
+
+	.menu-item > div {
+		@apply border-white/85 border-2 p-1;
+	}
+
+	.menu-item.not-selected {
+		@apply py-4;
+	}
+
+	.menu-item.selected > div {
+		@apply border-[3px] border-white;
+	}
+
+	.menu-item.selected {
+	}
+
+	.menu-item.not-selected {
+	}
+</style>
+
+<style scoped>
+	#showcase-main {
+		flex-direction: row;
+		transition: transform .5s ease-out;
+		overflow-x: scroll; /* Ermöglicht horizontales Scrollen */
+    	scroll-snap-type: x mandatory; /* Scroll-Snapping, damit die Elemente auf die Größe einrasten */
+	}
+
+	#showcase-main > * {
+		@apply flex relative px-0 md:p-10 pb-0;
+		/* flex: 0 0 calc(100% - 200px); */
+		/* set flex width to screen width */
+		flex: 0 0 100vw;
+		scroll-snap-align: start;
+	}
+
+	#showcase-main > * > * {
+		@apply w-full h-full object-cover;
+	}
+</style>
