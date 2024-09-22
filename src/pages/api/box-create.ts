@@ -50,6 +50,8 @@ export async function POST(context: APIContext): Promise<Response> {
 	if (error) return error;
 	if (!result.success) return redirect();
 
+	if (result.data.password_for_public) result.data.password_for_owner = true;
+
 	let owner_id = null;
 	if (result.data.customer.length !== 0) {
 		// Check if customer exists
