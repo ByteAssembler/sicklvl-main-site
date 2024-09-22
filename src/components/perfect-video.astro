@@ -21,7 +21,13 @@ const {
 	inForUrl,
 } = Astro.props;
 
-const urlGetter = inForUrl === "portfolio" ? fileNameToBlobUrlPath : fileNameToBoxFileUrlPath;
+function urlGetter(id: string, name: string) {
+    if (inForUrl === "portfolio") {
+        return fileNameToBlobUrlPath(name);
+    } else {
+        return fileNameToBoxFileUrlPath(id);
+    }
+}
 
 let posterImage;
 
@@ -30,10 +36,10 @@ if (poster) {
 		if (poster.length === 0) {
 			posterImage = "";
 		} else if (poster.length > 0) {
-			posterImage = urlGetter(poster[0].file_name);
+			posterImage = urlGetter(poster[0].id, poster[0].file_name);
 		}
 	} else if (typeof poster === "object") {
-		posterImage = urlGetter(poster.file_name);
+		posterImage = urlGetter(poster.id, poster.file_name);
 	} else if (typeof poster === "string") {
 		posterImage = poster;
 	}

@@ -17,7 +17,13 @@ const {
     inForUrl,
 } = Astro.props;
 
-const urlGetter = inForUrl === "portfolio" ? fileNameToBlobUrlPath : fileNameToBoxFileUrlPath;
+function urlGetter(id: string, name: string) {
+    if (inForUrl === "portfolio") {
+        return fileNameToBlobUrlPath(name);
+    } else {
+        return fileNameToBoxFileUrlPath(id);
+    }
+}
 
 const allowedImages = forceSizesW == null || forceSizesW.length === 0
     ? images
@@ -27,9 +33,12 @@ const allowedImages = forceSizesW == null || forceSizesW.length === 0
             return forceSizesW.indexOf(a.width) - forceSizesW.indexOf(b.width);
         });
 
-const src = urlGetter(allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : "");
+const src = urlGetter(
+    allowedImages && allowedImages.length > 0 ? allowedImages[0].id : "",
+    allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : ""
+);
 
-const srcset = Array.isArray(allowedImages) ? allowedImages.map(({ file_name, width }) => `${urlGetter(file_name)} ${width}w`).join(", ") : "";
+const srcset = Array.isArray(allowedImages) ? allowedImages.map(({ id, file_name, width }) => `${urlGetter(id, file_name)} ${width}w`).join(", ") : "";
 
 ---
 

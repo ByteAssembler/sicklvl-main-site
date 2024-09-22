@@ -36,7 +36,13 @@ type Props = (
 
 const props = Astro.props;
 
-const urlGetter = props.in === "portfolio" ? fileNameToBlobUrlPath : fileNameToBoxFileUrlPath;
+function urlGetter(id: string, name: string) {
+    if (props.in === "portfolio") {
+        return fileNameToBlobUrlPath(name);
+    } else {
+        return fileNameToBoxFileUrlPath(id);
+    }
+}
 
 let images: { image_variations: SingleImage[]; }[] = [];
 let vidoes: Videos = [];
@@ -78,16 +84,16 @@ let globalIndex = 0;
 			))}
 			{vidoes.map((item, idx) => (
 				<div data-index={idx} class="item h-full w-screen">
-					<PerfectVideo inForUrl={props.in} class="h-full w-full object-contain select-none" videoUrl={urlGetter(item.id)} poster={item.thumbnail.image_variations} controls playsinline={false} disablepictureinpicture />
+					<PerfectVideo inForUrl={props.in} class="h-full w-full object-contain select-none" videoUrl={urlGetter(item.id, item.file_name)} poster={item.thumbnail.image_variations} controls playsinline={false} disablepictureinpicture />
 				</div>
 			))}
 			{props.onlyCustomFiles && props.files.map((item, idx) => (
 				<div data-index={idx} class="item h-full w-screen">
-					{item.type === "video" && <video class="h-full w-full !object-contain select-none" controls playsinline src={urlGetter(item.id)} />}
-					{item.type === "image" && <img class="h-full w-full !object-contain select-none" src={urlGetter(item.id)} alt="" />}
+					{item.type === "video" && <video class="h-full w-full !object-contain select-none" controls playsinline src={urlGetter(item.id, item.file_name)} />}
+					{item.type === "image" && <img class="h-full w-full !object-contain select-none" src={urlGetter(item.id, item.file_name)} alt="" />}
 					{
 						(item.type !== "image" && item.type !== "video") &&
-						<iframe allowfullscreen src={urlGetter(item.id)}></iframe>
+						<iframe allowfullscreen src={urlGetter(item.id, item.file_name)}></iframe>
 					}
 				</div>
 			))}
@@ -107,7 +113,7 @@ let globalIndex = 0;
 				{files.map((item) => (
 					<ShowcaseMenuItem idx={globalIndex++}>
 						{item.type === "video" && <img class="h-full w-full rounded-lg object-cover" src="/play.webp" alt="" />}
-						{item.type === "image" && <img class="h-full w-full rounded-lg object-cover" src={urlGetter(item.id)} alt="" />}
+						{item.type === "image" && <img class="h-full w-full rounded-lg object-cover" src={urlGetter(item.id, item.file_name)} alt="" />}
 						{
 							(item.type !== "image" && item.type !== "video") &&
 							<img class="h-full w-full rounded-lg object-cover" src="/file.webp" alt="" />
