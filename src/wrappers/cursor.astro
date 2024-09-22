@@ -1,0 +1,97 @@
+<!-- Cursor Wrapper -->
+<div id="cursor" class="h-12 w-12 relative">
+    <!-- Cursor Pointer -->
+    <div class="cursor-pointer h-12 w-12">
+
+    </div>
+</div>
+
+<script>
+    function setup() {
+		const cursor = document.getElementById('cursor');
+		const cursorPointer = cursor?.querySelector('.cursor-pointer');
+
+        if (!cursor || !cursorPointer) return;
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Event: Check if cursor is over a link
+        document.addEventListener('mouseover', (e) => {
+			// Closest to a or button or input
+
+            const target = (e.target as HTMLElement)?.closest('a, button, input');
+
+            if (target) {
+                cursorPointer.classList.add('cursor-pointer-hover');
+            } else {
+                cursorPointer.classList.remove('cursor-pointer-hover');
+            }
+        });
+
+		// Event: Check if cursor is active
+		document.addEventListener('mousedown', () => cursorPointer.classList.add('cursor-pointer-active'));
+		document.addEventListener('mouseup', () => cursorPointer.classList.remove('cursor-pointer-active'));
+
+		function moveCursorInTheCenter() {
+			if (!cursor) return;
+
+			cursor.style.left = window.innerWidth / 2 + 'px';
+			cursor.style.top = window.innerHeight / 2 + 'px';
+		}
+
+		window.addEventListener('resize', moveCursorInTheCenter);
+    }
+
+    setup();
+</script>
+
+<style>
+	html, body {
+		cursor: none !important;
+	}
+
+	#cursor {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 1000;
+
+		transform: translate(-50%, -50%);
+		border-radius: 999999px;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		pointer-events: none; /* Ensure cursor does not block interactions */
+		background: rgba(255, 255, 255, 0.1); /* Ensure parent has a background */
+	}
+
+	#cursor .cursor-pointer {
+		transform: scale(.2);
+		border-radius: 999999px;
+
+		transition: all .2s ease-in-out;
+
+		mix-blend-mode: difference;
+		backdrop-filter: invert(1);
+
+		background: white; /* Ensure element has a background */
+		color: black; /* Ensure text color is set */
+	}
+
+	#cursor .cursor-pointer-hover {
+		transform: scale(.7);
+	}
+
+	#cursor .cursor-pointer-active {
+		transform: scale(.85);
+	}
+
+	#cursor .cursor-pointer-hover.cursor-pointer-active {
+		transform: scale(1);
+	}
+</style>
