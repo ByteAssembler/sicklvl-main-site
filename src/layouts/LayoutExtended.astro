@@ -1,7 +1,7 @@
 ---
 import Layout from './Layout.astro'
-import NavigationBox from 'src/wrappers/navigation-box.astro';
 import Navigation from 'src/wrappers/navigation.astro';
+// import NavigationBox from 'src/wrappers/navigation-box.astro';
 
 interface Props {
 	language?: string;
@@ -18,6 +18,5 @@ const { title, tabTitle, language } = Astro.props;
 	<Navigation />
 	<main class="h-full w-full">
 		<slot />
-		<NavigationBox />
 	</main>
 </Layout>
