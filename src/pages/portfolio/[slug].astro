@@ -3,6 +3,9 @@ import LayoutExtended from 'src/layouts/LayoutExtended.astro'
 import PerfectImage from 'src/components/perfect-image.astro';
 import Showcase from 'src/components/showcase.astro';
 import { getPortfolioWithInfos } from 'src/utils/portfolio';
+import { redirect } from 'src/utils/minis';
+
+const redirectToURL = "/";
 
 const { slug } = Astro.params;
 if (!slug) return redirect(redirectToURL);
