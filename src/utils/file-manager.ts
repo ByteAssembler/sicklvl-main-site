@@ -253,6 +253,7 @@ export async function saveVideo(
 	file_video_name: string,
 	folder_path: string = blobFolderPath
 ): Promise<{
+	video_mime: string;
 	video_file_name: string;
 	video_file_path_full: string;
 	thumbnail: SingleImageMemory,
@@ -287,6 +288,7 @@ export async function saveVideo(
 			const thumbnailMetadata = await thumbnailSharp.metadata();
 
 			resolve({
+				video_mime: file.type,
 				video_file_name: file_video_name,
 				video_file_path_full: filePath,
 				thumbnail: {

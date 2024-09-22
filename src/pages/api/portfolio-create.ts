@@ -2,14 +2,17 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
+import { extname } from "path";
 import type { SingleImageMemory } from "src/env";
 import { prismaClient } from "src/global";
 
 import { errorConditionerHtmlHttpResponse, errorConditionerHtmlResponse } from "src/utils/error-conditioner";
 import {
+	blobFolderPath,
 	saveImageWithFormatsFullHorizontal,
 	saveVideo,
 } from "src/utils/file-manager";
+import { createFolderIfNotExists } from "src/utils/filesystem-utils";
 import { multiFileSchemaImages, multiFileSchemaVideosOptional, singleFileSchemaImage } from "src/utils/form-validation";
 import { redirectToAdmin, unauthorized } from "src/utils/minis";
 
@@ -61,6 +64,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	if (error) return error;
 
 	if (result.success) {
+		// Create blob folder if not exists
+		await createFolderIfNotExists(blobFolderPath);
+
 		{
 			// Check if portfolio with slug already exists
 			const portfolioItem = await prismaClient.portfolioItem.findUnique({
@@ -98,6 +104,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		}
 
 		const videoGallery: ({
+			video_mime: string;
 			video_file_name: string;
 			video_file_path_full: string;
 			thumbnail: SingleImageMemory,
@@ -162,6 +169,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 						videos: {
 							create: videoGallery.map((video) => ({
 								file_name: video.video_file_name,
+								extension: extname(video.video_file_name),
+								mime: video.video_mime,
+								width: video.thumbnail.width, // TODO Add width from video
+								height: video.thumbnail.height, // TODO Add height from video
 								thumbnail: {
 									create: {
 										image_variations: {
