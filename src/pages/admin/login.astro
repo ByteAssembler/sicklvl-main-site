@@ -3,9 +3,13 @@ import LayoutLogin from "src/layouts/LayoutLogin.astro";
 ---
 
 <LayoutLogin
-	tabTitle="Client Panel",
-	title="Client Login",
+	tabTitle="Admin Login",
+	title="Login Panel",
+
+	type="username",
+
 	subtitle="Login",
-	descriptionHidden="Client Login",
+	descriptionHidden="Login page",
 	buttonContent="Login"
+	action="/api/admin-login"
 ></LayoutLogin>

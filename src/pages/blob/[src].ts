@@ -2,10 +2,10 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 
-import path from "path";
+import { join } from "path";
+import isValidFilename from "valid-filename";
 import { checkFileExists, readBinaryFile } from "src/utils/filesystem-utils";
 import { blobFolderPath } from "src/utils/file-manager";
-import isValidFilename from "valid-filename";
 
 interface BlobCacheEntry {
 	blob: Uint8Array;
@@ -22,7 +22,7 @@ function getFromCache(src: string): BlobCacheEntry | null {
 function blobResponse(blob: Uint8Array | Buffer, src: string) {
 	return new Response(blob, {
 		headers: {
-			"Content-Type": "application/octet-stream",
+			// "Content-Type": "application/octet-stream",
 			"Content-Disposition": `attachment; filename="${src}"`,
 
 			"Cache-Control": "public, max-age=31536000, immutable",
@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ params }) => {
 	let blob = getFromCache(src);
 
 	if (!blob) {
-		const filePath = path.join(blobFolderPath, src);
+		const filePath = join(blobFolderPath, src);
 
 		// Check if file exists
 		if (!(await checkFileExists(filePath))) {

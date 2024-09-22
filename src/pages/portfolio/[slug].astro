@@ -1,42 +1,41 @@
 ---
-export const prerender = false;
-
-import { redirect } from 'src/utils/minis.ts'
-
 import LayoutExtended from 'src/layouts/LayoutExtended.astro'
-
 import PerfectImage from 'src/components/perfect-image.astro';
-
-
-
+import Showcase from 'src/components/showcase.astro';
 import { getPortfolioWithInfos } from 'src/utils/portfolio';
-import Button from 'src/components/button.astro';
-import PortfolioShowMore from 'src/wrappers/portfolio-show-more.astro';
-
-const redirectToURL = "/";
 
 const { slug } = Astro.params;
 if (!slug) return redirect(redirectToURL);
 
-const props = await getPortfolioWithInfos(slug);
-if (!props) return redirect(redirectToURL);
+const t = await getPortfolioWithInfos(slug);
+if (!t) return redirect(redirectToURL);
 ---
 
-<LayoutExtended tabTitle={props.current.title}>
+<LayoutExtended tabTitle={t.current.title}>
 	<div class="absolute inset-0 h-full w-full flex items-center justify-center select-none" aria-hidden="true">
 		<div class="px-5 md:px-10">
-			<span class="drop-shadow-lg block max-w-full text-wrap font-august text-center text-[12vw] 2xl:text-[180px] leading-[120%] font-bold tracking-[13px] uppercase whitespace-nowrap" title={props.current.title}>
-				{props.current.title}
+			<span class="drop-shadow-lg block max-w-full text-wrap font-august text-center text-[12vw] 2xl:text-[180px] leading-[120%] font-bold tracking-[13px] uppercase whitespace-nowrap" title={t.current.title}>
+				{t.current.title}
 			</span>
 		</div>
 	</div>
 
-	<dialog id="portfolio-showcase" class="appear max-h-screen max-w-[100vw] h-full w-full p-0 m-0">
-		<Button class="fixed top-4 right-4 z-[110] bg-yellow-300" onclick="this.closest('dialog').close()">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-		</Button>
-		<PortfolioShowMore {...props.current} />
-	</dialog>
+	<Showcase
+		in="portfolio"
+		onlyCustomFiles={false}
+		images={[
+			...t.current.image_gallery?.images.map(img => ({ image_variations: img.image_variations })).flat(),
+			{ image_variations: t.current.thumbnail.image_variations },
+		]}
+		single_images={[]}
+		videos={t.current.video_gallery.videos.map(video => ({
+			id: video.id,
+			file_name: video.file_name,
+			thumbnail: {
+				image_variations: video.thumbnail?.image_variations || []
+			}
+		}))}
+	/>
 
 	<div class="absolute inset-0 h-full w-full overflow-hidden">
 		<div
@@ -86,8 +85,8 @@ if (!props) return redirect(redirectToURL);
 
 			<div class="portfolio-taskbar--menu min-w-[30%] overflow-hidden">
 				<div class="content">
-					<h1 class="font-august text-4xl leading-[120%] font-bold tracking-[3px] uppercase whitespace-nowrap" title={props.current.title}>
-						{props.current.title}
+					<h1 class="font-august text-4xl leading-[120%] font-bold tracking-[3px] uppercase whitespace-nowrap" title={t.current.title}>
+						{t.current.title}
 					</h1>
 				</div>
 			</div>
@@ -113,21 +112,21 @@ if (!props) return redirect(redirectToURL);
 
 			<div class="portfolio-taskbar--description min-w-64 w-full overflow-hidden">
 				<div class="content extra-padding">
-					<p class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={props.current.description}>
-						{props.current.description}
+					<p class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={t.current.description}>
+						{t.current.description}
 					</p>
 				</div>
 			</div>
 
 			<div class="portfolio-taskbar--stage min-w-32 w-fit max-w-40">
 				<div class="content">
-					<span class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={props.current_portfolio_count + " out of " + props.max_portfolio_count}>
-						{props.current_portfolio_count} / {props.max_portfolio_count}
+					<span class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={t.current_portfolio_count + " out of " + t.max_portfolio_count}>
+						{t.current_portfolio_count} / {t.max_portfolio_count}
 					</span>
 				</div>
 			</div>
 
-			<a class="portfolio-taskbar--left group min-w-fit max-w-20" href={"/portfolio/" + props.prev.slug} title={props.prev.title}>
+			<a class="portfolio-taskbar--left group min-w-fit max-w-20" href={"/portfolio/" + t.prev.slug} title={t.prev.title}>
 				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
 				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
 					<svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -135,7 +134,7 @@ if (!props) return redirect(redirectToURL);
 					</svg>
 				</div>
 			</a>
-			<a class="portfolio-taskbar--right group min-w-fit max-w-20" href={"/portfolio/" + props.next.slug} title={props.next.title}>
+			<a class="portfolio-taskbar--right group min-w-fit max-w-20" href={"/portfolio/" + t.next.slug} title={t.next.title}>
 				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
 				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
 					<svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,15 +145,20 @@ if (!props) return redirect(redirectToURL);
 		</div>
 	</div>
 
-
-	<PerfectImage class="h-full w-full object-cover select-none" images={props.current.image_horizontal} alt={props.current.title}>
-	</PerfectImage>
+	{t?.current?.image_gallery &&
+		<PerfectImage
+			inForUrl="portfolio"
+			class="h-full w-full object-cover select-none"
+			images={t.current.thumbnail.image_variations}
+			alt={t.current.title}
+		/>
+	}
 </LayoutExtended>
 
 <script>
 	const portfolioTaskbar = document.getElementById("portfolio-taskbar");
 	const showMoreBtn = document.getElementById("portfolio-taskbar-show-more-btn");
-	const dialog: HTMLDialogElement | null = document.getElementById("portfolio-showcase") as HTMLDialogElement;
+	const dialog: HTMLDialogElement | null = document.getElementById("showcase") as HTMLDialogElement;
 
 	const navigationTopLeft = document.getElementById("navigation-top-left");
 	const navigationTopRight = document.getElementById("navigation-top-right");
@@ -234,40 +238,5 @@ if (!props) return redirect(redirectToURL);
 		.portfolio-taskbar-small-screen > * {
 			max-width: unset;
 		}
-	}
-</style>
-
-<style scoped>
-	@keyframes appear {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
-
-	@keyframes disappear {
-		from { opacity: 1; }
-		to { opacity: 0; }
-	}
-
-	dialog {
-		background-color: black;
-		opacity: 0;
-	}
-
-	dialog.appear {
-		animation-name: appear;
-		animation-delay: 250ms;
-		animation-duration: 500ms;
-		animation-timing-function: ease-out;
-		animation-fill-mode: forwards;
-		animation-iteration-count: 1;
-	}
-
-	dialog.disappear {
-		animation-name: disappear;
-		animation-delay: 0ms;
-		animation-duration: 500ms;
-		animation-timing-function: ease-in;
-		animation-fill-mode: forwards;
-		animation-iteration-count: 1;
 	}
 </style>

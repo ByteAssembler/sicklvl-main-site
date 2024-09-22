@@ -1,20 +1,13 @@
----
-import PerfectImage from '../components/perfect-image.astro';
-
-interface Props {
-    portfolio: Portfolio;
-}
-const { portfolio } = Astro.props;
----
-
 <ul id="scrollable-container" class="flex flex-row flex-nowrap gap-8 p-8 h-full max-h-full overflow-y-hidden overflow-x-auto">
+    {/*
     {portfolio.map((item) => (
         <li class="snap-center" style="flex: 0 0 auto">
             <a href={`/portfolio/${item.slug}`}>
-                <PerfectImage class="w-auto h-full min-w-full min-h-full object-cover" images={item.image_vertical} alt={item.title} />
+                <PerfectImage class="w-auto h-full min-w-full min-h-full object-cover" images={item.thumbnail} alt={item.title} />
             </a>
         </li>
     ))}
+    */}
 </ul>
 
 <script>
@@ -24,7 +17,7 @@ const { portfolio } = Astro.props;
         if (event.deltaY !== 0) {
 			event.preventDefault();
 
-			scrollable.scrollLeft += (event.deltaY < 0 ? -100 : 100);
+			scrollable.scrollLeft += event.deltaY;
 		}
     });
 </script>

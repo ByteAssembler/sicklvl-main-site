@@ -1,5 +1,6 @@
 ---
-import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
+import type { PerfectImageProps } from 'src/env';
+import { fileNameToBlobUrlPath, fileNameToBoxFileUrlPath } from 'src/utils/file-manager';
 
 interface Props extends PerfectImageProps {}
 
@@ -12,8 +13,11 @@ const {
     width: wid,
     height: hei,
     images,
-    forceSizesW
+    forceSizesW,
+    inForUrl,
 } = Astro.props;
+
+const urlGetter = inForUrl === "portfolio" ? fileNameToBlobUrlPath : fileNameToBoxFileUrlPath;
 
 const allowedImages = forceSizesW == null || forceSizesW.length === 0
     ? images
@@ -23,9 +27,9 @@ const allowedImages = forceSizesW == null || forceSizesW.length === 0
             return forceSizesW.indexOf(a.width) - forceSizesW.indexOf(b.width);
         });
 
-const src = fileNameToBlobUrlPath(allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : "");
+const src = urlGetter(allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : "");
 
-const srcset = Array.isArray(allowedImages) ? allowedImages.map(({ file_name, width }) => `${fileNameToBlobUrlPath(file_name)} ${width}w`).join(", ") : "";
+const srcset = Array.isArray(allowedImages) ? allowedImages.map(({ file_name, width }) => `${urlGetter(file_name)} ${width}w`).join(", ") : "";
 
 ---
 

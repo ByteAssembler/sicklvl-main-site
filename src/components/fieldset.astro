@@ -1,8 +1,11 @@
 ---
+import type { FieldsetProps } from 'src/env';
+
 interface Props extends FieldsetProps {}
 
 const {
 	title = "Widget",
+	classParent = "",
 	class: className = "",
 
 	form = false,
@@ -11,7 +14,7 @@ const {
 }: Props = Astro.props;
 ---
 
-<fieldset>
+<fieldset class={classParent}>
 	<legend>{title}</legend>
 
 	{form && (

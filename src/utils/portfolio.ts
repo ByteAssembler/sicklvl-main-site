@@ -1,72 +1,219 @@
-import { globalDB } from "./cdate";
-
-const portfolioDB = globalDB.portfolio;
+import { prismaClient } from "src/global";
 
 export async function portfolioMoveDownBySlug(slug: string): Promise<boolean> {
-	const array = await portfolioDB.getArray();
+	const portfolio = await prismaClient.portfolioItem.findUnique({
+		where: {
+			slug,
+		},
+		select: {
+			id: true,
+			order: true,
+		},
+	});
+	if (!portfolio) return false;
 
-	const current = array.find((item) => item.slug === slug);
-	if (!current) return false;
+	const nextPortfolio = await prismaClient.portfolioItem.findFirst({
+		where: {
+			order: {
+				gt: portfolio.order,
+			},
+		},
+		select: {
+			id: true,
+			order: true,
+		},
+		orderBy: {
+			order: "asc",
+		},
+	});
+	if (!nextPortfolio) return false;
 
-	const currentIndex = array.indexOf(current);
-	const nextIndex = (currentIndex + 1) % array.length;
+	await prismaClient.portfolioItem.update({
+		where: {
+			id: portfolio.id,
+		},
+		data: {
+			order: nextPortfolio.order,
+		},
+	});
 
-	const next = array[nextIndex];
-
-	array[currentIndex] = next;
-	array[nextIndex] = current;
-
-	await portfolioDB.replaceArray(array);
+	await prismaClient.portfolioItem.update({
+		where: {
+			id: nextPortfolio.id,
+		},
+		data: {
+			order: portfolio.order,
+		},
+	});
 
 	return true;
 }
 
 export async function portfolioMoveUpBySlug(slug: string): Promise<boolean> {
-	const array = await portfolioDB.getArray();
+	const portfolio = await prismaClient.portfolioItem.findUnique({
+		where: {
+			slug,
+		},
+		select: {
+			id: true,
+			order: true,
+		},
+	});
+	if (!portfolio) return false;
 
-	const current = array.find((item) => item.slug === slug);
-	if (!current) return false;
+	const previousPortfolio = await prismaClient.portfolioItem.findFirst({
+		where: {
+			order: {
+				lt: portfolio.order,
+			},
+		},
+		select: {
+			id: true,
+			order: true,
+		},
+		orderBy: {
+			order: "desc",
+		},
+	});
+	if (!previousPortfolio) return false;
 
-	const currentIndex = array.indexOf(current);
-	const prevIndex = (currentIndex - 1 + array.length) % array.length;
+	await prismaClient.portfolioItem.update({
+		where: {
+			id: portfolio.id,
+		},
+		data: {
+			order: previousPortfolio.order,
+		},
+	});
 
-	const prev = array[prevIndex];
-
-	array[currentIndex] = prev;
-	array[prevIndex] = current;
-
-	await portfolioDB.replaceArray(array);
+	await prismaClient.portfolioItem.update({
+		where: {
+			id: previousPortfolio.id,
+		},
+		data: {
+			order: portfolio.order,
+		},
+	});
 
 	return true;
 }
 
 export async function portfolioDeleteBySlug(slug: string): Promise<boolean> {
-	await portfolioDB.removeIf((item) => item.slug === slug);
-	return true;
+	const portfolioResult = await prismaClient.portfolioItem.delete({
+		where: {
+			slug,
+		},
+	});
+	return !!portfolioResult;
 }
 
-export async function getPortfolioWithInfos(slug: string): Promise<PortfolioWithInfos | null> {
-	const array = await portfolioDB.getArray();
+export async function getPortfolioWithInfos(slug: string) {
+	const portfolio = await prismaClient.portfolioItem.findUnique({
+		where: {
+			slug,
+		},
+		select: {
+			id: true,
+			title: true,
+			description: true,
+			order: true,
+			thumbnail: {
+				include: {
+					image_variations: true
+				},
+			},
+			image_gallery: {
+				include: {
+					images: {
+						include: {
+							image_variations: true
+						}
+					}
+				},
+			},
+			video_gallery: {
+				include: {
+					videos: {
+						include: {
+							thumbnail: {
+								include: {
+									image_variations: true
+								}
+							}
+						}
+					}
+				},
+			},
+		}
+	});
+	if (!portfolio) return null;
 
-	const current = array.find((item) => item.slug === slug);
-	if (!current) return null;
+	const max_portfolio_count = await prismaClient.portfolioItem.count();
 
-	const currentIndex = array.indexOf(current);
+	const [previousPortfolio, nextPortfolio] = await prismaClient.$transaction([
+		prismaClient.portfolioItem.findFirst({
+			where: {
+				order: {
+					lt: portfolio.order,
+				},
+			},
+			orderBy: {
+				order: "desc",
+			},
+			include: {
+				thumbnail: true,
+				image_gallery: true,
+				video_gallery: true,
+			},
+		}),
+		prismaClient.portfolioItem.findFirst({
+			where: {
+				order: {
+					gt: portfolio.order,
+				},
+			},
+			orderBy: {
+				order: "asc",
+			},
+			include: {
+				thumbnail: true,
+				image_gallery: true,
+				video_gallery: true,
+			},
+		}),
+	]);
 
-	const prev_index = (currentIndex - 1 + array.length) % array.length;
-	const next_index = (currentIndex + 1) % array.length;
+	const circularPreviousPortfolio = previousPortfolio || await prismaClient.portfolioItem.findFirst({
+		orderBy: {
+			order: "desc",
+		},
+		include: {
+			thumbnail: true,
+			image_gallery: true,
+			video_gallery: true,
+		},
+	});
 
-	const prev = array[prev_index];
-	const next = array[next_index];
+	const circularNextPortfolio = nextPortfolio || await prismaClient.portfolioItem.findFirst({
+		orderBy: {
+			order: "asc",
+		},
+		include: {
+			thumbnail: true,
+			image_gallery: true,
+			video_gallery: true,
+		},
+	});
 
-	const max_portfolio_count = array.length;
-	const current_portfolio_count = currentIndex + 1;
+	if (!circularPreviousPortfolio || !circularNextPortfolio) {
+		throw new Error("Portfolio count is not enough for circular navigation");
+	}
 
 	return {
+		prev: circularPreviousPortfolio,
+		current: portfolio,
+		next: circularNextPortfolio,
+		current_portfolio_count: portfolio.order,
 		max_portfolio_count,
-		current_portfolio_count,
-		prev,
-		current,
-		next,
 	};
 }

@@ -1,20 +1,21 @@
 ---
-import Navigation from 'src/wrappers/navigation.astro';
 import Layout from './Layout.astro'
+import Navigation from 'src/wrappers/navigation.astro';
 import NavigationBox from 'src/wrappers/navigation-box.astro';
 
 interface Props {
 	language?: string;
 	tabTitle: string;
+	title: string;
 }
 
-const { tabTitle, language = "en" } = Astro.props;
+const { title, tabTitle, language } = Astro.props;
 ---
 
 <Layout {tabTitle} {language}>
 	<Navigation />
 	<main class="h-full w-full overflow-auto">
-		<h1 class="py-[calc(6%_+_4rem)] font-inconsolata text-center text-5xl md:text-6xl font-bold tracking-widest">title</h1>
+		<h1 class="py-[calc(6%_+_4rem)] font-inconsolata text-center text-5xl md:text-6xl font-bold tracking-widest">{title}</h1>
 		<div class="container px-6 md:px-8 mx-auto w-full">
 			<slot />
 		</div>

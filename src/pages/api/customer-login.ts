@@ -3,10 +3,7 @@ import { verify } from "@node-rs/argon2";
 
 import type { APIContext } from "astro";
 import { z } from "astro/zod";
-import { lucia } from "src/auth";
-import { globalDB } from "src/utils/cdate";
-
-const userDB = globalDB.users;
+import { lucia, prismaClient } from "src/global";
 
 const userLoginSchema = z.object({
 	email: z.string().email(),
@@ -28,11 +25,18 @@ export async function POST(context: APIContext): Promise<Response> {
 		});
 	}
 
-	const existingUser = await userDB.findOne(
-		(user) => user.email === data.email
-	);
+	const existingCustomer = await prismaClient.customer.findUnique({
+		where: {
+			email: result.data.email,
+		},
+		select: {
+			id: true,
+			email: true,
+			hashed_password: true,
+		},
+	});
 
-	if (!existingUser) {
+	if (!existingCustomer) {
 		// NOTE:
 		// Returning immediately allows malicious actors to figure out valid usernames from response times,
 		// allowing them to only focus on guessing passwords in brute-force attacks.
@@ -47,10 +51,10 @@ export async function POST(context: APIContext): Promise<Response> {
 		});
 	}
 
-	if (existingUser.password !== result.data.password) {
+	if (existingCustomer.hashed_password !== result.data.password) {
 		try {
 			const validPassword = await verify(
-				existingUser.password,
+				existingCustomer.hashed_password,
 				result.data.password,
 				{
 					memoryCost: 19456,
@@ -72,7 +76,7 @@ export async function POST(context: APIContext): Promise<Response> {
 		}
 	}
 
-	const session = await lucia.createSession(existingUser.id, {});
+	const session = await lucia.createSession(existingCustomer.id, {});
 	const sessionCookie = lucia.createSessionCookie(session.id);
 	context.cookies.set(
 		sessionCookie.name,
@@ -80,9 +84,5 @@ export async function POST(context: APIContext): Promise<Response> {
 		sessionCookie.attributes
 	);
 
-	console.log("session", session);
-	console.log("session", Intl.DateTimeFormat().format(session.expiresAt));
-	console.log("sessionCookie", sessionCookie);
-
-	return context.redirect("/admin");
+	return context.redirect("/box");
 }

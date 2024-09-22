@@ -1,11 +1,11 @@
 import type { APIContext } from "astro";
-import { lucia } from "src/auth";
+import { lucia } from "src/global";
+// import { unauthorized } from "src/utils/minis";
 
-export async function POST(context: APIContext): Promise<Response> {
+export async function GET(context: APIContext): Promise<Response> {
 	if (!context.locals.session) {
-		return new Response(null, {
-			status: 401,
-		});
+		return context.redirect("/customer-login");
+		// return unauthorized();
 	}
 
 	await lucia.invalidateSession(context.locals.session.id);
@@ -17,5 +17,5 @@ export async function POST(context: APIContext): Promise<Response> {
 		sessionCookie.attributes
 	);
 
-	return context.redirect("/login");
+	return context.redirect("/customer-login");
 }

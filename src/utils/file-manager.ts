@@ -1,91 +1,18 @@
-import path from "path";
+import path, { extname } from "path";
 import fs from "fs/promises";
 
-import { z } from "astro/zod";
-
 import { checkFileExists, createFolderIfNotExists } from "./filesystem-utils";
+import type { SingleImageMemory } from "src/env";
+
+import ffmpeg from "fluent-ffmpeg";
+import sharp from "sharp";
 
 export const blobFolderPath = path.join(process.cwd(), "drive", "blob");
+export const boxContentFolderPath = path.join(process.cwd(), "drive", "box-content");
 
-export const singleFileSchema = z
-	.custom<FileList | null>()
-	.transform((file) => {
-		if (!file) return null;
-		if (file instanceof File) return file;
-		return file.length > 0 ? file.item(0) : null;
-	})
-	.transform((file) => {
-		if (!file) return null;
-		return file.size > 1 ? file : null;
-	})
-	.refine((file) => file, {
-		message: "File is required",
-	});
-
-export const singleFileSchemaImage = singleFileSchema
-	.transform((file) => {
-		if (!file) return null;
-		return isFileExtensionAImage(file.name) ? file : null;
-	})
-	.refine((file) => file, {
-		message: "File is not an image",
-	});
-
-export const singleFileSchemaVideo = singleFileSchema
-	.transform((file) => {
-		if (!file) return null;
-		return isFileExtensionAVideo(file.name) ? file : null;
-	})
-	.refine((file) => file, {
-		message: "File is not a video",
-	});
-
-export const multiFileSchema = z
-	.custom<FileList | null>()
-	.transform((file) => {
-		if (!file) return null;
-		if (file instanceof File) return [file];
-		if (Array.isArray(file)) return file.filter((f) => f instanceof File);
-		const files: File[] = [];
-		for (let i = 0; i < file.length; i++) {
-			const f = file.item(i);
-			if (f instanceof File) files.push(f);
-		}
-		return files;
-	})
-	.transform((files) => {
-		if (!files) return null;
-		return files.length > 0 ? files.filter((f) => f.size > 1) : null;
-	})
-	.transform((files) => {
-		if (!files) return null;
-		return files.filter((f) => f && f.size > 1);
-	})
-	.refine((file) => file && file.length > 0, {
-		message: "Files are required",
-	});
-
-export const multiFileSchemaImages = multiFileSchema
-	.transform((files) => {
-		if (!files) return null;
-		return files.filter((f) => f && isFileExtensionAImage(f.name));
-	})
-	.refine((files) => files && files.length > 0, {
-		message: "Files are not images",
-	});
-
-export const multiFileSchemaVideos = multiFileSchema
-	.transform((files) => {
-		if (!files) return null;
-		return files.filter((f) => f && isFileExtensionAVideo(f.name));
-	})
-	.refine((files) => files && files.length > 0, {
-		message: "Files are not videos",
-	});
-
-export async function saveBlob(data: File | FileList): Promise<boolean> {
+export async function saveBlob(data: File | FileList, folderPath: string): Promise<boolean> {
 	if (data instanceof File) {
-		return (await saveSingleFile(data)) !== "";
+		return (await saveSingleFile(data, folderPath)) !== "";
 	} else if (Array.isArray(data)) {
 		let savedFiles: string[] = [];
 
@@ -94,7 +21,7 @@ export async function saveBlob(data: File | FileList): Promise<boolean> {
 			if (!file) continue;
 
 			if (file instanceof File) {
-				const filePath = await saveSingleFile(file);
+				const filePath = await saveSingleFile(file, folderPath);
 				if (filePath) savedFiles.push(filePath);
 				else {
 					// Revert all saved files
@@ -111,7 +38,7 @@ export async function saveBlob(data: File | FileList): Promise<boolean> {
 }
 
 export async function saveBlobObjectWithRevert(
-	save_data?: { [key: string]: any } | null
+	save_data: { [key: string]: any } | null, folderPath: string
 ): Promise<boolean> {
 	if (!save_data) return false;
 
@@ -123,7 +50,7 @@ export async function saveBlobObjectWithRevert(
 
 		if (data instanceof Buffer) {
 			// TODO: Check
-			const filePath = path.join(blobFolderPath, key);
+			const filePath = path.join(folderPath, key);
 
 			// Check if file exists
 			if (await checkFileExists(filePath)) {
@@ -139,7 +66,7 @@ export async function saveBlobObjectWithRevert(
 				return false;
 			}
 		} else if (data instanceof File) {
-			const filePath = await saveSingleFile(data);
+			const filePath = await saveSingleFile(data, folderPath);
 			if (filePath) savedFiles.push(filePath);
 			else {
 				// Revert all saved files
@@ -154,7 +81,7 @@ export async function saveBlobObjectWithRevert(
 				if (!file) continue;
 
 				if (file instanceof File) {
-					const filePath = await saveSingleFile(file);
+					const filePath = await saveSingleFile(file, folderPath);
 					if (filePath) savedFiles.push(filePath);
 					else {
 						// Revert all saved files
@@ -176,9 +103,10 @@ export async function saveBlobObjectWithRevert(
 
 export async function saveSingleBuffer(
 	buffer: Buffer,
-	name: string
+	name: string,
+	folderPath: string
 ): Promise<boolean> {
-	const filePath = path.join(blobFolderPath, name);
+	const filePath = path.join(folderPath, name);
 
 	// Check if file exists
 	if (await checkFileExists(filePath)) {
@@ -197,10 +125,11 @@ export async function saveSingleBuffer(
 	return true;
 }
 
-export async function saveSingleFile(file: File): Promise<string> {
-	await createFolderIfNotExists(blobFolderPath);
+export async function saveSingleFile(file: File, folderPath: string, fileName?: string): Promise<string> {
+	await createFolderIfNotExists(folderPath);
 
-	const filePath = path.join(blobFolderPath, file.name);
+	const filePath = path.join(folderPath, fileName ?? file.name);
+	console.log(filePath)
 
 	// Check if file exists
 	if (await checkFileExists(filePath)) {
@@ -232,23 +161,19 @@ export async function revertFile(filePath: string): Promise<boolean> {
 	return true;
 }
 
-export async function revertFileByFileName(fileName: string): Promise<boolean> {
-	const filePath = path.join(blobFolderPath, fileName);
+export async function revertFileByFileName(fileName: string, folderPath: string): Promise<boolean> {
+	const filePath = path.join(folderPath, fileName);
 	return await revertFile(filePath);
 }
 
 // https://sharp.pixelplumbing.com/
 // Create multiple images with different sizes, they should all be use as little space as possible
-// Sizes: XXx1080, XXx720, XXx480, XXx120
-
 export async function saveImageWithFormats(
 	file: File,
 	name: string,
 	fileSizes: number[],
 	fileQuality: number
-): Promise<CImage[]> {
-	const { default: sharp } = await import("sharp");
-
+): Promise<SingleImageMemory[]> {
 	// Get the file content
 	const fileContent = await file.arrayBuffer();
 	const fileName = name ?? file.name;
@@ -262,7 +187,7 @@ export async function saveImageWithFormats(
 	// Create the images
 	const image = sharp(fileContent);
 
-	let fileNames: CImage[] = [];
+	let fileNames: SingleImageMemory[] = [];
 
 	for (const size of fileSizes) {
 		const imgBuffer = await image
@@ -282,26 +207,28 @@ export async function saveImageWithFormats(
 		}
 
 		const newFileName = `${fileNameWithoutExtension}--${size}${fileExtension}`;
-		const result = await saveSingleBuffer(imgBuffer, newFileName);
+		const result = await saveSingleBuffer(imgBuffer, newFileName, blobFolderPath);
 		if (!result) {
-			await revertFileByFileName(newFileName);
+			await revertFileByFileName(newFileName, blobFolderPath);
 
 			// Revert all saved files
 			for (const fn of fileNames) {
-				await revertFileByFileName(fn.file_name);
+				await revertFileByFileName(fn.file_name, blobFolderPath);
 			}
 
 			return fileNames;
 		} else {
 			fileNames.push({
 				file_name: newFileName,
+
+				extension: fileExtension,
+				mime: "image/jpeg",
+
 				width: width,
 				height: height,
-
-				mime: "image/jpeg",
-				extension: fileExtension,
-				size: imgBuffer.length,
 				quality: fileQuality,
+
+				size: imgBuffer.length,
 			});
 		}
 	}
@@ -312,20 +239,76 @@ export async function saveImageWithFormats(
 export async function saveImageWithFormatsFullHorizontal(
 	file: File,
 	name: string
-): Promise<CImage[]> {
+) {
 	return await saveImageWithFormats(
 		file,
 		name,
-		[1920, 1080, 720, 480, 120],
+		[1920, 1600, 1280, 960, 640],
 		75
 	);
 }
 
-export async function saveImageWithFormatsFullVertical(
+export async function saveVideo(
 	file: File,
-	name: string
-): Promise<CImage[]> {
-	return await saveImageWithFormats(file, name, [1080, 720, 480, 120], 75);
+	file_video_name: string,
+	folder_path: string = blobFolderPath
+): Promise<{
+	video_file_name: string;
+	video_file_path_full: string;
+	thumbnail: SingleImageMemory,
+	success: true
+} | {
+	success: false
+}> {
+	const filePath = await saveSingleFile(file, folder_path, file_video_name);
+	if (!filePath) return { success: false };
+
+	const thumbnailFileExtension = extname(file_video_name);
+	const thumbnailFileNameWithoutExtension = file_video_name.slice(0, Math.max(0, file_video_name.length - thumbnailFileExtension.length));
+	const thumbnailFileName = `${thumbnailFileNameWithoutExtension}_thumbnail.jpg`;
+	const thumbnailPathNew = path.join(folder_path, thumbnailFileName);
+
+	const proc = ffmpeg(filePath)
+		.thumbnail({
+			count: 1,
+			folder: folder_path,
+			filename: thumbnailFileName,
+			timestamps: ["1"],
+			size: "1280x720",
+		});
+
+	return new Promise((resolve) => {
+		proc.on("end", async () => {
+			// Create a buffer from the thumbnail
+			const thumbnailBuffer = await fs.readFile(thumbnailPathNew);
+
+			// sharp
+			const thumbnailSharp = sharp(thumbnailBuffer);
+			const thumbnailMetadata = await thumbnailSharp.metadata();
+
+			resolve({
+				video_file_name: file_video_name,
+				video_file_path_full: filePath,
+				thumbnail: {
+					file_name: thumbnailFileName,
+
+					extension: extname(thumbnailFileName),
+					mime: thumbnailMetadata.format ?? "image/jpg",
+
+					size: thumbnailMetadata.size ?? 0,
+
+					width: thumbnailMetadata.width ?? 1280,
+					height: thumbnailMetadata.height ?? 720,
+					quality: 75,
+				},
+				success: true,
+			});
+		});
+		proc.on("error", (error) => {
+			console.error(`Error creating thumbnail for video "${file_video_name}": ${error}`);
+			resolve({ success: false });
+		});
+	});
 }
 
 export function isFileExtensionAImage(fileName: string): boolean {
@@ -354,6 +337,40 @@ export function isFileExtensionAVideo(fileName: string): boolean {
 		fe === ".mkv" ||
 		fe === ".wmv"
 	);
+}
+
+export type FileType = "image" | "video" | "audio" | "text" | "application" | "message" | "model" | "multipart" | "example" | "font" | "chemical" | "other";
+
+export function getFileTypeByMime(mime?: string | null): FileType {
+	if (!mime) return "other";
+	if (mime.startsWith("image")) return "image";
+	if (mime.startsWith("video")) return "video";
+	if (mime.startsWith("audio")) return "audio";
+	if (mime.startsWith("text")) return "text";
+	if (mime.startsWith("application")) return "application";
+	if (mime.startsWith("message")) return "message";
+	if (mime.startsWith("model")) return "model";
+	if (mime.startsWith("multipart")) return "multipart";
+	if (mime.startsWith("example")) return "example";
+	if (mime.startsWith("font")) return "font";
+	if (mime.startsWith("chemical")) return "chemical";
+	if (mime.startsWith("audio")) return "audio";
+	if (mime.startsWith("video")) return "video";
+	if (mime.startsWith("image")) return "image";
+	if (mime.startsWith("text")) return "text";
+	if (mime.startsWith("application")) return "application";
+	if (mime.startsWith("message")) return "message";
+	if (mime.startsWith("model")) return "model";
+	if (mime.startsWith("multipart")) return "multipart";
+	if (mime.startsWith("example")) return "example";
+	if (mime.startsWith("font")) return "font";
+	if (mime.startsWith("chemical")) return "chemical";
+	return "other";
+}
+
+export function fileNameToBoxFileUrlPath(fileName: string, download: boolean = false) {
+	if (download) return `/box/file/${fileName}?download=true`;
+	return `/box/file/${fileName}`;
 }
 
 export function fileNameToBlobUrlPath(fileName: string) {

@@ -1,0 +1,112 @@
+---
+import LayoutAdmin from "src/layouts/LayoutAdmin.astro";
+import FunctionalFieldset from "src/components/functional-fieldset.astro";
+import Button from "src/components/button.astro";
+
+import { prismaClient } from "src/global";
+import { redirectAdminLogin } from "src/utils/minis";
+
+if (!Astro.locals.admin) return redirectAdminLogin();
+
+const [customer, boxes] = await prismaClient.$transaction([
+	prismaClient.customer.findMany({
+		select: {
+			id: true,
+			name: true,
+			description: true,
+			boxes: {
+				select: { id: true }
+			}
+		},
+		orderBy: { name: "asc" },
+	}),
+	prismaClient.box.findMany({
+		orderBy: { created_at: "desc" },
+		include: {
+			owner: {
+				select: {
+					id: true,
+					name: true,
+					email: true
+				}
+			},
+			box_files: {
+				select: { id: true }
+			}
+		}
+	}),
+]);
+---
+
+<LayoutAdmin tabTitle="Box">
+
+	<FunctionalFieldset
+		title="Create Box"
+		form
+		formAction="/api/box-create"
+		formMethod="post"
+		submit
+		entries={[
+			{ type: "text", title: "Name*", placeholder: "Name", name: "name", required: true },
+			{ type: "password", title: "Password", placeholder: "Password", name: "password" },
+			{ type: "checkbox", title: "Public", name: "is_public" },
+			{ type: "checkbox", title: "Password for public", name: "password_for_public" },
+			{ type: "checkbox", title: "Password for owner (and public)", name: "password_for_owner" },
+			{ type: "file", title: "Files*", multiple: true, name: "files" },
+			{ type: "select", title: "Customer*", name: "customer", options: [
+				{ value: "", text: "NONE", selected: true },
+				...customer.map((item) => ({ value: item.id, text: item.name }))
+			] },
+		]}
+	/>
+
+	<FunctionalFieldset title="Boxes">
+		<div class="max-h-[70vh] max-w-80">
+			<Button submit size="small" href="/box" class="mb-2">
+				List all
+			</Button>
+			{boxes.map((box) => (
+				<article class="flex !flex-row !gap-3 items-center justify-between">
+					<div class="flex flex-col">
+						<div class="flex items-center gap-1">
+							<h2 class="truncate text-lg font-bold overflow-hidden">
+								{box.name}
+							</h2>
+							<span class="text-xs">
+								({box.box_files.length} Files)
+							</span>
+						</div>
+						<div class="flex items-center gap-1">
+							{!box.is_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>}
+							{box.is_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>}
+
+							{box.password_for_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg>}
+							{box.password_for_owner && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>}
+
+							<p class:list={["truncate text-sm", {
+								"italic": !box.owner
+							}]}>
+								{box.owner?.name ?? "NONE"}
+							</p>
+						</div>
+					</div>
+					<div class="flex items-center gap-2">
+						<Button submit size="small" class="w-min" href={`/box/${box.id}`}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/></svg>
+						</Button>
+						<Button submit size="small" class="w-min" href={`/box/full/${box.id}`}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+						</Button>
+						<form method="post" action={`/api/box-delete/${box.id}`}>
+							<Button submit size="small" typeButton="danger" class="w-min">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+							</Button>
+						</form>
+					</div>
+					{/*item.show && <span class="text-sm underline underline-offset-4">VISIBLE</span>*/}
+				</article>
+			))}
+		</div>
+	</FunctionalFieldset>
+
+</LayoutAdmin>

@@ -1,0 +1,46 @@
+---
+import Layout from 'src/layouts/Layout.astro'
+import BoxBlockWrapper from './box-block-wrapper.astro';
+
+interface Props {
+	title?: string;
+	subtitle?: string;
+}
+
+const {
+	title = "",
+	subtitle
+} = Astro.props;
+---
+
+<Layout tabTitle="Your Boxes">
+	<header class="container mx-auto h-[95px] p-5 flex items-center justify-between gap-4">
+		<div class="flex flex-col overflow-hidden">
+			<h1 class="text-3xl font-bold truncate">
+				{title}
+			</h1>
+			<!-- TODO CLASSES -->
+			{subtitle && (
+				<p class="truncate">
+					{subtitle}
+				</p>
+			)}
+		</div>
+		<!--
+		<form method="post" action={`/box/${portfolioItem?.id || "AAA"}/upload`} id="box-file-upload-form" class="flex gap-4">
+			<FileUpload id="box-file-upload" class="hidden"></FileUpload>
+
+			<Button class="w-min" onclick='document.getElementById("box-file-upload").click()'>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hard-drive-upload"><path d="m16 6-4-4-4 4"/><path d="M12 2v8"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg>
+			</Button>
+
+			<Button class="w-min">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+			</Button>
+		</form>
+		-->
+	</header>
+	<BoxBlockWrapper>
+		<slot />
+	</BoxBlockWrapper>
+</Layout>

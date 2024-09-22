@@ -1,12 +1,13 @@
 ---
-import Button from './button.astro';
-import Fieldset from './fieldset.astro';
-import FileUpload from './file-upload.astro';
-import Input from './input.astro';
+import type { ComponentProps } from 'src/env';
 import Label from './label.astro';
+import Button from './button.astro';
+import Input from './input.astro';
+import Select from './select.astro';
+import FileUpload from './file-upload.astro';
+import Fieldset from './fieldset.astro';
 import PerfectImage from './perfect-image.astro';
 import PerfectVideo from './perfect-video.astro';
-import Select from './select.astro';
 
 type Props = ComponentProps;
 let props = Astro.props;
@@ -21,6 +22,7 @@ const renderOther = [
 	"select",
 ].includes(props?.type ?? "text");
 ---
+
 {
 	renderOther ?
 		<>
@@ -33,5 +35,6 @@ const renderOther = [
 			{props.type === "select" && <Select {...props} />}
 		</>
 		:
+		// @ts-ignore
 		<Input {...props} type={props?.type ?? "text"} />
 }

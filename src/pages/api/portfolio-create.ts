@@ -2,17 +2,16 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
-import { globalDB } from "src/utils/cdate";
+import type { SingleImageMemory } from "src/env";
+import { prismaClient } from "src/global";
 
-import { errorConditionerHtmlHttpResponse } from "src/utils/error-conditioner";
+import { errorConditionerHtmlHttpResponse, errorConditionerHtmlResponse } from "src/utils/error-conditioner";
 import {
-	multiFileSchemaImages,
-	multiFileSchemaVideos,
 	saveImageWithFormatsFullHorizontal,
-	saveImageWithFormatsFullVertical,
-	singleFileSchemaImage,
+	saveVideo,
 } from "src/utils/file-manager";
-import { isAdmin, redirectToAdmin, unauthorized } from "src/utils/minis";
+import { multiFileSchemaImages, multiFileSchemaVideosOptional, singleFileSchemaImage } from "src/utils/form-validation";
+import { redirectToAdmin, unauthorized } from "src/utils/minis";
 
 const portfolioItemSchema = z.object({
 	slug: z
@@ -20,20 +19,20 @@ const portfolioItemSchema = z.object({
 		.trim()
 		.toLowerCase()
 		.min(3)
-		.transform((s) => s.replaceAll(" ", "-")),
+		.transform((s) => s.replaceAll(/\s/g, "-")),
 	title: z.string().trim().min(3),
-	description: z.string().trim(),
-	content: z.string().trim().optional().default(""),
 
-	image_vertical: singleFileSchemaImage,
-	image_horizontal: singleFileSchemaImage,
+	description: z.string().trim().optional(),
+	content: z.string().trim().optional(),
 
-	image_gallery: multiFileSchemaImages,
-	video_gallery: multiFileSchemaVideos,
+	thumbnail: singleFileSchemaImage,
+
+	image_gallery: multiFileSchemaImages.optional(),
+	video_gallery: multiFileSchemaVideosOptional.optional(),
 });
 
 export const POST: APIRoute = async ({ request, locals }) => {
-	// if (!isAdmin(locals.user)) return unauthorized();
+	if (!locals.admin) return unauthorized();
 
 	// Get form
 	const form = await request.formData();
@@ -42,11 +41,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	const data = {
 		slug: form.get("slug"),
 		title: form.get("title"),
+
 		description: form.get("description"),
 		content: form.get("content") ?? "",
 
-		image_vertical: form.get("image-vertical"),
-		image_horizontal: form.get("image-horizontal"),
+		thumbnail: form.get("thumbnail"),
 
 		image_gallery: form.getAll("image-gallery"),
 		video_gallery: form.getAll("video-gallery"),
@@ -62,39 +61,119 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	if (error) return error;
 
 	if (result.success) {
-		const horizontalImageFile = result.data.image_horizontal;
-		const verticalImageFile = result.data.image_vertical;
-
-		if (horizontalImageFile == null || verticalImageFile == null)
-			return new Response("No image files found", {
-				status: 400,
+		{
+			// Check if portfolio with slug already exists
+			const portfolioItem = await prismaClient.portfolioItem.findUnique({
+				where: {
+					slug: result.data.slug,
+				},
 			});
 
-		const horizontalImage = await saveImageWithFormatsFullHorizontal(
-			horizontalImageFile,
-			horizontalImageFile.name
+			if (portfolioItem != null)
+				return errorConditionerHtmlResponse("Portfolio item with slug already exists");
+		}
+
+		if (!result.data.thumbnail)
+			return errorConditionerHtmlResponse("No image files found 1");
+
+		if (!result.data.image_gallery)
+			return errorConditionerHtmlResponse("No image files found 2");
+
+		if (!result.data.video_gallery)
+			return errorConditionerHtmlResponse("No video files found 3");
+
+		const randomPrefix = Math.random().toString(36).substring(2, 9) + "-";
+
+		const thumbnailImage = await saveImageWithFormatsFullHorizontal(
+			result.data.thumbnail,
+			randomPrefix + result.data.thumbnail.name
 		);
-		const verticalImage = await saveImageWithFormatsFullVertical(
-			verticalImageFile,
-			verticalImageFile.name
-		);
 
-		if (horizontalImage.length === 0 || verticalImage.length === 0)
-			return new Response("Failed to save image with formats", {
-				status: 500,
-			});
+		const imageGallery: SingleImageMemory[][] = [];
+		for (const image of result.data.image_gallery) {
+			imageGallery.push(await saveImageWithFormatsFullHorizontal(
+				image,
+				randomPrefix + image.name
+			));
+		}
 
-		const portfolio = await globalDB.portfolio.addToArray({
-			slug: result.data.slug,
-			title: result.data.title,
-			description: result.data.description,
-			content: result.data.content,
+		const videoGallery: ({
+			video_file_name: string;
+			video_file_path_full: string;
+			thumbnail: SingleImageMemory,
+			success: true
+		})[] = [];
+		for (const video of result.data.video_gallery) {
+			const savedVideo = await saveVideo(video, randomPrefix + video.name);
+			if (savedVideo.success) {
+				videoGallery.push(savedVideo);
+			}
+		}
 
-			image_vertical: verticalImage,
-			image_horizontal: horizontalImage,
+		if (thumbnailImage.length === 0)
+			return errorConditionerHtmlResponse("Failed to save");
 
-			image_gallery: [],
-			video_gallery: {},
+		await prismaClient.portfolioItem.create({
+			data: {
+				slug: result.data.slug,
+				title: result.data.title,
+				description: result.data.description,
+				content: result.data.content,
+				order: await prismaClient.portfolioItem.count(),
+
+				thumbnail: {
+					create: {
+						image_variations: {
+							create: thumbnailImage.map((image) => ({
+								file_name: image.file_name,
+								extension: image.extension,
+								mime: image.mime,
+								size: image.size,
+								width: image.width,
+								height: image.height,
+								quality: image.quality,
+							})),
+						},
+					},
+				},
+
+				image_gallery: {
+					create: {
+						images: {
+							create: imageGallery.map((images) => ({
+								image_variations: {
+									create: images.map((image) => ({
+										file_name: image.file_name,
+										extension: image.extension,
+										mime: image.mime,
+										size: image.size,
+										width: image.width,
+										height: image.height,
+										quality: image.quality,
+									})),
+								},
+							})),
+						},
+					}
+				},
+
+				video_gallery: {
+					create: {
+						videos: {
+							create: videoGallery.map((video) => ({
+								file_name: video.video_file_name,
+								thumbnail: {
+									create: {
+										image_variations: {
+											create: video.thumbnail
+										},
+									},
+								},
+							})),
+						}
+					}
+				},
+			},
 		});
 
 		// Redirect to admin page

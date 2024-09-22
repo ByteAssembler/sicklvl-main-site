@@ -1,0 +1,103 @@
+---
+import LayoutAdmin from "src/layouts/LayoutAdmin.astro";
+import FunctionalFieldset from "src/components/functional-fieldset.astro";
+import Button from "src/components/button.astro";
+
+import { prismaClient } from "src/global";
+import { redirectAdminLogin } from "src/utils/minis";
+
+if (!Astro.locals.admin) return redirectAdminLogin();
+
+const porfolio = await prismaClient.portfolioItem.findMany({
+	orderBy: { order: "asc" },
+});
+// const filesInBlobStorage = (await readFilesInFolder(blobFolderPath)).sort();
+---
+
+<LayoutAdmin tabTitle="Index">
+	<FunctionalFieldset
+		title="Create New Portfolio Item"
+		form
+		formAction="/api/portfolio-create"
+		formMethod="post"
+		submit
+		entries={[
+			{ type: "text", title: "Slug (URL; lovercase, no-spaces)", name: "slug", placeholder: "Enter your slug" },
+			{ type: "text", title: "Title", name: "title", placeholder: "Enter your title" },
+			{ type: "text", title: "Description", name: "description", placeholder: "Enter your description" },
+			{ type: "file", title: "Thumbnail", name: "thumbnail" },
+			{ type: "file", title: "Image Gallery", multiple: true, name: "image-gallery" },
+			{ type: "file", title: "Video Gallery", multiple: true, name: "video-gallery" },
+		]}
+	/>
+	<!--
+	<FunctionalFieldset title={`Files (${filesInBlobStorage.length}x)`}>
+		<div class="max-h-[70vh] overflow-auto">
+			{filesInBlobStorage.map((item) => (
+				<article class="flex !flex-row !gap-3 items-center">
+					{/*
+					<Button class="w-min">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+					</Button>
+					*/}
+					<h2 class="px-2 truncate text-lg font-bold">
+						{item}
+					</h2>
+				</article>
+			))}
+		</div>
+	</FunctionalFieldset>
+	-->
+	<FunctionalFieldset title="Portfolio Order">
+		{porfolio.map((item, index) => (
+			<article class="flex !flex-row !gap-1 items-center">
+				<Button submit class="w-min" size="small" href={`/portfolio/${item.slug}`}>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/></svg>
+				</Button>
+				<form method="post" action={`/api/portfolio-delete/${item.slug}`}>
+					<Button submit class="w-min" size="small" typeButton="danger">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+					</Button>
+				</form>
+				<form method="post" action={`/api/portfolio-move-up/${item.slug}`} class:list={{ "invisible": index === 0 }}>
+					<Button submit class="w-min" size="small">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+					</Button>
+				</form>
+				<form method="post" action={`/api/portfolio-move-down/${item.slug}`} class:list={{ "invisible": porfolio.length === index + 1 }}>
+					<Button submit class="w-min" size="small">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+					</Button>
+				</form>
+				<div class="ml-2 max-w-72 flex flex-col">
+					<div class="flex items-center justify-center gap-2">
+						<span class="text-sm underline underline-offset-4">#{index}</span>
+						<h2 class="truncate text-lg font-bold">
+							{item.title}
+						</h2>
+						<span class="text-xs">({item.slug})</span>
+					</div>
+					<span class="truncate text-sm font-bold">{item.description}</span>
+				</div>
+			</article>
+		))}
+	</FunctionalFieldset>
+	<!--
+	<FunctionalFieldset title={`Files (${filesInBlob.length}x)`}>
+		<div class="max-h-[70vh] overflow-auto">
+			{porfolioSorted.map((item) => (
+				<article class="flex !flex-row !gap-3 items-center">
+					{/*
+					<Button class="w-min">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+					</Button>
+					*/}
+					<h2 class="px-2 truncate text-lg font-bold">
+						{item}
+					</h2>
+				</article>
+			))}
+		</div>
+	</FunctionalFieldset>
+	-->
+</LayoutAdmin>

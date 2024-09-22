@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../drive/database.db" // env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Customer {
@@ -20,19 +20,32 @@ model Customer {
 
   show Boolean @default(false)
 
-  folders Folder[]
-  // shared_folders FolderShare[]
+  sessions Session[]
+
+  boxes Box[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
 
-model File {
-  id   String @id @default(cuid())
-  name String
+model Session {
+  id        String   @id
+  userId    String   @map("customer_id")
+  expiresAt DateTime @map("expires_at")
 
-  folder    Folder @relation(fields: [folder_id], references: [id])
-  folder_id String // Verweis auf den Ordner, zu dem die Datei gehört
+  customer Customer @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+// type FileType = "image" | "video" | "audio" | "text" | "application" | "message" | "model" | "multipart" | "example" | "font" | "chemical" | "other";
+model BoxFile {
+  id                  String @id @default(cuid())
+  file_name           String
+  file_name_extension String
+  mime                String
+  type                String
+
+  box    Box    @relation(fields: [box_id], references: [id])
+  box_id String // Verweis auf den Ordner, zu dem die Datei gehört
 
   download_count Int @default(0) // Zählt die Anzahl der Downloads der Datei
 
@@ -40,21 +53,24 @@ model File {
   updated_at DateTime @updatedAt
 }
 
-model Folder {
-  id   String @id @default(cuid())
-  name String
+model Box {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
 
-  owner    Customer @relation(fields: [owner_id], references: [id])
-  owner_id String // Verweis auf den Benutzer, dem der Ordner gehört
+  owner    Customer? @relation(fields: [owner_id], references: [id])
+  owner_id String? // Verweis auf den Benutzer, dem der Ordner gehört
 
-  files File[] // Dateien im Ordner
+  box_files BoxFile[] // Dateien im Ordner
 
-  is_public      Boolean @default(false) // Bestimmt, ob der Ordner öffentlich zugänglich ist
-  password       String? // Optional: Passwort für den Ordner
-  download_count Int     @default(0) // Zählt die Anzahl der Downloads
+  is_public           Boolean @default(false) // Bestimmt, ob der Ordner öffentlich zugänglich ist
+  password            String?
+  password_for_public Boolean @default(false) // Bestimmt, ob ein Passwort für den öffentlichen Zugriff erforderlich ist
+  password_for_owner  Boolean @default(false) // Bestimmt, ob ein Passwort für den Zugriff des Eigentümers erforderlich ist
+  download_count      Int     @default(0) // Zählt die Anzahl der Downloads
 
   access_until DateTime? // Optional: Datum, bis zu dem der Ordner zugänglich ist
-  delete_at    DateTime? // Optional: Automatisches Löschdatum
+  // delete_at    DateTime? // Optional: Automatisches Löschdatum
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -65,13 +81,15 @@ model PortfolioItem {
   slug        String  @unique
   title       String
   description String?
-  content     String
+  content     String?
+
+  order Int
 
   thumbnail    Image  @relation(fields: [thumbnail_id], references: [id])
   thumbnail_id String @unique
 
-  image_gallery    ImageGallery?
-  image_gallery_id String
+  image_gallery    ImageGallery @relation(fields: [image_gallery_id], references: [id])
+  image_gallery_id String       @unique
 
   video_gallery    VideoGallery @relation(fields: [video_gallery_id], references: [id])
   video_gallery_id String       @unique
@@ -85,8 +103,7 @@ model ImageGallery {
 
   images Image[]
 
-  portfolio_item    PortfolioItem @relation(fields: [portfolio_item_id], references: [id])
-  portfolio_item_id String        @unique
+  portfolio_item PortfolioItem?
 }
 
 model Image {
@@ -94,8 +111,8 @@ model Image {
 
   image_variations SingleImage[]
 
-  image_gallery    ImageGallery @relation(fields: [image_gallery_id], references: [id])
-  image_gallery_id String
+  image_gallery    ImageGallery? @relation(fields: [image_gallery_id], references: [id])
+  image_gallery_id String?
 
   portfolio_item  PortfolioItem?
   video_thumbnail SingleVideo?
@@ -106,13 +123,13 @@ model SingleImage {
   id        String @id @default(cuid())
   file_name String
 
-  width  Int
-  height Int
-
-  mime      String
   extension String
+  mime      String
 
-  size    Int
+  size Int
+
+  width   Int
+  height  Int
   quality Int
 
   image    Image  @relation(fields: [image_id], references: [id])
@@ -129,7 +146,14 @@ model VideoGallery {
 }
 
 model SingleVideo {
-  id String @id @default(cuid())
+  id        String @id @default(cuid())
+  file_name String
+
+  extension String
+  mime      String
+
+  width  Int
+  height Int
 
   thumbnail    Image?  @relation(fields: [thumbnail_id], references: [id])
   thumbnail_id String? @unique

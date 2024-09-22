@@ -3,12 +3,11 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { errorConditionerHtmlResponse } from "src/utils/error-conditioner";
 
-import { isAdmin, redirectToAdmin, unauthorized } from "src/utils/minis";
+import { redirectToAdmin, unauthorized } from "src/utils/minis";
 import { portfolioMoveDownBySlug } from "src/utils/portfolio";
 
 export const POST: APIRoute = async ({ params, locals }) => {
-	// if (!isAdmin(locals.user)) return unauthorized();
-	// TODO: ADD AUTHENTICATION
+	if (!locals.admin) return unauthorized();
 
 	// Get slug parameter
 	const { slug } = params;

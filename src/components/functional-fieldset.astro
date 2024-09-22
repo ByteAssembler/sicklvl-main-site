@@ -3,6 +3,7 @@ import Fieldset from "src/components/fieldset.astro";
 import Label from "src/components/label.astro";
 import Button from "src/components/button.astro";
 import UniversalComponent from "./universal-component.astro";
+import type { ComponentProps } from "src/env";
 
 interface Props {
 	title?: string;
@@ -11,7 +12,7 @@ interface Props {
 	formMethod?: string;
 	submit?: boolean;
 	class?: string;
-	classChild?: string;
+	classFieldset?: string;
 
 	entries?: (ComponentProps & {
 		title: string;
@@ -21,7 +22,7 @@ interface Props {
 const props: Props = Astro.props;
 ---
 
-<Fieldset {...props} class={["gap-4 [&>*]:w-full [&>*]:flex [&>*]:flex-col [&>*]:gap-1.5", (props.class ?? "")]}>
+<Fieldset {...props} classParent={props.classFieldset} class={["gap-4 [&>*]:w-full [&>*]:flex [&>*]:flex-col [&>*]:gap-1.5", props.class]}>
 	{props.entries && props.entries.map((item) => (
 		<div>
 			<Label for={item.name}>{item.title}</Label>
@@ -31,7 +32,7 @@ const props: Props = Astro.props;
 	<slot />
 	{props.submit && (
 		<div class="pt-4">
-			<Button>Submit</Button>
+			<Button submit>Submit</Button>
 		</div>
 	)}
 </Fieldset>

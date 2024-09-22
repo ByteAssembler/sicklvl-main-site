@@ -53,3 +53,7 @@ drive/
 *.tgz
 *.rar
 *.7z
+
+# Prisma
+prisma/migrations
+*.db

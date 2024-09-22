@@ -1,8 +1,11 @@
 ---
+import type { InputSelectProps } from 'src/env';
+
 interface Props extends InputSelectProps {}
 
 const {
 	name = "",
+	multiple = false,
 	options = [],
 	required = false
 } = Astro.props;
@@ -10,6 +13,7 @@ const {
 
 <select
 	name={name}
+	multiple={multiple}
 	class="font-inconsolata text-lg font-bold tracking-widest"
 	required={required}
 >

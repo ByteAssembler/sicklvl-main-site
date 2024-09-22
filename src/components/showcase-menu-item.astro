@@ -1,0 +1,46 @@
+---
+type Props = { idx?: number; };
+const { idx } = Astro.props;
+---
+
+<button
+	data-index={idx}
+	class:list={[ "menu-item h-full snap-center my-auto mx-1.5",
+		{
+			selected: idx === 0,
+			"not-selected" : idx !== 0
+		}
+	]}
+	>
+	<div class="cursor-pointer h-full rounded-xl">
+		<slot />
+	</div>
+</button>
+
+<style scoped>
+	.menu-item {
+		@apply transition-all ease-out h-full py-2 min-w-fit;
+	}
+
+	.menu-item img {
+		/* @apply filter blur-[2px]; */
+	}
+
+	.menu-item > div {
+		@apply border-white/85 border-2 p-1;
+	}
+
+	.menu-item.not-selected {
+		@apply py-4;
+	}
+
+	.menu-item.selected > div {
+		@apply border-[3px] border-white;
+	}
+
+	.menu-item.selected {
+	}
+
+	.menu-item.not-selected {
+	}
+</style>

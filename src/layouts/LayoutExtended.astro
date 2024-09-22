@@ -1,6 +1,6 @@
 ---
-import NavigationBox from 'src/wrappers/navigation-box.astro';
 import Layout from './Layout.astro'
+import NavigationBox from 'src/wrappers/navigation-box.astro';
 import Navigation from 'src/wrappers/navigation.astro';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 	title?: string;
 }
 
-const { title, tabTitle, language = "en" } = Astro.props;
+const { title, tabTitle, language } = Astro.props;
 ---
 
 <Layout {tabTitle} {language}>

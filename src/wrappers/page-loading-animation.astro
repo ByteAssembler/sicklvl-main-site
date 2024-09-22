@@ -1,15 +1,37 @@
 ---
-import pic1 from "../assets/1.jpg";
-import pic2 from "../assets/2.jpg";
-import pic3 from "../assets/3.jpg";
-import pic4 from "../assets/4.jpg";
-import pic5 from "../assets/5.jpg";
+import { prismaClient } from "src/global";
+import { fileNameToBlobUrlPath } from "src/utils/file-manager";
+import { getImageWithPreferredWidth } from "src/utils/minis";
 
-const pic1src = `url(${pic1.src})`;
-const pic2src = `url(${pic2.src})`;
-const pic3src = `url(${pic3.src})`;
-const pic4src = `url(${pic4.src})`;
-const pic5src = `url(${pic5.src})`;
+const portfolioItemsFirst5 = await prismaClient.portfolioItem.findMany({
+	select: {
+		id: true,
+		thumbnail: {
+			select: {
+				image_variations: true,
+			},
+		},
+	},
+	orderBy: {
+		order: "asc",
+	},
+	take: 5,
+});
+
+function getImage(pos: number, pics = portfolioItemsFirst5) {
+	if (pos < 0 || pos >= pics.length) return "/play.webp";
+
+	const item = portfolioItemsFirst5[pos];
+	const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
+	const url = fileNameToBlobUrlPath(image.file_name);
+	return url;
+}
+
+const pic1src = `url(${getImage(0)})`;
+const pic2src = `url(${getImage(1)})`;
+const pic3src = `url(${getImage(2)})`;
+const pic4src = `url(${getImage(3)})`;
+const pic5src = `url(${getImage(4)})`;
 
 const animationCount = 5;
 const animationTimePerStep = `305ms`;
@@ -17,7 +39,7 @@ const animationSlideoutTime = `305ms`;
 ---
 
 <section id="loading-box-wrapper" class="fixed inset-0 z-[99999] bg-black flex items-center justify-center">
-	<div id="loading-box" class="loading-box-animation bg-red-300">
+	<div id="loading-box" class="loading-box-animation">
 	</div>
 </section>
 

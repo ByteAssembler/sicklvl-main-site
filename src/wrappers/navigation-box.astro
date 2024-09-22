@@ -1,23 +1,5 @@
 ---
-import { globalDB } from "src/utils/cdate";
-import NavigationBoxPortfolio from "./navigation-box-portfolio.astro";
-
-const portfolio = await globalDB.portfolio.getArray();
-const members = await globalDB.users.getArray();
-// const membersFiltered = members.filter(m => m.show);
-
-const membersFiltered: User[] = [
-  {
-    name: "Thom",
-    email: "thom@mail.com",
-    id: "1",
-    telephone: "123-456-7890",
-    show: true,
-    password: "password",
-    attributes: {},
-    role: "admin"
-  },
-]
+const membersFiltered: any[] = []
 ---
 
 <section class="nb fixed inset-0 z-[40] overflow-auto" id="navigation-box">
@@ -67,7 +49,7 @@ const membersFiltered: User[] = [
 
 
     <div class="nb-portfolio h-full w-full overflow-y-hidden overflow-x-auto LG:min-h-64">
-      <NavigationBoxPortfolio portfolio={portfolio} />
+      {/* <NavigationBoxPortfolio portfolio={portfolio} /> */}
     </div>
 
 

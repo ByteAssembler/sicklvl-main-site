@@ -1,5 +1,6 @@
 ---
-import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
+import type { PerfectVideoProps } from 'src/env';
+import { fileNameToBlobUrlPath, fileNameToBoxFileUrlPath } from 'src/utils/file-manager';
 
 interface Props extends PerfectVideoProps {}
 
@@ -10,13 +11,17 @@ const {
     width: wid,
     height: hei,
 
-	video,
+	videoUrl,
 
 	controls,
 	playsinline = true,
 	poster,
 	disablepictureinpicture = true,
+
+	inForUrl,
 } = Astro.props;
+
+const urlGetter = inForUrl === "portfolio" ? fileNameToBlobUrlPath : fileNameToBoxFileUrlPath;
 
 let posterImage;
 
@@ -25,32 +30,22 @@ if (poster) {
 		if (poster.length === 0) {
 			posterImage = "";
 		} else if (poster.length > 0) {
-			posterImage = fileNameToBlobUrlPath(poster[0].file_name);
+			posterImage = urlGetter(poster[0].file_name);
 		}
 	} else if (typeof poster === "object") {
-		posterImage = fileNameToBlobUrlPath(poster.file_name);
+		posterImage = urlGetter(poster.file_name);
 	} else if (typeof poster === "string") {
 		posterImage = poster;
 	}
 } else {
-	if (video.thumbnail) {
-		if (video.thumbnail.length === 0) {
-			posterImage = "";
-		} else if (video.thumbnail.length > 0) {
-			posterImage = fileNameToBlobUrlPath(video.thumbnail[0].file_name);
-		}
-	} else {
-		posterImage = "";
-	}
+	posterImage = "/play.webp";
 }
-
-
 ---
 
 <video
 	title={title}
     class={cls}
-    src={video.url}
+    src={videoUrl}
     width={wid ?? "auto"}
     height={hei ?? "auto"}
 	controls={controls}

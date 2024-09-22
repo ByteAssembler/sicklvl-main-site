@@ -1,17 +1,17 @@
 ---
+import "../styles/font-august.css";
+import "../styles/defaults.css";
+
 interface Props {
 	language?: string;
 	tabTitle: string;
 }
 
-import "../styles/font-august.css";
-import "../styles/defaults.css";
-
-const { tabTitle, language = "en" } = Astro.props;
+const { tabTitle, language } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={language}>
+<html lang={language ?? "en"}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />

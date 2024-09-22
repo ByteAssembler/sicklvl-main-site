@@ -1,11 +1,15 @@
 ---
-// Usefull Input field properties
+import type { FileUploadProps } from 'src/env';
+
 interface Props extends FileUploadProps {}
 
 const {
 	name = "",
 	multiple = true,
 	accept = "*",
+	required = false,
+	id = "",
+	class: className = "",
 } = Astro.props;
 ---
 
@@ -14,7 +18,9 @@ const {
 	name={name}
 	multiple={multiple}
 	accept={accept}
-	class="font-inconsolata text-lg font-bold tracking-widest"
+	id={id}
+	required={required}
+	class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
 >
 
 
@@ -81,7 +87,6 @@ const {
 		border-right: 2px solid white;
 
 		cursor: pointer;
-
 	}
 
 	input[type=file]:hover::file-selector-button,

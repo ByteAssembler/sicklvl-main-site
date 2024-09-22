@@ -1,8 +1,29 @@
 ---
-import { globalDB } from "src/utils/cdate";
+import { prismaClient } from "src/global";
 import { fileNameToBlobUrlPath } from "src/utils/file-manager";
+import { getImageWithPreferredWidth } from "src/utils/minis";
 
-const items = await globalDB.portfolio.getArray();
+const items = await prismaClient.portfolioItem.findMany({
+	orderBy: {
+		order: 'asc',
+	},
+	select: {
+		title: true,
+		slug: true,
+		thumbnail: {
+			select: {
+				id: true,
+				image_variations: {
+					select: {
+						id: true,
+						file_name: true,
+						width: true,
+					},
+				},
+			},
+		},
+	},
+});
 const itemCount = items.length;
 
 // NOTE: Focus animation time is 300ms
@@ -11,20 +32,8 @@ const itemCount = items.length;
 <section class="select-none" id="container-grid">
 	<div id="container-grid-box" class="container-grid-box-always h-full w-full absolute inset-0">
 		{items.map((item) => {
-			// Get image by 480 width
-			let image = item.image_horizontal.find((img) => img.width === 480);
-			if (!image) {
-				// Get the available image size by width closest to 480
-				image = item.image_horizontal.reduce((prev, curr) => {
-					return Math.abs(curr.width - 480) < Math.abs(prev.width - 480) ? curr : prev;
-				});
-			}
-			if (!image) {
-				// Fallback to the first image
-				image = item.image_horizontal[0];
-			}
+			const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
 			if (!image) console.error('No image found for', item);
-
 			const imageURL = `url(${fileNameToBlobUrlPath(image.file_name)})`;
 
 			return (
@@ -129,7 +138,7 @@ const itemCount = items.length;
 	}
 </style>
 
-<script lang="ts" define:vars={{ itemCount }}>
+<script is:inline define:vars={{ itemCount }}>
 	function setup() {
 		const grid = document.getElementById('container-grid');
 		if (!grid) return;

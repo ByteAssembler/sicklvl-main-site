@@ -7,20 +7,26 @@ interface Props {
 	language?: string;
 	tabTitle: string;
 
+	type: "username" | "email";
+
 	title?: string;
 	subtitle?: string;
 	descriptionHidden?: string;
 	buttonContent?: string;
+	action?: string;
 }
 
 const {
 	tabTitle,
-	language = "en",
+	language,
+
+	type,
 
 	title = "Login Panel",
 	subtitle = "Login",
 	descriptionHidden = "Login page",
 	buttonContent = "Login",
+	action = "/api/login",
 } = Astro.props;
 ---
 
@@ -32,10 +38,11 @@ const {
 		<div class="flex flex-col items-center justify-center gap-8 border-2 border-white p-8">
 			<h2 class="font-inconsolata text-center text-4xl font-bold tracking-widest">{subtitle}</h2>
 
-			<form method="post" action="/api/login" enctype="multipart/form-data" class="w-full flex gap-4 flex-col items-center justify-center">
-				<Input name="email" placeholder="Email" type="email" required />
+			<form method="post" action={action} enctype="multipart/form-data" class="w-full flex gap-4 flex-col items-center justify-center">
+				{type === "username" && <Input name="username" placeholder="Username" type="text" min={3} max={255} required />}
+				{type === "email" && <Input name="email" placeholder="Email" type="email" min={3} max={255} required />}
 				<Input name="password" placeholder="Password" type="password" min={6} max={256} required />
-				<Button class="w-[50%]">{buttonContent}</Button>
+				<Button submit class="w-[50%]">{buttonContent}</Button>
 			</form>
 		</div>
 	</main>
