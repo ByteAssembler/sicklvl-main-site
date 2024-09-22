@@ -52,6 +52,10 @@ const itemCount = items.length;
 </section>
 
 <style is:global>
+	body {
+		touch-action: none;
+	}
+
 	#container-grid {
 		width: 100%;
 		height: 100%;
@@ -171,7 +175,7 @@ const itemCount = items.length;
 		// Funktion, um die Position eines Bildes dynamisch zu aktualisieren
 		function updateImagePosition(ele, gridXPos, gridYPos, mouseX, mouseY, maxTranslateX, maxTranslateY) {
 			// Berechne den Korrekturwert für die X- und Y-Achse, um das Padding auf beiden Seiten zu balancieren
-			const translateX = gridXPos * (imgWidth + imgXGap) + ((mouseX - 0.5) * maxTranslateX); 
+			const translateX = gridXPos * (imgWidth + imgXGap) + ((mouseX - 0.5) * maxTranslateX);
 			const translateY = gridYPos * (imgHeight + imgYGap) + ((mouseY - 0.5) * maxTranslateY);
 
 			// Setze die neue Position des Artikels
@@ -196,6 +200,20 @@ const itemCount = items.length;
 		window.addEventListener('mousemove', (e) => {
 			mouseX = e.clientX / window.innerWidth;
 			mouseY = e.clientY / window.innerHeight;
+
+			if (!animationFrameRequested) {
+				requestAnimationFrame(updateImages);
+				animationFrameRequested = true;
+			}
+		});
+
+		window.addEventListener("touchmove", (e) => {
+			const touch = e.touches[0];
+			console.log(touch);
+
+			// Invertiere die X und Y-Achse, um die Bewegung zu korrigieren
+			mouseX = 1 - (touch.clientX / window.innerWidth);
+			mouseY = 1 - (touch.clientY / window.innerHeight);
 
 			if (!animationFrameRequested) {
 				requestAnimationFrame(updateImages);
