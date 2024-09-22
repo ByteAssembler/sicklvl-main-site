@@ -37,10 +37,12 @@ const [diskUsageRootFolder, diskUsageBlobFolder, diskUsageBoxContentFolder] = aw
 				<tr>
 					<td class="text-green-500">Free: {prettyBytes(diskUsageRootFolder.available)}</td>
 					<td class="text-yellow-500">Used: {prettyBytes(diskUsageBlobFolder.size + diskUsageBoxContentFolder.size)}</td>
+					<td class="text-gray-500">Used OS: {prettyBytes(diskUsageRootFolder.total - diskUsageRootFolder.available - diskUsageBlobFolder.size - diskUsageBoxContentFolder.size)}</td>
 				</tr>
 				<tr>
 					<td class="text-green-500">Free: {Math.round(diskUsageRootFolder.available / diskUsageRootFolder.total * 100)}%</td>
 					<td class="text-yellow-500">Used: {Math.round((diskUsageBlobFolder.size + diskUsageBoxContentFolder.size) / diskUsageRootFolder.total * 100)}%</td>
+					<td class="text-gray-500">Used OS: {Math.round((diskUsageRootFolder.total - diskUsageRootFolder.available - diskUsageBlobFolder.size - diskUsageBoxContentFolder.size) / diskUsageRootFolder.total * 100)}%</td>
 				</tr>
 			</tbody>
 		</table>
