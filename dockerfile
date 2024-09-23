@@ -6,9 +6,10 @@ WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json (if it exists)
 # COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
@@ -26,7 +27,7 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/ /usr/src/app/
 
 # Install only production dependencies
-RUN npm ci --omit=dev
+RUN npm install --only=production
 
 # Expose the port your application will run on
 ENV HOST=0.0.0.0
