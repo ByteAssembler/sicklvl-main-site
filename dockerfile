@@ -32,6 +32,9 @@ COPY --from=build /usr/src/app/ /usr/src/app/
 # Install only production dependencies
 RUN npm install --only=production
 
+RUN npx prisma generate
+RUN npx prisma migrate deploy
+
 # Expose the port your application will run on
 ENV HOST=0.0.0.0
 ENV PORT=4321
