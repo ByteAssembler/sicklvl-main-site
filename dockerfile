@@ -5,7 +5,7 @@ FROM node:lts-alpine AS build
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json (if it exists)
-COPY package.json package-lock.json ./
+# COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm ci
