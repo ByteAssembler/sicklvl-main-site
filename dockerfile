@@ -1,6 +1,9 @@
 # Use the latest stable Node.js LTS version for the build stage
 FROM node:lts-alpine AS build
 
+# Install necessary build tools for node-gyp
+RUN apk add --no-cache python3 make g++
+
 # Set the working directory
 WORKDIR /usr/src/app
 
