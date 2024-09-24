@@ -10,9 +10,9 @@ export default defineConfig({
   integrations: [tailwind()],
   output: "server",
 
-  security: {
-    checkOrigin: import.meta.env.PROD,
-  },
+  // security: {
+  //   checkOrigin: import.meta.env.PROD,
+  // },
 
   adapter: node({
     mode: 'standalone'
