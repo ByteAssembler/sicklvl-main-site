@@ -23,7 +23,6 @@ RUN npx prisma migrate deploy
 # Build the Astro site
 RUN npm run build
 
-
 # Expose the port your application will run on
 ENV HOST=0.0.0.0
 ENV PORT=4321
