@@ -7,8 +7,10 @@ import type { SingleImageMemory } from "src/env";
 import ffmpeg from "fluent-ffmpeg";
 import sharp from "sharp";
 
-export const blobFolderPath = path.join(process.cwd(), "drive", "blob");
-export const boxContentFolderPath = path.join(process.cwd(), "drive", "box-content");
+const rootFolderPath = import.meta.env.STORAGE_FOLDER_PATH || process.cwd();
+
+export const blobFolderPath = path.join(rootFolderPath, "drive", "blob");
+export const boxContentFolderPath = path.join(rootFolderPath, "drive", "box-content");
 
 export async function saveBlob(data: File | FileList, folderPath: string): Promise<boolean> {
 	if (data instanceof File) {
