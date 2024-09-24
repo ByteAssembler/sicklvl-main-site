@@ -8,7 +8,6 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json (if it exists)
-# COPY package.json package-lock.json ./
 COPY package.json ./
 
 # Install dependencies
@@ -17,6 +16,10 @@ RUN npm install
 # Copy the rest of the application source code
 COPY . .
 
+# Set the DATABASE_URL for Prisma (SQLite example)
+ENV DATABASE_URL="file:./database.db"
+
+# Generate the Prisma client and deploy migrations
 RUN npx prisma generate
 RUN npx prisma migrate deploy
 
@@ -34,6 +37,9 @@ COPY --from=build /usr/src/app/ /usr/src/app/
 
 # Install only production dependencies
 RUN npm install --only=production
+
+# Expose the prisma database file path
+ENV DATABASE_URL="file:./database.db"
 
 # Expose the port your application will run on
 ENV HOST=0.0.0.0
