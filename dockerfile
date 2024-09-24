@@ -23,6 +23,7 @@ RUN echo $PORT
 
 # Generate the Prisma client and deploy migrations
 RUN npx prisma generate
+RUN npx prisma migrate dev
 RUN npx prisma migrate deploy
 
 # Build the Astro site
