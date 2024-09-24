@@ -16,6 +16,11 @@ RUN npm install
 # Copy the rest of the application source code
 COPY . .
 
+# Log environment variables
+RUN echo $DATABASE_URL
+RUN echo $HOST
+RUN echo $PORT
+
 # Generate the Prisma client and deploy migrations
 RUN npx prisma generate
 RUN npx prisma migrate deploy
