@@ -16,6 +16,9 @@ RUN npm install
 # Copy the rest of the application source code
 COPY . .
 
+# Generate the Prisma client and deploy migrations
+RUN npx prisma generate
+
 # Build the Astro site
 RUN npm run build
 
