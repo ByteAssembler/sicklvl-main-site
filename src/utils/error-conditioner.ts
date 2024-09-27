@@ -92,10 +92,11 @@ export function errorConditionerHtml(name: string | null | undefined, htmlConten
 `;
 }
 
-export function errorConditionerHtmlResponse(name: string | null | undefined, htmlContent?: string): Response {
+export function errorConditionerHtmlResponse(name: string | null | undefined, htmlContent?: string, status: number = 400): Response {
 	return new Response(
 		errorConditionerHtml(name, htmlContent),
 		{
+			status,
 			headers: {
 				"content-type": "text/html; charset=utf-8",
 			},
