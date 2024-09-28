@@ -4,13 +4,15 @@ import Button from 'src/components/button.astro';
 
 import { prismaClient } from 'src/global';
 import { redirectCustomerLogin } from 'src/utils/minis';
+import { fileNameToBoxFileUrlPath, isFileExtensionAImage } from 'src/utils/file-manager';
 
 let box = [];
 let isAdmin = false;
 
 if (Astro.locals.admin) {
 	box = await prismaClient.box.findMany({
-		orderBy: { created_at: 'desc' }
+		orderBy: { created_at: 'desc' },
+		include: { box_files: true }
 	});
 	isAdmin = true;
 } else {
@@ -18,9 +20,16 @@ if (Astro.locals.admin) {
 	if (!customerId) return redirectCustomerLogin();
 	box = await prismaClient.box.findMany({
 		where: { owner_id: customerId },
-		orderBy: { created_at: 'desc' }
+		orderBy: { created_at: 'desc' },
+		include: { box_files: true }
 	});
 	isAdmin = false;
+}
+
+function getBoxThumbnail(box: any) {
+	const firstImage = box.box_files.find((file: any) => isFileExtensionAImage(file.file_name));
+	const firstImageUrl = firstImage ? fileNameToBoxFileUrlPath(firstImage.id) : undefined;
+	return firstImageUrl || "/file.webp";
 }
 ---
 
@@ -32,9 +41,9 @@ if (Astro.locals.admin) {
 		<article class="flex flex-col gap-1 p-2 border-2">
 			<a href={`/box/${item.id}`} class="w-full h-40">
 				<img
-					class="h-full w-full object-cover"
-					src="/play.webp"
-					alt=""
+					class="h-full w-full p-4 object-cover filter blur-[8px] brightness-50"
+					src={getBoxThumbnail(item)}
+					alt={`Thumbnail for ${item.name}`}
 				>
 			</a>
 
