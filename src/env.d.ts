@@ -154,6 +154,7 @@ interface FieldsetProps {
 
 interface FileUploadProps {
 	type?: "file";
+	size?: "normal" | "small";
 	name?: string;
 	multiple?: boolean;
 	accept?: string;

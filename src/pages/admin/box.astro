@@ -1,6 +1,7 @@
 ---
 import LayoutAdmin from "src/layouts/LayoutAdmin.astro";
 import FunctionalFieldset from "src/components/functional-fieldset.astro";
+import FileUpload from "src/components/file-upload.astro";
 import Button from "src/components/button.astro";
 
 import { prismaClient } from "src/global";
@@ -61,19 +62,19 @@ const [customer, boxes] = await prismaClient.$transaction([
 	/>
 
 	<FunctionalFieldset title="Boxes">
-		<div class="max-h-[70vh] max-w-80">
+		<div class="max-h-[70vh]">
 			<Button submit size="small" href="/box" class="mb-2">
 				List all
 			</Button>
 			{boxes.map((box) => (
-				<article class="flex !flex-row !gap-3 items-center justify-between">
+				<article class="flex !flex-col gap-2 border-2 p-2">
 					<div class="flex flex-col">
-						<div class="flex items-center gap-1">
-							<h2 class="truncate text-lg font-bold overflow-hidden">
+						<div class="max-w-[24rem] flex items-center gap-1">
+							<h2 class="truncate text-lg font-bold">
 								{box.name}
 							</h2>
-							<span class="text-xs">
-								({box.box_files.length} Files)
+							<span class="truncate text-xs italic align-middle">
+								{box.box_files.length}
 							</span>
 						</div>
 						<div class="flex items-center gap-1">
@@ -91,17 +92,33 @@ const [customer, boxes] = await prismaClient.$transaction([
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
-						<Button submit size="small" class="w-min" href={`/box/${box.id}`}>
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/></svg>
-						</Button>
-						<Button submit size="small" class="w-min" href={`/box/full/${box.id}`}>
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-						</Button>
-						<form method="post" action={`/api/box-delete/${box.id}`}>
-							<Button submit size="small" typeButton="danger" class="w-min">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+						<div>
+							<form class="flex items-center gap-2" method="post" action={`/api/box-files-upload/${box.id}`} enctype="multipart/form-data">
+								<span class="italic text-sm">
+									Upload
+								</span>
+								<FileUpload name="files" size="small" class="w-min">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+								</FileUpload>
+								<Button submit size="small" class="w-min">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg>
+								</Button>
+							</form>
+						</div>
+						<hr class="border-0 border-l h-full">
+						<div class="flex gap-2">
+							<Button submit size="small" class="w-min" href={`/box/${box.id}`}>
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/></svg>
 							</Button>
-						</form>
+							<Button submit size="small" class="w-min" href={`/box/full/${box.id}`}>
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+							</Button>
+							<form method="post" action={`/api/box-delete/${box.id}`}>
+								<Button submit size="small" typeButton="danger" class="w-min">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+								</Button>
+							</form>
+						</div>
 					</div>
 					{/*item.show && <span class="text-sm underline underline-offset-4">VISIBLE</span>*/}
 				</article>

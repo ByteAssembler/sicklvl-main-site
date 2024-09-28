@@ -5,6 +5,7 @@ interface Props extends FileUploadProps {}
 
 const {
 	name = "",
+	size = "normal",
 	multiple = true,
 	accept = "*",
 	required = false,
@@ -15,6 +16,7 @@ const {
 
 <input
 	type="file"
+	data-size={size}
 	name={name}
 	multiple={multiple}
 	accept={accept}
@@ -47,12 +49,6 @@ const {
 
 	input *, input::placeholder, input::-webkit-file-upload-button, input::file-selector-button {
 		height: 100%;
-	}
-
-	input[type="text"],
-	input[type="email"],
-	input[type="password"] {
-		padding: 0.5rem 0.75rem;
 	}
 
 	input:hover, input:active {
@@ -94,5 +90,15 @@ const {
 		border-color: black;
 		background-color: white;
 		color: black;
+	}
+
+	input[data-size="small"]::file-selector-button {
+		display: none;
+	}
+
+	input[data-size="small"] {
+		padding: 0 0.5rem;
+		width: 150px;
+		height: 2rem;
 	}
 </style>
