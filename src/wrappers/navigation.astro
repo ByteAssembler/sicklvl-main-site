@@ -1,23 +1,18 @@
 ---
+import type { NavigationLink } from "src/env";
 import NavigationMobile from "src/wrappers/navigation-mobile.astro";
 import NavigationDesktop from "./navigation-desktop.astro";
 
-const staticLinks = [
-	{ href: "/", text: "Home" },
-	{ href: "/about", text: "About" },
+const staticLinks: NavigationLink[] = [
+	{ href: "/", text: "Home", size: "medium" },
+    { href: "/portfolio", text: "Portfolio", size: "medium" },
+    { href: "/about", text: "About", size: "medium" },
+    { href: "/customer-login", text: "Customer Area", size: "medium" },
+    { href: "/disclaimer", text: "Disclaimer", size: "small" },
+    { href: "/imprint", text: "Imprint", size: "small" },
 
-    // Customer area
-    { href: "/customer-login", text: "Customer Area" },
-
-    // cookie-policy
     // { href: "/cookie-policy", text: "Cookie Policy" },
-    // disclaimer
-    { href: "/disclaimer", text: "Disclaimer" },
-    // imprint
-    { href: "/imprint", text: "Imprint" },
-    // privacy-policy
     // { href: "/privacy-policy", text: "Privacy Policy" },
-    // terms-and-conditions
     // { href: "/terms-and-conditions", text: "Terms and Conditions" },
 ];
 ---

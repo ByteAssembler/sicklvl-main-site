@@ -7,7 +7,7 @@ interface Props {
 const { links } = Astro.props;
 ---
 
-<div id="navigation-top-left" class="SM:hidden h-60 w-52 fixed p-4 pt-5 pl-5 lg:pt-9 lg:pl-9 flex z-[30]">
+<div id="navigation-desktop" class="SM:hidden h-60 w-52 fixed p-4 pt-5 pl-5 lg:pt-9 lg:pl-9 flex z-[30]">
     <svg width="21" height="114" viewBox="0 0 21 114" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M13.48 1.41048C15.248 1.41048 16.6867 2.13848 17.796 3.59448C18.9053 5.06781 19.46 6.99181 19.46 9.36648C19.46 11.7585 18.8793 13.7085 17.718 15.2165C16.5567 16.7418 15.3433 17.5045 14.078 17.5045C13.922 17.5045 13.7833 17.4438 13.662 17.3225C13.558 17.2185 13.506 17.0971 13.506 16.9585L13.506 11.7585C13.506 11.3598 13.6533 10.9958 13.948 10.6665C14.2427 10.3371 14.39 9.89514 14.39 9.34048C14.39 8.50848 14.1473 8.09248 13.662 8.09248C13.402 8.09248 13.1853 8.29181 13.012 8.69048C12.8387 9.10648 12.6827 9.86914 12.544 10.9785C12.2147 13.5611 11.608 15.3985 10.724 16.4905C9.85733 17.5998 8.53133 18.1545 6.746 18.1545C4.978 18.1545 3.53067 17.3398 2.404 15.7105C1.29467 14.0985 0.74 11.9838 0.74 9.36648C0.74 6.74914 1.27733 4.69514 2.352 3.20448C3.42667 1.71381 4.73533 0.968477 6.278 0.968477C6.434 0.968477 6.564 1.02048 6.668 1.12448C6.78933 1.24581 6.85 1.38448 6.85 1.54048V6.48048C6.85 6.84448 6.67667 7.24314 6.33 7.67648C5.98333 8.12714 5.81 8.74248 5.81 9.52248C5.81 10.8225 6.05267 11.4725 6.538 11.4725C6.85 11.4725 7.084 11.2385 7.24 10.7705C7.41333 10.3025 7.58667 9.41848 7.76 8.11848C8.34933 3.64648 10.256 1.41048 13.48 1.41048ZM1 25.5828V20.9288C1 20.7381 1.06933 20.5734 1.208 20.4348C1.34667 20.2961 1.51133 20.2268 1.702 20.2268H13.818C14.0087 20.2268 14.1733 20.2961 14.312 20.4348C14.4507 20.5734 14.52 20.7381 14.52 20.9288L14.52 25.5828C14.52 25.7734 14.4507 25.9381 14.312 26.0768C14.1733 26.2154 14.0087 26.2848 13.818 26.2848H1.702C1.51133 26.2848 1.34667 26.2154 1.208 26.0768C1.06933 25.9381 1 25.7734 1 25.5828ZM19.538 26.1548H16.392C16.2013 26.1548 16.0367 26.0854 15.898 25.9468C15.7593 25.8081 15.69 25.6434 15.69 25.4528L15.69 21.0588C15.69 20.8681 15.7593 20.7034 15.898 20.5648C16.0367 20.4261 16.2013 20.3568 16.392 20.3568H19.538C19.7287 20.3568 19.8933 20.4261 20.032 20.5648C20.1707 20.7034 20.24 20.8681 20.24 21.0588V25.4528C20.24 25.6434 20.1707 25.8081 20.032 25.9468C19.8933 26.0854 19.7287 26.1548 19.538 26.1548ZM8.67 34.865H6.85C6.26067 34.865 5.836 34.943 5.576 35.099C5.316 35.255 5.186 35.4976 5.186 35.827C5.186 36.1563 5.238 36.3816 5.342 36.503C5.46333 36.6243 5.68 36.7456 5.992 36.867C6.32133 37.0056 6.486 37.257 6.486 37.621V42.691C6.486 42.8816 6.41667 43.0463 6.278 43.185C6.13933 43.3236 5.95733 43.393 5.732 43.393C5.50667 43.393 5.20333 43.315 4.822 43.159C4.44067 43.003 4.00733 42.7343 3.522 42.353C3.03667 41.9716 2.586 41.5036 2.17 40.949C1.77133 40.3943 1.43333 39.6663 1.156 38.765C0.878667 37.8636 0.74 36.867 0.74 35.775C0.74 33.6083 1.30333 31.849 2.43 30.497C3.574 29.1623 5.15133 28.495 7.162 28.495H8.358C10.3687 28.495 11.9373 29.1623 13.064 30.497C14.208 31.849 14.78 33.6083 14.78 35.775C14.78 37.0576 14.5807 38.219 14.182 39.259C13.8007 40.299 13.324 41.0963 12.752 41.651C12.1973 42.223 11.6513 42.6563 11.114 42.951C10.5767 43.2456 10.1607 43.393 9.866 43.393C9.58867 43.393 9.38067 43.3236 9.242 43.185C9.10333 43.0463 9.034 42.8816 9.034 42.691V37.621C9.034 37.2916 9.20733 37.0403 9.554 36.867C10.074 36.6243 10.334 36.3036 10.334 35.905C10.334 35.2116 9.77933 34.865 8.67 34.865ZM18.758 51.419H10.334L14.078 53.707C14.3727 53.8804 14.52 54.1317 14.52 54.461V59.713C14.52 59.8864 14.4593 60.0337 14.338 60.155C14.2167 60.2764 14.078 60.337 13.922 60.337C13.766 60.337 13.6273 60.2937 13.506 60.207L8.436 56.645L1.962 60.857C1.858 60.9264 1.728 60.961 1.572 60.961C1.43333 60.961 1.30333 60.9004 1.182 60.779C1.06067 60.6577 1 60.5104 1 60.337V54.877C1 54.5304 1.14733 54.2617 1.442 54.071L5.862 51.419L1.702 51.419C1.51133 51.419 1.34667 51.3497 1.208 51.211C1.06933 51.0724 1 50.9077 1 50.717L1 46.167C1 45.9764 1.06933 45.8117 1.208 45.673C1.34667 45.5344 1.51133 45.465 1.702 45.465L18.758 45.465C18.9487 45.465 19.1133 45.5344 19.252 45.673C19.3907 45.8117 19.46 45.9764 19.46 46.167V50.717C19.46 50.9077 19.3907 51.0724 19.252 51.211C19.1133 51.3497 18.9487 51.419 18.758 51.419ZM6.33 69.5215V76.7235C6.33 76.9142 6.26067 77.0789 6.122 77.2175C5.98333 77.3562 5.81867 77.4255 5.628 77.4255H1.702C1.51133 77.4255 1.34667 77.3562 1.208 77.2175C1.06933 77.0789 1 76.9142 1 76.7235L1 63.6195C1 63.4289 1.06933 63.2642 1.208 63.1255C1.34667 62.9869 1.51133 62.9175 1.702 62.9175L18.498 62.9175C18.6887 62.9175 18.8533 62.9869 18.992 63.1255C19.1307 63.2642 19.2 63.4289 19.2 63.6195L19.2 68.8195C19.2 69.0102 19.1307 69.1749 18.992 69.3135C18.8533 69.4522 18.6887 69.5215 18.498 69.5215H6.33ZM19.2 91.1649V96.0009C19.2 96.1569 19.1393 96.2869 19.018 96.3909C18.914 96.5122 18.81 96.5729 18.706 96.5729C18.602 96.5729 18.5153 96.5642 18.446 96.5469L1.858 91.6589C1.286 91.5029 1 91.1129 1 90.4889L1 84.5609C1 83.9369 1.286 83.5469 1.858 83.3909L18.446 78.5029C18.5153 78.4856 18.602 78.4769 18.706 78.4769C18.81 78.4769 18.914 78.5289 19.018 78.6329C19.1393 78.7542 19.2 78.8929 19.2 79.0489V83.8849C19.2 84.5089 18.914 84.8989 18.342 85.0549L8.67 87.5249L18.342 89.9949C18.914 90.1509 19.2 90.5409 19.2 91.1649ZM6.33 105.246L6.33 112.448C6.33 112.639 6.26067 112.803 6.122 112.942C5.98333 113.081 5.81867 113.15 5.628 113.15H1.702C1.51133 113.15 1.34667 113.081 1.208 112.942C1.06933 112.803 1 112.639 1 112.448L1 99.3441C1 99.1535 1.06933 98.9888 1.208 98.8501C1.34667 98.7115 1.51133 98.6421 1.702 98.6421H18.498C18.6887 98.6421 18.8533 98.7115 18.992 98.8501C19.1307 98.9888 19.2 99.1535 19.2 99.3441L19.2 104.544C19.2 104.735 19.1307 104.899 18.992 105.038C18.8533 105.177 18.6887 105.246 18.498 105.246H6.33Z" fill="white"/>
     </svg>
@@ -24,45 +24,45 @@ const { links } = Astro.props;
 </div>
 
 <style scoped>
-    #navigation-top-left {
+    #navigation-desktop {
         /* 29px, 68px */
         background: radial-gradient(circle at 31px 68px, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 70%);
     }
 
-    #navigation-top-left ul {
+    #navigation-desktop ul {
         overflow: hidden;
     }
 
-    #navigation-top-left li {
+    #navigation-desktop li {
         transition: transform 0.5s cubic-bezier(.57,-0.39,.44,1.42), opacity 0.45s ease-in-out;
         opacity: 0;
         transform: translateX(-100%);
     }
 
-    #navigation-top-left:hover li {
+    #navigation-desktop:hover li {
         opacity: 1;
         transform: translateX(0);
     }
 
-    #navigation-top-left:hover li:nth-child(1) { transition-delay: 0.075s; }
-    #navigation-top-left:hover li:nth-child(2) { transition-delay: 0.15s; }
-    #navigation-top-left:hover li:nth-child(3) { transition-delay: 0.225s; }
-    #navigation-top-left:hover li:nth-child(4) { transition-delay: 0.3s; }
-    #navigation-top-left:hover li:nth-child(5) { transition-delay: 0.375s; }
-    #navigation-top-left:hover li:nth-child(6) { transition-delay: 0.45s; }
-    #navigation-top-left:hover li:nth-child(7) { transition-delay: 0.525s; }
-    #navigation-top-left:hover li:nth-child(8) { transition-delay: 0.6s; }
-    #navigation-top-left:hover li:nth-child(9) { transition-delay: 0.675s; }
-    #navigation-top-left:hover li:nth-child(10) { transition-delay: 0.75s; }
+    #navigation-desktop:hover li:nth-child(1) { transition-delay: 0.075s; }
+    #navigation-desktop:hover li:nth-child(2) { transition-delay: 0.15s; }
+    #navigation-desktop:hover li:nth-child(3) { transition-delay: 0.225s; }
+    #navigation-desktop:hover li:nth-child(4) { transition-delay: 0.3s; }
+    #navigation-desktop:hover li:nth-child(5) { transition-delay: 0.375s; }
+    #navigation-desktop:hover li:nth-child(6) { transition-delay: 0.45s; }
+    #navigation-desktop:hover li:nth-child(7) { transition-delay: 0.525s; }
+    #navigation-desktop:hover li:nth-child(8) { transition-delay: 0.6s; }
+    #navigation-desktop:hover li:nth-child(9) { transition-delay: 0.675s; }
+    #navigation-desktop:hover li:nth-child(10) { transition-delay: 0.75s; }
 
-    #navigation-top-left:not(:hover) li:nth-child(10) { transition-delay: 0.0375s; }
-    #navigation-top-left:not(:hover) li:nth-child(9) { transition-delay: 0.075s; }
-    #navigation-top-left:not(:hover) li:nth-child(8) { transition-delay: 0.1125s; }
-    #navigation-top-left:not(:hover) li:nth-child(7) { transition-delay: 0.15s; }
-    #navigation-top-left:not(:hover) li:nth-child(6) { transition-delay: 0.1875s; }
-    #navigation-top-left:not(:hover) li:nth-child(5) { transition-delay: 0.225s; }
-    #navigation-top-left:not(:hover) li:nth-child(4) { transition-delay: 0.2625s; }
-    #navigation-top-left:not(:hover) li:nth-child(3) { transition-delay: 0.3s; }
-    #navigation-top-left:not(:hover) li:nth-child(2) { transition-delay: 0.3375s; }
-    #navigation-top-left:not(:hover) li:nth-child(1) { transition-delay: 0.375s; }
+    #navigation-desktop:not(:hover) li:nth-child(10) { transition-delay: 0.0375s; }
+    #navigation-desktop:not(:hover) li:nth-child(9) { transition-delay: 0.075s; }
+    #navigation-desktop:not(:hover) li:nth-child(8) { transition-delay: 0.1125s; }
+    #navigation-desktop:not(:hover) li:nth-child(7) { transition-delay: 0.15s; }
+    #navigation-desktop:not(:hover) li:nth-child(6) { transition-delay: 0.1875s; }
+    #navigation-desktop:not(:hover) li:nth-child(5) { transition-delay: 0.225s; }
+    #navigation-desktop:not(:hover) li:nth-child(4) { transition-delay: 0.2625s; }
+    #navigation-desktop:not(:hover) li:nth-child(3) { transition-delay: 0.3s; }
+    #navigation-desktop:not(:hover) li:nth-child(2) { transition-delay: 0.3375s; }
+    #navigation-desktop:not(:hover) li:nth-child(1) { transition-delay: 0.375s; }
 </style>

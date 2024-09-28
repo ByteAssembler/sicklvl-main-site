@@ -34,6 +34,7 @@ interface AdminSession {
 interface NavigationLink {
 	text: string;
 	href: string;
+	size: "small" | "medium";
 }
 
 /////////////////////////////////////////////////////////////

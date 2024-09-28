@@ -1,6 +1,7 @@
 ---
 import type { NavigationLink } from 'src/env';
 import HamburgerButton from 'src/components/hamburger-button.astro';
+import Logo from 'src/components/logo.astro';
 
 interface Props {
     links: NavigationLink[];
@@ -8,15 +9,15 @@ interface Props {
 const { links } = Astro.props;
 ---
 
-<button class="sm:hidden z-[1000005] fixed top-4 right-4" style="background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);" onclick="(async () => {
-	document.getElementById('navigation-top-left-mobile')?.showModal();
-	document.getElementById('navigation-top-left-mobile')?.classList.add('open');
+<button id="navigation-mobile-button" class="sm:hidden z-[1000005] fixed top-4 right-4" style="background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);" onclick="(async () => {
+	document.getElementById('navigation-mobile')?.showModal();
+	document.getElementById('navigation-mobile')?.classList.add('open');
 })()">
     <HamburgerButton />
 </button>
 
 <script>
-	const dialog = document.getElementById('navigation-top-left-mobile');
+	const dialog = document.getElementById('navigation-mobile');
 
 	dialog?.addEventListener("cancel", (e) => {
 		e.preventDefault();
@@ -36,41 +37,50 @@ const { links } = Astro.props;
 		}
     }
 
-	const dialogCloseIntern = document.getElementById('navigation-top-left-mobile-close');
+	const dialogCloseIntern = document.getElementById('navigation-mobile-close');
 	dialogCloseIntern?.addEventListener("click", (e) => {
 		e.preventDefault();
 		delayCloseDialog(dialog);
 	});
 </script>
 
-<dialog id="navigation-top-left-mobile" class="overflow-hidden bg-transparent h-full w-full max-h-full max-w-full">
+<dialog id="navigation-mobile" class="overflow-hidden bg-transparent h-full w-full max-h-full max-w-full">
     <div class="wrapper overflow-hidden h-full w-full max-h-full max-w-full flex items-center justify-center">
+		<div class="beam"></div>
 		<div class="beam"></div>
 		<div class="beam"></div>
 		<div class="beam"></div>
 		<div class="beam"></div>
 
 		<!-- Close Button -->
-		<button id="navigation-top-left-mobile-close" class="absolute top-7 right-7">
+		<button id="navigation-mobile-close" class="absolute top-7 right-7">
 			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 			</svg>
 		</button>
 
 		<div class="beam-content">
-			<svg class="[&_*]:fill-black" width="226" height="40" viewBox="0 0 226 40" xmlns="http://www.w3.org/2000/svg">
-				<path d="M1.82095 14.04C1.82095 10.504 3.27695 7.62667 6.18895 5.408C9.13562 3.18933 12.9836 2.08 17.733 2.08C22.517 2.08 26.417 3.24133 29.433 5.564C32.4836 7.88667 34.009 10.3133 34.009 12.844C34.009 13.156 33.8876 13.4333 33.645 13.676C33.437 13.884 33.1943 13.988 32.917 13.988H22.517C21.7196 13.988 20.9916 13.6933 20.333 13.104C19.6743 12.5147 18.7903 12.22 17.681 12.22C16.017 12.22 15.185 12.7053 15.185 13.676C15.185 14.196 15.5836 14.6293 16.381 14.976C17.213 15.3227 18.7383 15.6347 20.957 15.912C26.1223 16.5707 29.797 17.784 31.981 19.552C34.1996 21.2853 35.309 23.9373 35.309 27.508C35.309 31.044 33.6796 33.9387 30.421 36.192C27.197 38.4107 22.9676 39.52 17.733 39.52C12.4983 39.52 8.39029 38.4453 5.40895 36.296C2.42762 34.1467 0.936953 31.5293 0.936953 28.444C0.936953 28.132 1.04095 27.872 1.24895 27.664C1.49162 27.4213 1.76895 27.3 2.08095 27.3H11.961C12.689 27.3 13.4863 27.6467 14.353 28.34C15.2543 29.0333 16.485 29.38 18.045 29.38C20.645 29.38 21.945 28.8947 21.945 27.924C21.945 27.3 21.477 26.832 20.541 26.52C19.605 26.1733 17.837 25.8267 15.237 25.48C6.29295 24.3013 1.82095 20.488 1.82095 14.04ZM50.1655 39H40.8575C40.4762 39 40.1468 38.8613 39.8695 38.584C39.5922 38.3067 39.4535 37.9773 39.4535 37.596L39.4535 13.364C39.4535 12.9827 39.5922 12.6533 39.8695 12.376C40.1468 12.0987 40.4762 11.96 40.8575 11.96L50.1655 11.96C50.5468 11.96 50.8762 12.0987 51.1535 12.376C51.4308 12.6533 51.5695 12.9827 51.5695 13.364L51.5695 37.596C51.5695 37.9773 51.4308 38.3067 51.1535 38.584C50.8762 38.8613 50.5468 39 50.1655 39ZM51.3095 1.924V8.216C51.3095 8.59733 51.1709 8.92667 50.8935 9.204C50.6162 9.48133 50.2869 9.62 49.9055 9.62L41.1175 9.62C40.7362 9.62 40.4068 9.48133 40.1295 9.204C39.8522 8.92667 39.7135 8.59733 39.7135 8.216V1.924C39.7135 1.54266 39.8522 1.21333 40.1295 0.935997C40.4068 0.658665 40.7362 0.52 41.1175 0.52L49.9055 0.52C50.2869 0.52 50.6162 0.658665 50.8935 0.935997C51.1709 1.21333 51.3095 1.54266 51.3095 1.924ZM68.7299 23.66V27.3C68.7299 28.4787 68.8859 29.328 69.1979 29.848C69.5099 30.368 69.9953 30.628 70.6539 30.628C71.3126 30.628 71.7633 30.524 72.0059 30.316C72.2486 30.0733 72.4913 29.64 72.7339 29.016C73.0113 28.3573 73.5139 28.028 74.2419 28.028H84.3819C84.7633 28.028 85.0926 28.1667 85.3699 28.444C85.6473 28.7213 85.7859 29.0853 85.7859 29.536C85.7859 29.9867 85.6299 30.5933 85.3179 31.356C85.0059 32.1187 84.4686 32.9853 83.7059 33.956C82.9433 34.9267 82.0073 35.828 80.8979 36.66C79.7886 37.4573 78.3326 38.1333 76.5299 38.688C74.7273 39.2427 72.7339 39.52 70.5499 39.52C66.2166 39.52 62.6979 38.3933 59.9939 36.14C57.3246 33.852 55.9899 30.6973 55.9899 26.676L55.9899 24.284C55.9899 20.2627 57.3246 17.1253 59.9939 14.872C62.6979 12.584 66.2166 11.44 70.5499 11.44C73.1153 11.44 75.4379 11.8387 77.5179 12.636C79.5979 13.3987 81.1926 14.352 82.3019 15.496C83.4459 16.6053 84.3126 17.6973 84.9019 18.772C85.4913 19.8467 85.7859 20.6787 85.7859 21.268C85.7859 21.8227 85.6473 22.2387 85.3699 22.516C85.0926 22.7933 84.7633 22.932 84.3819 22.932L74.2419 22.932C73.5833 22.932 73.0806 22.5853 72.7339 21.892C72.2486 20.852 71.6073 20.332 70.8099 20.332C69.4233 20.332 68.7299 21.4413 68.7299 23.66ZM101.838 3.484V20.332L106.414 12.844C106.761 12.2547 107.263 11.96 107.922 11.96L118.426 11.96C118.773 11.96 119.067 12.0813 119.31 12.324C119.553 12.5667 119.674 12.844 119.674 13.156C119.674 13.468 119.587 13.7453 119.414 13.988L112.29 24.128L120.714 37.076C120.853 37.284 120.922 37.544 120.922 37.856C120.922 38.1333 120.801 38.3933 120.558 38.636C120.315 38.8787 120.021 39 119.674 39H108.754C108.061 39 107.523 38.7053 107.142 38.116L101.838 29.276V37.596C101.838 37.9773 101.699 38.3067 101.422 38.584C101.145 38.8613 100.815 39 100.434 39L91.3341 39C90.9527 39 90.6234 38.8613 90.3461 38.584C90.0687 38.3067 89.9301 37.9773 89.9301 37.596V3.484C89.9301 3.10267 90.0687 2.77333 90.3461 2.496C90.6234 2.21866 90.9527 2.08 91.3341 2.08L100.434 2.08C100.815 2.08 101.145 2.21866 101.422 2.496C101.699 2.77333 101.838 3.10267 101.838 3.484ZM138.043 28.34H152.447C152.828 28.34 153.158 28.4787 153.435 28.756C153.712 29.0333 153.851 29.3627 153.851 29.744V37.596C153.851 37.9773 153.712 38.3067 153.435 38.584C153.158 38.8613 152.828 39 152.447 39H126.239C125.858 39 125.528 38.8613 125.251 38.584C124.974 38.3067 124.835 37.9773 124.835 37.596V4.004C124.835 3.62267 124.974 3.29333 125.251 3.016C125.528 2.73866 125.858 2.6 126.239 2.6H136.639C137.02 2.6 137.35 2.73866 137.627 3.016C137.904 3.29333 138.043 3.62267 138.043 4.004V28.34ZM181.33 2.6H191.002C191.314 2.6 191.574 2.72133 191.782 2.964C192.024 3.172 192.146 3.38 192.146 3.588C192.146 3.796 192.128 3.96933 192.094 4.108L182.318 37.284C182.006 38.428 181.226 39 179.978 39H168.122C166.874 39 166.094 38.428 165.782 37.284L156.006 4.108C155.971 3.96933 155.954 3.796 155.954 3.588C155.954 3.38 156.058 3.172 156.266 2.964C156.508 2.72133 156.786 2.6 157.098 2.6L166.77 2.6C168.018 2.6 168.798 3.172 169.11 4.316L174.05 23.66L178.99 4.316C179.302 3.172 180.082 2.6 181.33 2.6ZM209.492 28.34H223.896C224.278 28.34 224.607 28.4787 224.884 28.756C225.162 29.0333 225.3 29.3627 225.3 29.744V37.596C225.3 37.9773 225.162 38.3067 224.884 38.584C224.607 38.8613 224.278 39 223.896 39H197.688C197.307 39 196.978 38.8613 196.7 38.584C196.423 38.3067 196.284 37.9773 196.284 37.596V4.004C196.284 3.62267 196.423 3.29333 196.7 3.016C196.978 2.73866 197.307 2.6 197.688 2.6H208.088C208.47 2.6 208.799 2.73866 209.076 3.016C209.354 3.29333 209.492 3.62267 209.492 4.004V28.34Z" fill="white"/>
-			</svg>
+			<Logo width={225} />
 
 			<ul>
 				{links.map((link) => (
 					<li>
 						{link.href === Astro.url.pathname ? (
-							<span class="cursor-pointer text-3xl font-bold underline text-black/70" style="text-underline-offset: 4px;">{link.text}</span>
+							link.size === "medium" ? (
+								<span class="cursor-pointer text-3xl font-bold underline text-black/70" style="text-underline-offset: 4px;">{link.text}</span>
+							) : (
+								<span class="cursor-pointer text-2xl font-bold underline text-black/70" style="text-underline-offset: 4px;">{link.text}</span>
+							)
 						) : (
-							<a class="cursor-pointer text-3xl font-extrabold text-black" href={link.href}>
-								{link.text}
-							</a>
+							link.size === "medium" ? (
+								<a class="cursor-pointer text-3xl font-extrabold text-black" href={link.href}>
+									{link.text}
+								</a>
+							) : (
+								<a class="cursor-pointer text-2xl font-bold text-black/70" href={link.href}>
+									{link.text}
+								</a>
+							)
 						)}
 					</li>
 				))}
@@ -81,7 +91,7 @@ const { links } = Astro.props;
 
 <style scoped>
 	:root {
-		--navigation-mobile-beam-width: 25%;
+		--navigation-mobile-beam-width: 20%;
 		--navigation-mobile-start-delay: 0ms;
 	}
 
@@ -109,6 +119,10 @@ const { links } = Astro.props;
 
 	dialog.open .beam {
 		transform: translateY(0);
+	}
+
+	dialog::backdrop {
+		background: none;
 	}
 
     .beam {
@@ -141,14 +155,14 @@ const { links } = Astro.props;
 		transition-delay: 350ms;
 	}
 
-	#navigation-top-left-mobile-close {
+	#navigation-mobile-close {
 		opacity: 0;
 
 		transition: opacity 150ms ease-out;
 		transition-delay: 0ms;
 	}
 
-	dialog.open #navigation-top-left-mobile-close {
+	dialog.open #navigation-mobile-close {
 		opacity: 1;
 
 		transition: opacity 150ms ease-out;

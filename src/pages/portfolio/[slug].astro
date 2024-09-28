@@ -165,8 +165,8 @@ if (!t) return redirect(redirectToURL);
 	const showMoreBtn = document.getElementById("portfolio-taskbar-show-more-btn");
 	const dialog: HTMLDialogElement | null = document.getElementById("showcase") as HTMLDialogElement;
 
-	const navigationTopLeft = document.getElementById("navigation-top-left");
-	const navigationTopRight = document.getElementById("navigation-top-right");
+	const navigationTopLeft = document.getElementById("navigation-desktop");
+	const navigationTopRight = document.getElementById("navigation-mobile-button");
 
 	function openShowMoreDialog() {
 		dialog?.classList.remove("disappear");
