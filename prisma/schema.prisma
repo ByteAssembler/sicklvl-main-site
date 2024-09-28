@@ -2,162 +2,161 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Customer {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
+    id          String  @id @default(cuid())
+    name        String
+    description String?
 
-  email           String @unique
-  hashed_password String
+    email           String @unique
+    hashed_password String
 
-  show Boolean @default(false)
+    show Boolean @default(false)
 
-  sessions Session[]
+    sessions Session[]
 
-  boxes Box[]
+    boxes Box[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model Session {
-  id        String   @id
-  userId    String   @map("customer_id")
-  expiresAt DateTime @map("expires_at")
+    id        String   @id
+    userId    String   @map("customer_id")
+    expiresAt DateTime @map("expires_at")
 
-  customer Customer @relation(references: [id], fields: [userId], onDelete: Cascade)
+    customer Customer @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
 // type FileType = "image" | "video" | "audio" | "text" | "application" | "message" | "model" | "multipart" | "example" | "font" | "chemical" | "other";
 model BoxFile {
-  id                  String @id @default(cuid())
-  file_name           String
-  file_name_extension String
-  mime                String
-  type                String
+    id                  String @id @default(cuid())
+    file_name           String
+    file_name_extension String
+    mime                String
+    type                String
 
-  box    Box    @relation(fields: [box_id], references: [id])
-  box_id String // Verweis auf den Ordner, zu dem die Datei gehört
+    box    Box    @relation(fields: [box_id], references: [id])
+    box_id String // Verweis auf den Ordner, zu dem die Datei gehört
 
-  download_count Int @default(0) // Zählt die Anzahl der Downloads der Datei
+    download_count Int @default(0) // Zählt die Anzahl der Downloads der Datei
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model Box {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
+    id          String  @id @default(cuid())
+    name        String
+    description String?
 
-  owner    Customer? @relation(fields: [owner_id], references: [id])
-  owner_id String? // Verweis auf den Benutzer, dem der Ordner gehört
+    owner    Customer? @relation(fields: [owner_id], references: [id])
+    owner_id String? // Verweis auf den Benutzer, dem der Ordner gehört
 
-  box_files BoxFile[] // Dateien im Ordner
+    box_files BoxFile[] // Dateien im Ordner
 
-  is_public           Boolean @default(false) // Bestimmt, ob der Ordner öffentlich zugänglich ist
-  password            String?
-  password_for_public Boolean @default(false) // Bestimmt, ob ein Passwort für den öffentlichen Zugriff erforderlich ist
-  password_for_owner  Boolean @default(false) // Bestimmt, ob ein Passwort für den Zugriff des Eigentümers erforderlich ist
-  download_count      Int     @default(0) // Zählt die Anzahl der Downloads
+    is_public           Boolean @default(false) // Bestimmt, ob der Ordner öffentlich zugänglich ist
+    password            String?
+    password_for_public Boolean @default(false) // Bestimmt, ob ein Passwort für den öffentlichen Zugriff erforderlich ist
+    password_for_owner  Boolean @default(false) // Bestimmt, ob ein Passwort für den Zugriff des Eigentümers erforderlich ist
+    download_count      Int     @default(0) // Zählt die Anzahl der Downloads
 
-  access_until DateTime? // Optional: Datum, bis zu dem der Ordner zugänglich ist
-  // delete_at    DateTime? // Optional: Automatisches Löschdatum
+    access_until DateTime? // Optional: Datum, bis zu dem der Ordner zugänglich ist
+    // delete_at    DateTime? // Optional: Automatisches Löschdatum
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model PortfolioItem {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  title       String
-  description String?
-  content     String?
+    id          String  @id @default(cuid())
+    slug        String  @unique
+    title       String
+    description String?
+    content     String?
 
-  order Int
+    file_name_prefix String
 
-  thumbnail    Image  @relation(fields: [thumbnail_id], references: [id])
-  thumbnail_id String @unique
+    order Int
 
-  image_gallery    ImageGallery @relation(fields: [image_gallery_id], references: [id])
-  image_gallery_id String       @unique
+    thumbnail    Image  @relation(fields: [thumbnail_id], references: [id])
+    thumbnail_id String @unique
 
-  video_gallery    VideoGallery @relation(fields: [video_gallery_id], references: [id])
-  video_gallery_id String       @unique
+    image_gallery    ImageGallery @relation(fields: [image_gallery_id], references: [id])
+    image_gallery_id String       @unique
+
+    video_gallery    VideoGallery @relation(fields: [video_gallery_id], references: [id])
+    video_gallery_id String       @unique
 }
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
 model ImageGallery {
-  id String @id @default(cuid())
+    id String @id @default(cuid())
 
-  images Image[]
+    images Image[]
 
-  portfolio_item PortfolioItem?
+    portfolio_item PortfolioItem?
 }
 
 model Image {
-  id String @id @default(cuid())
+    id String @id @default(cuid())
 
-  image_variations SingleImage[]
+    image_variations SingleImage[]
 
-  image_gallery    ImageGallery? @relation(fields: [image_gallery_id], references: [id])
-  image_gallery_id String?
+    image_gallery    ImageGallery? @relation(fields: [image_gallery_id], references: [id], onDelete: Cascade)
+    image_gallery_id String?
 
-  portfolio_item  PortfolioItem?
-  video_thumbnail SingleVideo?
-  // customer_avatar Customer?
+    portfolio_item  PortfolioItem?
+    video_thumbnail SingleVideo?
+    // customer_avatar Customer?
 }
 
 model SingleImage {
-  id        String @id @default(cuid())
-  file_name String
+    id        String @id @default(cuid())
+    file_name String
+    extension String
+    mime      String
 
-  extension String
-  mime      String
+    size    Int
+    width   Int
+    height  Int
+    quality Int
 
-  size Int
-
-  width   Int
-  height  Int
-  quality Int
-
-  image    Image  @relation(fields: [image_id], references: [id])
-  image_id String
+    image    Image  @relation(fields: [image_id], references: [id], onDelete: Cascade)
+    image_id String
 }
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
 model VideoGallery {
-  id             String         @id @default(cuid())
-  videos         SingleVideo[]
-  portfolio_item PortfolioItem?
+    id             String         @id @default(cuid())
+    videos         SingleVideo[]
+    portfolio_item PortfolioItem?
 }
 
 model SingleVideo {
-  id        String @id @default(cuid())
-  file_name String
+    id        String @id @default(cuid())
+    file_name String
+    extension String
+    mime      String
 
-  extension String
-  mime      String
+    width  Int
+    height Int
 
-  width  Int
-  height Int
+    thumbnail    Image?  @relation(fields: [thumbnail_id], references: [id], onDelete: Cascade)
+    thumbnail_id String? @unique
 
-  thumbnail    Image?  @relation(fields: [thumbnail_id], references: [id])
-  thumbnail_id String? @unique
-
-  video_gallery    VideoGallery? @relation(fields: [video_gallery_id], references: [id])
-  video_gallery_id String?
+    video_gallery    VideoGallery? @relation(fields: [video_gallery_id], references: [id], onDelete: Cascade)
+    video_gallery_id String?
 }
