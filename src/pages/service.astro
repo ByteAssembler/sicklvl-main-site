@@ -1,5 +1,5 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 import LayoutContent from 'src/layouts/LayoutContent.astro'
 import Button from 'src/components/button.astro';
@@ -14,10 +14,11 @@ import img_aerial_photography from "../assets/service/aerial-photography.png";
 import img_aerial_videography from "../assets/service/aerial-videography.png";
 import img_project_management from "../assets/service/project-management.avif";
 import img_live_broadcasting from "../assets/service/live-broadcasting.jpg";
+import img_tooth_fairy from "../assets/service/tooth-fairy.jpg";
 
 import happy_clients_banner from "../assets/service/happy-clients-banner.png";
 
-const tile_data = [
+let tile_data = [
 	{
 		title: "Aerial Videography",
 		image: img_aerial_videography,
@@ -59,6 +60,14 @@ const tile_data = [
 		description: "Our Cinematography service offers high-quality video production for film and television projects, delivering captivating visual narratives and stunning visuals. With a skilled team of cinematographers and cutting-edge technology, we bring cinematic excellence to every project we undertake.",
 	},
 ];
+
+if (Astro.url.searchParams.has('tooth-fairy')) {
+	tile_data.push({
+		title: "Tooth Fairy",
+		image: img_tooth_fairy,
+		description: "In the world of video production, sometimes it takes more than just a little magic. That's where we come in: the tooth fairy for the tough job! We don't just sprinkle glitter over your project - we unpack the big tools. As the deadline approaches and the pressure mounts, we'll put on our pink wings, wave our magic wand and make sure your video is delivered squeaky clean and on time. From the finishing touches to the big challenge: no job is too difficult for us, no wish too wild. We don't just do magic - we deliver quality with bite!",
+	});
+}
 ---
 
 <LayoutContent title="Our services" tabTitle="SickLVL's services">
