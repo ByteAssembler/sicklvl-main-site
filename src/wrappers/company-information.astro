@@ -1,0 +1,35 @@
+---
+interface Info {
+	info: string;
+	imageURL?: string;
+	imageWidth?: number;
+	title: string;
+	body: string;
+	url?: string;
+}
+
+interface Props {
+	entries: Info[];
+}
+
+const { entries } = Astro.props;
+---
+
+<div class="flex justify-center flex-wrap max-w-[1500px] my-[0] mx-auto">
+	{
+		entries.map((info) => (
+			<article class="flex-grow-[.25] py-4 px-[max(25px,1%)] w-[20%] XL:w-1/2 XL:py-[30px] XL:px-[20px] SM:w-full">
+				<div class="text-center tracking-widest mb-6">
+					{info.url && <a href={info.url} class="flex items-center justify-center underline font-august text-6xl font-semibold mb-1 text-[gold]">
+						{info.imageURL ? <img src={info.imageURL} width={info.imageWidth ?? 250} alt={info.info} /> : info.info}
+					</a>}
+					{!info.url && <span class="flex items-center justify-center font-august text-6xl font-semibold mb-1 text-[gold]">
+						{info.imageURL ? <img src={info.imageURL} width={info.imageWidth ?? 250} alt={info.info} /> : info.info}
+					</span>}
+					<h3 class="font-inconsolata font-bold text-xl text-center mt-2">{info.title}</h3>
+				</div>
+				<div class="font-inconsolata text-center">{info.body}</div>
+			</article>
+		))
+	}
+</div>
