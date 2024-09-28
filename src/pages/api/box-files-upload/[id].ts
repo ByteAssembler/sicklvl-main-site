@@ -38,12 +38,9 @@ export async function POST(context: APIContext): Promise<Response> {
 		files: formData.getAll("files"),
 	};
 
-	console.log(data);
-
 	const result = boxFilesUploadSchema.safeParse(data);
 
 	const error = errorConditionerHtmlHttpResponse(result, "Box Files Upload");
-	console.log(error, result);
 
 	if (error) return error;
 	if (!result.success) return redirect();
