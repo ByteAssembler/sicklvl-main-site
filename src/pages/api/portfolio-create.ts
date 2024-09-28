@@ -13,7 +13,7 @@ import {
 	saveVideo,
 } from "src/utils/file-manager";
 import { createFolderIfNotExists } from "src/utils/filesystem-utils";
-import { multiFileSchemaImages, multiFileSchemaVideosOptional, singleFileSchemaImage } from "src/utils/form-validation";
+import { multiFileSchemaImages, multiFileSchemaVideosOptional, singleFileSchemaImage, singleFileSchemaVideo } from "src/utils/form-validation";
 import { redirectToAdmin, unauthorized } from "src/utils/minis";
 
 const portfolioItemSchema = z.object({
@@ -29,6 +29,7 @@ const portfolioItemSchema = z.object({
 	content: z.string().trim().optional(),
 
 	thumbnail: singleFileSchemaImage,
+	background_video: singleFileSchemaVideo,
 
 	image_gallery: multiFileSchemaImages.optional(),
 	video_gallery: multiFileSchemaVideosOptional.optional(),
@@ -49,6 +50,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		content: form.get("content") ?? "",
 
 		thumbnail: form.get("thumbnail"),
+		background_video: form.get("background-video"),
 
 		image_gallery: form.getAll("image-gallery"),
 		video_gallery: form.getAll("video-gallery"),
@@ -82,11 +84,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		if (!result.data.thumbnail)
 			return errorConditionerHtmlResponse("No image files found 1");
 
-		if (!result.data.image_gallery)
+		if (!result.data.background_video)
 			return errorConditionerHtmlResponse("No image files found 2");
 
+		if (!result.data.image_gallery)
+			return errorConditionerHtmlResponse("No image files found 3");
+
 		if (!result.data.video_gallery)
-			return errorConditionerHtmlResponse("No video files found 3");
+			return errorConditionerHtmlResponse("No video files found 4");
 
 		const randomPrefix = Math.random().toString(36).substring(2, 9) + "-";
 
@@ -119,6 +124,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			}
 		}
 
+		const backgroundVideo = await saveVideo(
+			result.data.background_video,
+			randomPrefix + result.data.background_video.name
+		);
+
+		if (!backgroundVideo.success)
+			return errorConditionerHtmlResponse("Failed to save background video");
+
 		if (thumbnailImage.length === 0)
 			return errorConditionerHtmlResponse("Failed to save");
 
@@ -143,6 +156,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
 								height: image.height,
 								quality: image.quality,
 							})),
+						},
+					},
+				},
+
+				background_video: {
+					create: {
+						file_name: backgroundVideo.video_file_name,
+						extension: extname(backgroundVideo.video_file_name),
+						mime: backgroundVideo.video_mime,
+						width: backgroundVideo.thumbnail.width, // TODO Add width from video
+						height: backgroundVideo.thumbnail.height, // TODO Add height from video
+						thumbnail: {
+							create: {
+								image_variations: {
+									create: backgroundVideo.thumbnail
+								},
+							},
 						},
 					},
 				},

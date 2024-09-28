@@ -79,6 +79,9 @@ interface PerfectVideoProps {
 	videoUrl: string;
 
 	controls?: boolean;
+	muted?: boolean;
+	loop?: boolean;
+	autoplay?: boolean;
 	playsinline?: boolean | string;
 	poster?: string | SingleImage | SingleImage[];
 	disablepictureinpicture?: boolean;

@@ -325,7 +325,6 @@ export async function saveVideo(
 
 export function isFileExtensionAImage(fileName: string): boolean {
 	const fe = path.extname(fileName).toLowerCase();
-	console.log("AAA", fe)
 	return (
 		fe === ".png" ||
 		fe === ".jpg" ||

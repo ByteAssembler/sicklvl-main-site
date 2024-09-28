@@ -26,6 +26,7 @@ const porfolio = await prismaClient.portfolioItem.findMany({
 			{ type: "text", title: "Title", name: "title", placeholder: "Enter your title" },
 			{ type: "text", title: "Description", name: "description", placeholder: "Enter your description" },
 			{ type: "file", title: "Thumbnail", name: "thumbnail" },
+			{ type: "file", title: "Background Video", name: "background-video" },
 			{ type: "file", title: "Image Gallery", multiple: true, name: "image-gallery" },
 			{ type: "file", title: "Video Gallery", multiple: true, name: "video-gallery" },
 		]}

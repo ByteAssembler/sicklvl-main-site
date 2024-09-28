@@ -122,6 +122,15 @@ export async function getPortfolioWithInfos(slug: string) {
 					image_variations: true
 				},
 			},
+			background_video: {
+				include: {
+					thumbnail: {
+						include: {
+							image_variations: true
+						}
+					}
+				}
+			},
 			image_gallery: {
 				include: {
 					images: {

@@ -14,6 +14,9 @@ const {
 	videoUrl,
 
 	controls,
+	muted = false,
+	loop = false,
+	autoplay = false,
 	playsinline = true,
 	poster,
 	disablepictureinpicture = true,
@@ -55,6 +58,9 @@ if (poster) {
     width={wid ?? "auto"}
     height={hei ?? "auto"}
 	controls={controls}
+	muted={muted}
+	loop={loop}
+	autoplay={autoplay}
 	playsinline={playsinline}
 	poster={posterImage}
 	disablepictureinpicture={disablepictureinpicture}

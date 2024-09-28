@@ -3,7 +3,9 @@ import LayoutExtended from 'src/layouts/LayoutExtended.astro'
 import PerfectImage from 'src/components/perfect-image.astro';
 import Showcase from 'src/components/showcase.astro';
 import { getPortfolioWithInfos } from 'src/utils/portfolio';
-import { redirect } from 'src/utils/minis';
+import { getImageWithPreferredWidth, redirect } from 'src/utils/minis';
+import PerfectVideo from 'src/components/perfect-video.astro';
+import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
 
 const redirectToURL = "/";
 
@@ -33,13 +35,24 @@ if (!t) return redirect(redirectToURL);
 			{ image_variations: t.current.thumbnail.image_variations },
 		]}
 		single_images={[]}
-		videos={t.current.video_gallery.videos.map(video => ({
-			id: video.id,
-			file_name: video.file_name,
-			thumbnail: {
-				image_variations: video.thumbnail?.image_variations || []
-			}
-		}))}
+		videos={[
+			...t.current.video_gallery.videos.map(video => ({
+				id: video.id,
+				file_name: video.file_name,
+				thumbnail: {
+					image_variations: video.thumbnail?.image_variations || []
+				}
+			})),
+			...(
+				t.current.background_video ? [{
+					id: t.current.background_video.id,
+					file_name: t.current.background_video.file_name,
+					thumbnail: {
+						image_variations: t.current.background_video.thumbnail?.image_variations || []
+					}
+				}] : []
+			)
+		]}
 	/>
 
 	<div class="absolute inset-0 h-full w-full overflow-hidden">
@@ -104,16 +117,6 @@ if (!t) return redirect(redirectToURL);
 					</span>
 				</div>
 			</button>
-			{/*
-			<button class="select-none group min-w-56 max-w-64">
-				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
-				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
-					<span class="font-inconsolata text-lg font-bold uppercase tracking-widest">
-						SHOW GALLERY
-					</span>
-				</div>
-			</button>
-			*/}
 
 			<div class="portfolio-taskbar--description min-w-64 w-full overflow-hidden">
 				<div class="content extra-padding">
@@ -150,14 +153,26 @@ if (!t) return redirect(redirectToURL);
 		</div>
 	</div>
 
-	{t?.current?.image_gallery &&
+	{t.current.background_video ? (
+		<PerfectVideo
+			inForUrl="portfolio"
+			class="h-full w-full object-cover select-none pointer-events-none"
+			controls={false}
+			muted={true}
+			loop={true}
+			autoplay={true}
+			playsinline={true}
+			poster={getImageWithPreferredWidth(t.current.thumbnail.image_variations, 1280)}
+			videoUrl={fileNameToBlobUrlPath(t.current.background_video?.file_name)}
+		/>
+	) : (
 		<PerfectImage
 			inForUrl="portfolio"
 			class="h-full w-full object-cover select-none"
 			images={t.current.thumbnail.image_variations}
 			alt={t.current.title}
 		/>
-	}
+	)}
 </LayoutExtended>
 
 <script>
