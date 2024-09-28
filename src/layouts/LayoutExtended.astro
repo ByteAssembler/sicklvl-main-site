@@ -7,16 +7,17 @@ interface Props {
 	language?: string;
 	tabTitle: string;
 	title?: string;
+	mainClass?: string;
 }
 
-const { title, tabTitle, language } = Astro.props;
+const { title, tabTitle, language, mainClass } = Astro.props;
 ---
 
 <Layout {tabTitle} {language}>
 	{title && <h1 class="hidden">{title}</h1>}
 	<!-- <PageLoadingAnimation /> -->
 	<Navigation />
-	<main class="h-full w-full">
+	<main class:list={["h-full w-full", mainClass]}>
 		<slot />
 	</main>
 </Layout>

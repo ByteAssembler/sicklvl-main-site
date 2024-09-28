@@ -1,5 +1,5 @@
 ---
-import Layout from "src/layouts/Layout.astro";
+import LayoutExtended from "./LayoutExtended.astro";
 import Input from "src/components/input.astro";
 import Button from "src/components/button.astro";
 
@@ -30,20 +30,18 @@ const {
 } = Astro.props;
 ---
 
-<Layout {tabTitle} {language}>
-	<main class="h-full w-full flex flex-col items-center justify-center">
-		<h1 class="pb-[6%] font-inconsolata text-center text-6xl font-bold tracking-widest">{title}</h1>
-		<p class="hidden">{descriptionHidden}</p>
+<LayoutExtended {tabTitle} {language} mainClass="flex flex-col items-center justify-center">
+	<h1 class="pb-[6%] px-8 font-inconsolata text-center text-6xl font-bold tracking-widest">{title}</h1>
+	<p class="hidden">{descriptionHidden}</p>
 
-		<div class="flex flex-col items-center justify-center gap-8 border-2 border-white p-8">
-			<h2 class="font-inconsolata text-center text-4xl font-bold tracking-widest">{subtitle}</h2>
+	<div class="flex flex-col items-center justify-center gap-8 border-2 border-white p-8">
+		<h2 class="font-inconsolata text-center text-4xl font-bold tracking-widest">{subtitle}</h2>
 
-			<form method="post" action={action} enctype="multipart/form-data" class="w-full flex gap-4 flex-col items-center justify-center">
-				{type === "username" && <Input name="username" placeholder="Username" type="text" min={3} max={255} required />}
-				{type === "email" && <Input name="email" placeholder="Email" type="email" min={3} max={255} required />}
-				<Input name="password" placeholder="Password" type="password" min={6} max={256} required />
-				<Button submit class="w-[50%]">{buttonContent}</Button>
-			</form>
-		</div>
-	</main>
-</Layout>
+		<form method="post" action={action} enctype="multipart/form-data" class="w-full flex gap-4 flex-col items-center justify-center">
+			{type === "username" && <Input name="username" placeholder="Username" type="text" min={3} max={255} required />}
+			{type === "email" && <Input name="email" placeholder="Email" type="email" min={3} max={255} required />}
+			<Input name="password" placeholder="Password" type="password" min={6} max={256} required />
+			<Button submit class="w-[50%]">{buttonContent}</Button>
+		</form>
+	</div>
+</LayoutExtended>

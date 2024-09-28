@@ -170,7 +170,7 @@ export async function revertFileByFileName(fileName: string, folderPath: string)
 
 // https://sharp.pixelplumbing.com/
 // Create multiple images with different sizes, they should all be use as little space as possible
-export async function saveImageWithFormats(
+async function saveImageWithFormats(
 	file: File,
 	name: string,
 	fileSizes: number[],
@@ -188,10 +188,18 @@ export async function saveImageWithFormats(
 
 	// Create the images
 	const image = sharp(fileContent);
+	const imageWidth = (await image.metadata()).width ?? 0;
+
+	const fileSizesToUse = fileSizes.filter((size) => size <= imageWidth);
+
+	if (fileSizesToUse.length === 0) {
+		console.error(`No valid sizes for image "${fileName}"`);
+		return [];
+	}
 
 	let fileNames: SingleImageMemory[] = [];
 
-	for (const size of fileSizes) {
+	for (const size of fileSizesToUse) {
 		const imgBuffer = await image
 			.resize(size)
 			.jpeg({ mozjpeg: true, quality: fileQuality })
