@@ -114,6 +114,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			const savedVideo = await saveVideo(video, randomPrefix + video.name);
 			if (savedVideo.success) {
 				videoGallery.push(savedVideo);
+			} else {
+				return errorConditionerHtmlResponse("Failed to save a video");
 			}
 		}
 
@@ -127,6 +129,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				description: result.data.description,
 				content: result.data.content,
 				order: await prismaClient.portfolioItem.count(),
+				file_name_prefix: randomPrefix,
 
 				thumbnail: {
 					create: {

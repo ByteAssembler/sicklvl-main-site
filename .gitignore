@@ -56,4 +56,5 @@ drive/
 
 # Prisma
 prisma/migrations
+primsa/dev.db-journal
 *.db
