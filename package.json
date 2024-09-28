@@ -13,9 +13,10 @@
   "dependencies": {
     "@astrojs/check": "^0.9.3",
     "@astrojs/node": "^8.3.4",
+    "@astrojs/sitemap": "^3.1.6",
     "@astrojs/tailwind": "^5.1.1",
     "@lucia-auth/adapter-prisma": "^4.0.1",
-    "@prisma/client": "^5.19.1",
+    "@prisma/client": "^5.20.0",
     "archiver": "^7.0.1",
     "astro": "^4.15.9",
     "diskusage": "^1.2.0",
@@ -31,7 +32,7 @@
   "devDependencies": {
     "@types/archiver": "^6.0.2",
     "@types/fluent-ffmpeg": "^2.1.26",
-    "@types/node": "^22.6.1",
-    "prisma": "^5.19.1"
+    "@types/node": "^22.7.4",
+    "prisma": "^5.20.0"
   }
 }
