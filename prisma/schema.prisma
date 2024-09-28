@@ -90,6 +90,9 @@ model PortfolioItem {
     thumbnail    Image  @relation(fields: [thumbnail_id], references: [id])
     thumbnail_id String @unique
 
+    background_video    SingleVideo? @relation(fields: [background_video_id], references: [id])
+    background_video_id String?
+
     image_gallery    ImageGallery @relation(fields: [image_gallery_id], references: [id])
     image_gallery_id String       @unique
 
@@ -159,4 +162,6 @@ model SingleVideo {
 
     video_gallery    VideoGallery? @relation(fields: [video_gallery_id], references: [id], onDelete: Cascade)
     video_gallery_id String?
+
+    portfolio_items PortfolioItem[]
 }
