@@ -20,9 +20,7 @@ export async function POST(context: APIContext): Promise<Response> {
 
 	const result = userLoginSchema.safeParse(data);
 	if (!result.success) {
-		return new Response(result.error.message, {
-			status: 400,
-		});
+		return context.redirect("/customer-login?error=true");
 	}
 
 	const existingCustomer = await prismaClient.customer.findUnique({
@@ -46,9 +44,7 @@ export async function POST(context: APIContext): Promise<Response> {
 		// Since protecting against this is non-trivial,
 		// it is crucial your implementation is protected against brute-force attacks with login throttling etc.
 		// If usernames are public, you may outright tell the user that the username is invalid.
-		return new Response("Incorrect email or password", {
-			status: 400,
-		});
+		return context.redirect("/customer-login?error=true");
 	}
 
 	if (existingCustomer.hashed_password !== result.data.password) {
@@ -64,15 +60,11 @@ export async function POST(context: APIContext): Promise<Response> {
 				}
 			);
 			if (!validPassword) {
-				return new Response("Incorrect username or password", {
-					status: 400,
-				});
+				return context.redirect("/customer-login?error=true");
 			}
 		} catch (error) {
 			console.error("Error verifying password", error);
-			return new Response("Error verifying password", {
-				status: 500,
-			});
+			return context.redirect("/customer-login?error=true");
 		}
 	}
 
