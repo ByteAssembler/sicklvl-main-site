@@ -26,6 +26,7 @@ export async function POST(context: APIContext): Promise<Response> {
 			box: {
 				select: {
 					id: true,
+					box_files: true
 				}
 			}
 		}
@@ -35,16 +36,16 @@ export async function POST(context: APIContext): Promise<Response> {
 	}
 
 	// Delete one
-	const deletedBox = await prismaClient.boxFile.delete({
+	const deletedBoxFile = await prismaClient.boxFile.delete({
 		where: { id },
 		select: { id: true },
 	});
-	await deleteFileInFolder(boxContentFolderPath, deletedBox.id);
+	await deleteFileInFolder(boxContentFolderPath, deletedBoxFile.id);
 
-	if (boxFile.box.id.length === 1) {
+	if (boxFile.box.box_files.length === 1) {
 		// Delete also the box
 		await prismaClient.box.delete({
-			where: { id },
+			where: { id: boxFile.box.id },
 			select: { id: true },
 		});
 
