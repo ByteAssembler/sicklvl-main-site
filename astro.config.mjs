@@ -12,10 +12,10 @@ export default defineConfig({
   integrations: [tailwind(), sitemap()],
   output: "server",
 
-  site: "https://sicklevel.com/",
-  security: {
-    checkOrigin: import.meta.env.PROD,
-  },
+  // site: "https://sicklevel.com/",
+  // security: {
+  //   checkOrigin: import.meta.env.PROD,
+  // },
 
   adapter: node({
     mode: 'standalone'
