@@ -117,15 +117,6 @@ export const GET: APIRoute = async ({ request, params }) => {
 	if (range) {
 		// Parse range
 		const parts = range.replace(/bytes=/, "").split("-");
-		if (parts.length !== 2) {
-			return new Response(null, {
-				status: 416,
-				headers: {
-					'Content-Range': `bytes */${fileSize}`
-				}
-			});
-		}
-
 		start = parseInt(parts[0], 10);
 		end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + MAX_CHUNK_SIZE - 1, fileSize - 1);
 
