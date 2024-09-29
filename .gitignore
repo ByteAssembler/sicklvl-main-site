@@ -55,6 +55,6 @@ drive/
 *.7z
 
 # Prisma
-prisma/migrations
+prisma/migrations*
 primsa/dev.db-journal
 *.db
