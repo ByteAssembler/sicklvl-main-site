@@ -1,0 +1,29 @@
+# Use the latest stable Node.js LTS version for development
+FROM node:lts-alpine
+
+# Install necessary build tools for node-gyp, ffmpeg, and additional development tools
+RUN apk add --no-cache python3 make g++ ffmpeg bash git
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application source code
+COPY . .
+
+# Set the environment variables
+ENV DATABASE_URL="postgres://postgres:jQEDtDfuwUbmuyp4VM3orKVXlZTo854QS8a12lJOFG8q1Uldd1UQNjmr7dq1pjHi@37.60.245.252:5433/postgres"
+
+# Generate the Prisma client
+RUN npx prisma generate
+
+# Set the development command
+CMD ["npm", "run", "dev", "--", "--host"]
+
+# Expose the development port
+EXPOSE 4321

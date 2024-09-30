@@ -1,0 +1,30 @@
+{
+	"name": "Node.js Dev Container",
+	"dockerFile": "Dockerfile.dev",
+	"context": "..",
+	"build": {
+		"args": {
+			"BUILDKIT_INLINE_CACHE": "1"
+		},
+		"options": {
+			"build": "--no-cache"
+		}
+	},
+	"appPort": [
+		"4321:4321"
+	],
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+	"extensions": [
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"prisma.prisma",
+		"astro-build.astro-vscode",
+		"ms-azuretools.vscode-docker",
+	],
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached"
+	],
+	"remoteUser": "root"
+}
