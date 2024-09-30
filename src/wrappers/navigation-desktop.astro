@@ -16,7 +16,7 @@ const { links } = Astro.props;
         {links.map((link) => (
             <li class="text-nowrap">
                 {link.size === "medium" ? (
-                    <a class="cursor-pointer hover-underline" href={link.href}>
+                    <a class="cursor-pointer hover-underline text-base" href={link.href}>
                         {link.text}
                     </a>
                 ) : (
