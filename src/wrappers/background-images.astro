@@ -33,12 +33,6 @@ const itemCount = items.length;
 	<div id="container-grid-box" class="h-full w-full absolute inset-0">
 		{items.map((item) => {
 			const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
-			console.log(item);
-			console.log(item.thumbnail);
-			console.log(item.thumbnail.image_variations);
-			console.log(image);
-			console.log(image ? fileNameToBlobUrlPath(image.file_name) : null);
-			console.log("-----");
 
 			return (
 				<article class="not-focused" style={image ? `background-image: url(${fileNameToBlobUrlPath(image.file_name)})` : ""}>
