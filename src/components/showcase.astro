@@ -99,7 +99,7 @@ let globalIndex = 0;
 			))}
 		</div>
 		<div class="h-[110px] w-screen select-none overflow-hidden">
-			<div class="h-full w-fit mx-auto py-3 px-6 overflow-y-hidden overflow-x-scroll scroll-smooth snap-x snap-mandatory flex">
+			<div class="h-full w-full mx-auto py-3 px-6 overflow-y-hidden overflow-x-scroll scroll-smooth snap-x snap-mandatory flex justify-center">
 				{images.map((item) => (
 					<ShowcaseMenuItem idx={globalIndex++}>
 						<PerfectImage inForUrl={props.in} class="h-full w-full rounded-lg object-cover" images={item.image_variations} />
@@ -242,6 +242,10 @@ let globalIndex = 0;
 </script>
 
 <style scoped>
+	body {
+		touch-action: none;
+	}
+
 	#showcase-main {
 		flex-direction: row;
 		transition: transform .5s ease-out;
