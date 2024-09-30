@@ -30,6 +30,28 @@ const { links } = Astro.props;
 </div>
 
 <style scoped>
+
+    #navigation-desktop a {
+        position: relative;
+        transition: width 200ms cubic-bezier(0.06, 0.86, 0.78, 0.8);
+    }
+
+    #navigation-desktop a::after {
+        content: "";
+        background-color: white;
+        position: absolute;
+        bottom: -2px;
+        height: 2px;
+        left: 0;
+        width: 0;
+        transition: width 200ms cubic-bezier(0.06, 0.86, 0.78, 0.8);
+    }
+
+    #navigation-desktop a:hover::after {
+        background-color: white;
+        width: 100%;
+    }
+
     #navigation-desktop {
         /* 29px, 68px */
         background: radial-gradient(circle at 31px 68px, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 70%);
@@ -43,11 +65,35 @@ const { links } = Astro.props;
         transition: transform 0.5s cubic-bezier(.57,-0.39,.44,1.42), opacity 0.45s ease-in-out;
         opacity: 0;
         transform: translateX(-100%);
+        pointer-events: none;
     }
 
-    #navigation-desktop:hover li {
+    #navigation-desktop svg {
+        margin-top: 3px;
+    }
+
+    #navigation-desktop ul {
+        padding-top: 3px;
+        padding-right: 3px;
+    }
+
+    #navigation-desktop li a {
+        padding: 3px;
+    }
+
+    #navigation-desktop li a:focus-visible {
+        filter: invert(1) hue-rotate(180deg);
+        background-color: black;
+        outline: solid 1px black;
+        outline-offset: 2px;
+    }
+
+    #navigation-desktop:hover li,
+    #navigation-desktop:focus-within li,
+    #navigation-desktop:active li {
         opacity: 1;
         transform: translateX(0);
+        pointer-events: auto;
     }
 
     #navigation-desktop:hover li:nth-child(1) { transition-delay: 0.075s; }
@@ -72,3 +118,22 @@ const { links } = Astro.props;
     #navigation-desktop:not(:hover) li:nth-child(2) { transition-delay: 0.3375s; }
     #navigation-desktop:not(:hover) li:nth-child(1) { transition-delay: 0.375s; }
 </style>
+
+<script>
+    const navDesktop = document.getElementById('navigation-desktop');
+
+    // Check if the device is touch-enabled
+    const isTouchDevice = 'ontouchstart' in document.documentElement;
+
+    if (isTouchDevice && navDesktop) {
+        navDesktop.addEventListener('click', () => {
+            navDesktop.classList.add('hover');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!navDesktop.contains(event.target as Node)) {
+                navDesktop.classList.remove('hover');
+            }
+        });
+    }
+</script>
