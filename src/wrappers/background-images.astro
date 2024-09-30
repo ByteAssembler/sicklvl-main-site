@@ -117,13 +117,15 @@ const itemCount = items.length;
 	}
 </style>
 
-<script is:inline define:vars={{ itemCount }}>
+<script>
 	function setup() {
 		const grid = document.getElementById('container-grid');
 		if (!grid) return;
 		const articlesInGrid = grid.querySelectorAll('article');
 
-		const gridItemCount = itemCount;
+		const containerGridBox = document.getElementById('container-grid-box');
+
+		const gridItemCount = containerGridBox?.children.length || 0;
 		const imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
 		const imgHeight = 9 * 2;  // Höhe der Bilder in vw (16:9 Verhältnis)
 		const imgXGap = 2; // Abstand zwischen den Bildern in vw
@@ -153,9 +155,10 @@ const itemCount = items.length;
 			const paddingY = (viewportHeight - totalGridHeightPx) / 2;
 
 			// Setze das Padding dynamisch auf das Container-Grid
-			const containerGridBox = document.getElementById('container-grid-box');
-			containerGridBox.style.paddingLeft = `${paddingX}px`;
-			containerGridBox.style.paddingTop = `${paddingY}px`;
+			if (containerGridBox) {
+				containerGridBox.style.paddingLeft = `${paddingX}px`;
+				containerGridBox.style.paddingTop = `${paddingY}px`;
+			}
 
 			// Berechne die maximale Verschiebung (Translation) basierend auf dem Viewport
 			const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
@@ -171,7 +174,17 @@ const itemCount = items.length;
 		}
 
 		// Funktion, um die Position eines Bildes dynamisch zu aktualisieren
-		function updateImagePosition(ele, gridXPos, gridYPos, mouseX, mouseY, maxTranslateX, maxTranslateY) {
+		/**
+		 * Updates the position of an image element.
+		 * @param {HTMLElement} ele - The image element.
+		 * @param {number} gridXPos - The X position in the grid.
+		 * @param {number} gridYPos - The Y position in the grid.
+		 * @param {number} mouseX - The X position of the mouse.
+		 * @param {number} mouseY - The Y position of the mouse.
+		 * @param {number} maxTranslateX - The maximum translation in the X direction.
+		 * @param {number} maxTranslateY - The maximum translation in the Y direction.
+		 */
+		function updateImagePosition(ele: HTMLElement, gridXPos: number, gridYPos: number, mouseX: number, mouseY: number, maxTranslateX: number, maxTranslateY: number) {
 			// Berechne den Korrekturwert für die X- und Y-Achse, um das Padding auf beiden Seiten zu balancieren
 			const translateX = gridXPos * (imgWidth + imgXGap) + ((mouseX - 0.5) * maxTranslateX);
 			const translateY = gridYPos * (imgHeight + imgYGap) + ((mouseY - 0.5) * maxTranslateY);
