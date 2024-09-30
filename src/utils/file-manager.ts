@@ -381,10 +381,10 @@ export function getFileTypeByMime(mime?: string | null): FileType {
 }
 
 export function fileNameToBoxFileUrlPath(fileName: string, download: boolean = false) {
-	if (download) return encodeURIComponent(`/box/file/${fileName}?download=true`);
-	return encodeURIComponent(`/box/file/${fileName}`);
+	if (download) return `/box/file/${encodeURIComponent(fileName)}?download=true`;
+	return `/box/file/${encodeURIComponent(fileName)}`;
 }
 
 export function fileNameToBlobUrlPath(fileName: string) {
-	return encodeURIComponent(`/blob/${fileName}`);
+	return `/blob/${encodeURIComponent(fileName)}`;
 }
