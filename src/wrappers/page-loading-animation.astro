@@ -23,8 +23,7 @@ function getImage(pos: number, pics = portfolioItemsFirst5) {
 
 	const item = portfolioItemsFirst5[pos];
 	const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
-	const url = fileNameToBlobUrlPath(image.file_name);
-	return url;
+	return image ? fileNameToBlobUrlPath(image.file_name) : "/play.webp";
 }
 
 const pic1src = `url(${getImage(0)})`;

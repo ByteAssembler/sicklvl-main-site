@@ -93,7 +93,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		if (!result.data.video_gallery)
 			return errorConditionerHtmlResponse("No video files found 4");
 
-		const randomPrefix = Math.random().toString(36).substring(2, 9) + "-";
+		function randomString() {
+			return Math.random().toString(36).substring(2, 9) + "-";
+		}
+
+		const randomPrefix = randomString();
 
 		const thumbnailImage = await saveImageWithFormatsFullHorizontal(
 			result.data.thumbnail,

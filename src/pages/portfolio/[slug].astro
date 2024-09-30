@@ -2,10 +2,10 @@
 import LayoutExtended from 'src/layouts/LayoutExtended.astro'
 import PerfectImage from 'src/components/perfect-image.astro';
 import Showcase from 'src/components/showcase.astro';
-import { getPortfolioWithInfos } from 'src/utils/portfolio';
-import { getImageWithPreferredWidth, redirect } from 'src/utils/minis';
 import PerfectVideo from 'src/components/perfect-video.astro';
 import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
+import { getPortfolioWithInfos } from 'src/utils/portfolio';
+import { getImageWithPreferredWidth, redirect } from 'src/utils/minis';
 
 const redirectToURL = "/";
 
@@ -162,7 +162,7 @@ if (!t) return redirect(redirectToURL);
 			loop={true}
 			autoplay={true}
 			playsinline={true}
-			poster={getImageWithPreferredWidth(t.current.thumbnail.image_variations, 1280)}
+			poster={getImageWithPreferredWidth(t.current.thumbnail.image_variations, 1280) || '/play.webp'}
 			videoUrl={fileNameToBlobUrlPath(t.current.background_video?.file_name)}
 		/>
 	) : (

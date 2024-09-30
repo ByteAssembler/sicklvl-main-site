@@ -29,15 +29,13 @@ export function unauthorized() {
 
 export function getImageWithPreferredWidth<T>(images: (T & {
 	width: number;
-})[], preferredWidth: number = 960): T { // 960x540
-	let image = images.find((img) => img.width === preferredWidth);
-	if (!image) {
-		image = images.reduce((prev, curr) => {
-			return Math.abs(curr.width - preferredWidth) < Math.abs(prev.width - preferredWidth) ? curr : prev;
-		});
-	}
-	if (!image) image = images[0];
-	if (!image) console.error("No image found for", images);
+})[], preferredWidth: number = 960): T | null { // 960x540
+	if (images.length === 0) return null;
 
-	return image;
+	return images.reduce((closestImage, currentImage) => {
+		const currentDifference = Math.abs(currentImage.width - preferredWidth);
+		const closestDifference = Math.abs(closestImage.width - preferredWidth);
+
+		return currentDifference < closestDifference ? currentImage : closestImage;
+	});
 }

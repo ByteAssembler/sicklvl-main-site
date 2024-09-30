@@ -33,11 +33,9 @@ const itemCount = items.length;
 	<div id="container-grid-box" class="h-full w-full absolute inset-0">
 		{items.map((item) => {
 			const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
-			if (!image) console.error('No image found for', item);
-			const imageURL = `url(${fileNameToBlobUrlPath(image.file_name)})`;
 
 			return (
-				<article class="not-focused" style={`background-image: ${imageURL};`}>
+				<article class="not-focused" style={image ? `background-image: url(${fileNameToBlobUrlPath(image.file_name)})` : ""}>
 					<a class="h-full w-full flex items-center justify-center" href={`/portfolio/${item.slug}`}>
 						<div class="overflow-hidden px-[5%]">
 							<h2 class="drop-shadow font-august text-center text-[calc(4vw+.2rem)] font-bold tracking-wide overflow-hidden transition-transform">
