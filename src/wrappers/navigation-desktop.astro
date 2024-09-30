@@ -14,7 +14,7 @@ const { links } = Astro.props;
 
     <ul class="pl-4" style="mask-image: linear-gradient(90deg,transparent 0,#000 1rem);">
         {links.map((link) => (
-            <li>
+            <li class="text-nowrap">
                 {link.size === "medium" ? (
                     <a class="cursor-pointer hover-underline" href={link.href}>
                         {link.text}
