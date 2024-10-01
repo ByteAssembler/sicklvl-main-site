@@ -89,7 +89,7 @@ let globalIndex = 0;
 			))}
 			{props.onlyCustomFiles && props.files.map((item, idx) => (
 				<div data-index={idx} class="item h-full w-screen">
-					{item.type === "video" && <video class="h-full w-full !object-contain select-none" controls playsinline src={urlGetter(item.id, item.file_name)} />}
+					{item.type === "video" && <video preload="none" class="h-full w-full !object-contain select-none" controls playsinline src={urlGetter(item.id, item.file_name)} />}
 					{item.type === "image" && <img class="h-full w-full !object-contain select-none" src={urlGetter(item.id, item.file_name)} alt="" />}
 					{
 						(item.type !== "image" && item.type !== "video") &&
