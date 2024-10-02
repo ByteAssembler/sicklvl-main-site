@@ -24,7 +24,6 @@ const items = await prismaClient.portfolioItem.findMany({
 		},
 	},
 });
-const itemCount = items.length;
 
 // NOTE: Focus animation time is 300ms
 ---
@@ -38,7 +37,7 @@ const itemCount = items.length;
 				<article class="not-focused" style={image ? `background-image: url(${fileNameToBlobUrlPath(image.file_name)})` : ""}>
 					<a class="h-full w-full flex items-center justify-center" href={`/portfolio/${item.slug}`}>
 						<div class="overflow-hidden px-[5%]">
-							<h2 class="drop-shadow font-august text-center text-[calc(4vw+.2rem)] font-bold tracking-wide overflow-hidden transition-transform">
+							<h2 class="drop-shadow font-august text-center text-[calc(2.8vw+.2rem)] font-bold tracking-wide overflow-hidden transition-transform">
 								{item.title}
 							</h2>
 						</div>
@@ -62,8 +61,7 @@ const itemCount = items.length;
 	}
 
 	#container-grid article {
-		width: calc(16vw * 2);
-		height: calc(9vw * 2);
+		@apply w-[64vw] h-[36vw] md:w-[32vw] md:h-[18vw];
 
 		object-fit: cover;
 		position: absolute;
@@ -126,10 +124,10 @@ const itemCount = items.length;
 		const containerGridBox = document.getElementById('container-grid-box');
 
 		const gridItemCount = containerGridBox?.children.length || 0;
-		const imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
-		const imgHeight = 9 * 2;  // Höhe der Bilder in vw (16:9 Verhältnis)
-		const imgXGap = 2; // Abstand zwischen den Bildern in vw
-		const imgYGap = 2.5; // Abstand zwischen den Bildern in vw
+		let imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
+		let imgHeight = 9 * 2;  // Höhe der Bilder in vw (16:9 Verhältnis)
+		let imgXGap = 2; // Abstand zwischen den Bildern in vw
+		let imgYGap = 2.5; // Abstand zwischen den Bildern in vw
 
 		let gridX = Math.ceil(Math.sqrt(gridItemCount));
 		let gridY = Math.ceil(gridItemCount / gridX);
@@ -137,6 +135,31 @@ const itemCount = items.length;
 		let mouseX = 0;
 		let mouseY = 0;
 		let animationFrameRequested = false;
+
+		// On event: @media (min-width: 768px) {
+		// Define the media query
+		const mediaQuery = window.matchMedia('(min-width: 768px)');
+
+		// Function to handle the media query change
+		function handleTabletChange(e: MediaQueryList) {
+			if (e.matches) {
+				imgWidth = 16 * 2;
+				imgHeight = 9 * 2;
+				imgXGap = 2;
+				imgYGap = 2.5;
+			} else { // less than
+				imgWidth = 16 * 2 * 2;
+				imgHeight = 9 * 2 * 2;
+				imgXGap = 2;
+				imgYGap = 2.5;
+			}
+		}
+
+		// Register the event listener for when the media query matches
+		mediaQuery.addEventListener('change', handleTabletChange);
+
+		// Check the initial state
+		handleTabletChange(mediaQuery);
 
 		// Funktion, um Grid-Größe und Positionierung zu berechnen
 		function updateGridLayout() {
