@@ -34,17 +34,18 @@ function isCachable(size: number): boolean {
 
 export const GET: APIRoute = async ({ request, params }) => {
 	const { src } = params;
-	if (!src || typeof src !== "string") return errorConditionerHtmlResponse("Not found");
+	if (!src || typeof src !== "string") return errorConditionerHtmlResponse("Not found", undefined, 404);
 
 	// Check if the file exists
 	if (!isValidFilename(src))
-		return errorConditionerHtmlResponse("Invalid filename");
+		return errorConditionerHtmlResponse("Invalid filename", undefined, 404);
 
 	// Check if the file is already in the cache
 	const cachedBlob = getFromCache(src);
 	if (cachedBlob) {
 		// Return the cached file if it exists
 		return new Response(cachedBlob.buffer, {
+			status: 200,
 			headers: {
 				"Content-Length": cachedBlob.size.toString(),
 				// "Content-Type": "application/octet-stream",
@@ -59,7 +60,7 @@ export const GET: APIRoute = async ({ request, params }) => {
 
 	// Check if the file exists on the disk
 	if (!existsSync(filePath))
-		return errorConditionerHtmlResponse("Not found");
+		return errorConditionerHtmlResponse("Not found", undefined, 404);
 
 	// Get file stats
 	const stat = statSync(filePath);
@@ -76,6 +77,7 @@ export const GET: APIRoute = async ({ request, params }) => {
 
 		// Return the cached file response
 		return new Response(buffer, {
+			status: 200,
 			headers: {
 				"Content-Length": fileSize.toString(),
 				// "Content-Type": "application/octet-stream",
