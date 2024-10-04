@@ -158,7 +158,7 @@ const items = await prismaClient.portfolioItem.findMany({
         const mediaQuery = window.matchMedia("(min-width: 768px)");
 
         // Function to handle the media query change
-        function handleTabletChange(e: MediaQueryList) {
+        function handleTabletChange(e: MediaQueryListEvent | MediaQueryList) {
             if (e.matches) {
                 imgWidth = 16 * 2;
                 imgHeight = 9 * 2;
