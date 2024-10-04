@@ -1,38 +1,42 @@
 ---
-import PerfectImage from './perfect-image.astro';
-import PerfectVideo from './perfect-video.astro';
-import Button from './button.astro';
+import PerfectImage from "./perfect-image.astro";
+import PerfectVideo from "./perfect-video.astro";
+import Button from "./button.astro";
 
-import type { BoxFile, SingleImage } from '@prisma/client';
-import { fileNameToBlobUrlPath, fileNameToBoxFileUrlPath } from 'src/utils/file-manager';
-import ShowcaseMenuItem from './showcase-menu-item.astro';
+import type { BoxFile, SingleImage } from "@prisma/client";
+import {
+    fileNameToBlobUrlPath,
+    fileNameToBoxFileUrlPath,
+} from "src/utils/file-manager";
+import ShowcaseMenuItem from "./showcase-menu-item.astro";
 
 type Images = {
-	image_variations: SingleImage[];
+    image_variations: SingleImage[];
 }[];
 
 type Videos = {
-	id: string;
-	file_name: string;
-	thumbnail: {
-		image_variations: SingleImage | SingleImage[];
-	};
+    id: string;
+    file_name: string;
+    thumbnail: {
+        image_variations: SingleImage | SingleImage[];
+    };
 }[];
 
 type Props = (
-	{
-		onlyCustomFiles: false;
-		images: Images;
-		single_images: SingleImage[];
-		videos: Videos;
-	} | {
-		onlyCustomFiles: true;
-		files: BoxFile[]
-	}
+    | {
+          onlyCustomFiles: false;
+          images: Images;
+          single_images: SingleImage[];
+          videos: Videos;
+      }
+    | {
+          onlyCustomFiles: true;
+          files: BoxFile[];
+      }
 ) & {
-	// downloadBoxFiles?: boolean;
-	in: "portfolio" | "box-files";
-}
+    // downloadBoxFiles?: boolean;
+    in: "portfolio" | "box-files";
+};
 
 const props = Astro.props;
 
@@ -44,109 +48,205 @@ function urlGetter(id: string, name: string) {
     }
 }
 
-let images: { image_variations: SingleImage[]; }[] = [];
+let images: { image_variations: SingleImage[] }[] = [];
 let vidoes: Videos = [];
 let files: BoxFile[] = [];
 
 if (!props.onlyCustomFiles) {
-	images = [
-		...props.images.filter((item) => item.image_variations.length > 0),
-		...props.single_images.filter((item) => !!item).map((item) => ({
-			image_variations: [item]
-		})),
-	]
+    images = [
+        ...props.images.filter((item) => item.image_variations.length > 0),
+        ...props.single_images
+            .filter((item) => !!item)
+            .map((item) => ({
+                image_variations: [item],
+            })),
+    ];
 
-	vidoes = [
-		...props.videos.filter((item) => !!item.thumbnail)
-	];
+    vidoes = [...props.videos.filter((item) => !!item.thumbnail)];
 } else {
-	files = props.files;
+    files = props.files;
 }
 
 let globalIndex = 0;
 ---
 
-<dialog id="showcase" class="appear max-h-screen max-w-[100vw] h-full w-full p-0 m-0">
-	<!--
+<dialog
+    id="showcase"
+    class="appear max-h-screen max-w-[100vw] h-full w-full p-0 m-0"
+>
+    <!--
 	<Button size="small" class="fixed top-4 right-14 z-[110]" href={fileNameToBoxFileUrlPath(item.id, true)}>
 		<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
 	</Button>
 	-->
-	<Button size="small" class="fixed top-4 right-4 z-[110]" onclick="this.closest('dialog').close()">
-		<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-	</Button>
-	<div id="showcase" class="fixed inset-0 z-100 h-full w-full overflow-hidden">
-		<div id="showcase-main" class="h-[calc(100%-110px)] bg-black w-full pb-4 flex overflow-y-hidden overflow-x-auto">
-			{images.map((item, idx) => (
-				<div data-index={idx} class="item h-full w-screen">
-					<PerfectImage inForUrl={props.in} class="h-full w-full object-contain select-none" images={item.image_variations} />
-				</div>
-			))}
-			{vidoes.map((item, idx) => (
-				<div data-index={idx} class="item h-full w-screen">
-					<PerfectVideo inForUrl={props.in} class="h-full w-full object-contain select-none" videoUrl={urlGetter(item.id, item.file_name)} poster={item.thumbnail.image_variations} controls playsinline={false} disablepictureinpicture />
-				</div>
-			))}
-			{props.onlyCustomFiles && props.files.map((item, idx) => (
-				<div data-index={idx} class="item h-full w-screen">
-					{item.type === "video" && <video preload="none" class="h-full w-full !object-contain select-none" controls playsinline src={urlGetter(item.id, item.file_name)} />}
-					{item.type === "image" && <img class="h-full w-full !object-contain select-none" src={urlGetter(item.id, item.file_name)} alt="" />}
-					{
-						(item.type !== "image" && item.type !== "video") &&
-						<iframe allowfullscreen src={urlGetter(item.id, item.file_name)}></iframe>
-					}
-				</div>
-			))}
-		</div>
-		<div class="h-[110px] w-screen select-none overflow-hidden">
-			<div class="h-full w-full mx-auto py-3 px-6 overflow-y-hidden overflow-x-scroll scroll-smooth snap-x snap-mandatory flex justify-center">
-				{images.map((item) => (
-					<ShowcaseMenuItem idx={globalIndex++}>
-						<PerfectImage inForUrl={props.in} class="h-full w-full rounded-lg object-cover" images={item.image_variations} />
-					</ShowcaseMenuItem>
-				))}
-				{vidoes.map((item) => (
-					<ShowcaseMenuItem idx={globalIndex++}>
-						<PerfectImage inForUrl={props.in} class="h-full w-full rounded-lg object-cover" images={Array.isArray(item.thumbnail.image_variations) ? item.thumbnail.image_variations : [item.thumbnail.image_variations]} />
-					</ShowcaseMenuItem>
-				))}
-				{files.map((item) => (
-					<ShowcaseMenuItem idx={globalIndex++}>
-						{item.type === "video" && <img class="h-full w-full rounded-lg object-cover" src="/play.webp" alt="" />}
-						{item.type === "image" && <img class="h-full w-full rounded-lg object-cover" src={urlGetter(item.id, item.file_name)} alt="" />}
-						{
-							(item.type !== "image" && item.type !== "video") &&
-							<img class="h-full w-full rounded-lg object-cover" src="/file.webp" alt="" />
-						}
-					</ShowcaseMenuItem>
-				))}
-			</div>
-		</div>
-	</div>
+    <Button
+        size="small"
+        class="fixed top-4 right-4 z-[110]"
+        onclick="this.closest('dialog').close()"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-x"
+            ><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg
+        >
+    </Button>
+    <div
+        id="showcase"
+        class="fixed inset-0 z-100 h-full w-full overflow-hidden"
+    >
+        <div
+            id="showcase-main"
+            class="h-[calc(100%-110px)] bg-black w-full pb-4 flex overflow-y-hidden overflow-x-auto"
+        >
+            {
+                images.map((item, idx) => (
+                    <div data-index={idx} class="item h-full w-screen">
+                        <PerfectImage
+                            inForUrl={props.in}
+                            class="h-full w-full object-contain select-none"
+                            images={item.image_variations}
+                        />
+                    </div>
+                ))
+            }
+            {
+                vidoes.map((item, idx) => (
+                    <div data-index={idx} class="item h-full w-screen">
+                        <PerfectVideo
+                            inForUrl={props.in}
+                            class="h-full w-full object-contain select-none"
+                            videoUrl={urlGetter(item.id, item.file_name)}
+                            poster={item.thumbnail.image_variations}
+                            controls
+                            playsinline={false}
+                            disablepictureinpicture
+                        />
+                    </div>
+                ))
+            }
+            {
+                props.onlyCustomFiles &&
+                    props.files.map((item, idx) => (
+                        <div data-index={idx} class="item h-full w-screen">
+                            {item.type === "video" && (
+                                <video
+                                    preload="none"
+                                    class="h-full w-full !object-contain select-none"
+                                    controls
+                                    playsinline
+                                    src={urlGetter(item.id, item.file_name)}
+                                />
+                            )}
+                            {item.type === "image" && (
+                                <img
+                                    class="h-full w-full !object-contain select-none"
+                                    src={urlGetter(item.id, item.file_name)}
+                                    alt=""
+                                />
+                            )}
+                            {item.type !== "image" && item.type !== "video" && (
+                                <iframe
+                                    allowfullscreen
+                                    src={urlGetter(item.id, item.file_name)}
+                                />
+                            )}
+                        </div>
+                    ))
+            }
+        </div>
+        <div class="h-[110px] w-screen select-none overflow-hidden">
+            <div
+                class="h-full w-full mx-auto py-3 px-6 overflow-y-hidden overflow-x-scroll scroll-smooth snap-x snap-mandatory flex justify-center"
+            >
+                {
+                    images.map((item) => (
+                        <ShowcaseMenuItem idx={globalIndex++}>
+                            <PerfectImage
+                                inForUrl={props.in}
+                                class="h-full w-full rounded-lg object-cover"
+                                images={item.image_variations}
+                            />
+                        </ShowcaseMenuItem>
+                    ))
+                }
+                {
+                    vidoes.map((item) => (
+                        <ShowcaseMenuItem idx={globalIndex++}>
+                            <PerfectImage
+                                inForUrl={props.in}
+                                class="h-full w-full rounded-lg object-cover"
+                                images={
+                                    Array.isArray(
+                                        item.thumbnail.image_variations,
+                                    )
+                                        ? item.thumbnail.image_variations
+                                        : [item.thumbnail.image_variations]
+                                }
+                            />
+                        </ShowcaseMenuItem>
+                    ))
+                }
+                {
+                    files.map((item) => (
+                        <ShowcaseMenuItem idx={globalIndex++}>
+                            {item.type === "video" && (
+                                <img
+                                    class="h-full w-full rounded-lg object-cover"
+                                    src="/play.webp"
+                                    alt=""
+                                />
+                            )}
+                            {item.type === "image" && (
+                                <img
+                                    class="h-full w-full rounded-lg object-cover"
+                                    src={urlGetter(item.id, item.file_name)}
+                                    alt=""
+                                />
+                            )}
+                            {item.type !== "image" && item.type !== "video" && (
+                                <img
+                                    class="h-full w-full rounded-lg object-cover"
+                                    src="/file.webp"
+                                    alt=""
+                                />
+                            )}
+                        </ShowcaseMenuItem>
+                    ))
+                }
+            </div>
+        </div>
+    </div>
 </dialog>
 
 <script>
-	const showcase = document.getElementById('showcase') as HTMLDialogElement;
-	const showcaseMain = document.getElementById('showcase-main');
-	const menuItems = showcase.querySelectorAll('.menu-item');
+    const showcase = document.getElementById("showcase") as HTMLDialogElement;
+    const showcaseMain = document.getElementById("showcase-main");
+    const menuItems = showcase.querySelectorAll(".menu-item");
 
-	const observer = new MutationObserver(handleDatasetChange);
+    const observer = new MutationObserver(handleDatasetChange);
     observer.observe(showcase, { attributes: true });
 
     function handleDatasetChange() {
         const newValue = showcase.dataset.startIndex;
-		if (newValue) {
-			const index = getIndex(newValue);
+        if (newValue) {
+            const index = getIndex(newValue);
 
-			// Check if in range
-			if (index >= 0 && index < menuItems.length)
-				scroll(menuItems[index]);
-			else
-				console.warn('Index out of range:', index);
-		}
+            // Check if in range
+            if (index >= 0 && index < menuItems.length)
+                scroll(menuItems[index]);
+            else console.warn("Index out of range:", index);
+        }
     }
 
-	/*function openShowMoreDialog() {
+    /*function openShowMoreDialog() {
 		showcase?.classList.remove("disappear");
 		showcase?.classList.add("appear");
 
@@ -162,141 +262,149 @@ let globalIndex = 0;
 	}
 	*/
 
-	function getIndex(a?: string | number | null) {
-		return Number(a || "0");
-	}
+    function getIndex(a?: string | number | null) {
+        return Number(a || "0");
+    }
 
-	showcase?.addEventListener('close', disablePlayables);
-	function disablePlayables() {
-		const videos = showcase?.querySelectorAll("video");
-		const audios = showcase?.querySelectorAll("audio");
-		const iframes = showcase?.querySelectorAll("iframe");
+    showcase?.addEventListener("close", disablePlayables);
+    function disablePlayables() {
+        const videos = showcase?.querySelectorAll("video");
+        const audios = showcase?.querySelectorAll("audio");
+        const iframes = showcase?.querySelectorAll("iframe");
 
-		videos?.forEach((video) => video.pause());
-		audios?.forEach((audio) => audio.pause());
-		iframes?.forEach((iframe) => {
-			const iframeDocument = iframe.contentDocument || iframe?.contentWindow?.document;
+        videos?.forEach((video) => video.pause());
+        audios?.forEach((audio) => audio.pause());
+        iframes?.forEach((iframe) => {
+            const iframeDocument =
+                iframe.contentDocument || iframe?.contentWindow?.document;
 
-			if (!iframeDocument) return;
+            if (!iframeDocument) return;
 
-			const iFrameVideos = iframeDocument.querySelectorAll("video");
-			const iFrameAudios = iframeDocument.querySelectorAll("audio");
+            const iFrameVideos = iframeDocument.querySelectorAll("video");
+            const iFrameAudios = iframeDocument.querySelectorAll("audio");
 
-			iFrameVideos?.forEach((video) => video.pause());
-			iFrameAudios?.forEach((audio) => audio.pause());
-		});
-	}
+            iFrameVideos?.forEach((video) => video.pause());
+            iFrameAudios?.forEach((audio) => audio.pause());
+        });
+    }
 
+    function scroll(item: Element) {
+        disablePlayables();
 
-	function scroll(item: Element) {
-		disablePlayables();
+        // Alle anderen Items als nicht ausgewählt markieren
+        menuItems?.forEach((item) => {
+            item.classList.remove("selected");
+            item.classList.add("not-selected");
+        });
 
-		// Alle anderen Items als nicht ausgewählt markieren
-		menuItems?.forEach((item) => {
-			item.classList.remove('selected');
-			item.classList.add('not-selected');
-		});
+        // Das geklickte Item als ausgewählt markieren
+        item.classList.remove("not-selected");
+        item.classList.add("selected");
 
-		// Das geklickte Item als ausgewählt markieren
-		item.classList.remove('not-selected');
-		item.classList.add('selected');
+        const id = getIndex(item.getAttribute("data-index"));
 
-		const id = getIndex(item.getAttribute('data-index'));
+        // Das ausgewählte Element in die Mitte scrollen
+        (item as HTMLElement).scrollIntoView({
+            behavior: "smooth",
+            inline: "center", // Horizontal in die Mitte scrollen
+            block: "center", // Vertikal in die Mitte scrollen, falls notwendig
+        });
 
-		// Das ausgewählte Element in die Mitte scrollen
-		(item as HTMLElement).scrollIntoView({
-			behavior: 'smooth',
-			inline: 'center', // Horizontal in die Mitte scrollen
-			block: 'center'   // Vertikal in die Mitte scrollen, falls notwendig
-		});
+        if (showcaseMain && menuItems) {
+            // Scroll to the selected item
+            showcaseMain.scrollTo({
+                left: id * window.innerWidth,
+                behavior: "smooth",
+            });
+        }
+    }
 
-		if (showcaseMain && menuItems) {
-			// Scroll to the selected item
-			showcaseMain.scrollTo({
-				left: id * window.innerWidth,
-				behavior: 'smooth'
-			});
-		}
-	}
+    menuItems?.forEach((ele) => {
+        ele.addEventListener("click", (e) => {
+            scroll(e.currentTarget as HTMLElement);
+        });
+    });
 
-	menuItems?.forEach((ele) => {
-		ele.addEventListener('click', (e) => {
-			scroll(e.currentTarget as HTMLElement);
-		});
-	});
+    showcaseMain?.addEventListener("scrollend", () => {
+        const id = Math.round(showcaseMain.scrollLeft / window.innerWidth);
+        if (menuItems) {
+            scroll(menuItems[id]);
+        }
+    });
 
-	showcaseMain?.addEventListener('scrollend', () => {
-		const id = Math.round(showcaseMain.scrollLeft / window.innerWidth);
-		if (menuItems) {
-			scroll(menuItems[id]);
-		}
-	});
-
-	showcaseMain?.addEventListener('wheel', (e) => {
+    showcaseMain?.addEventListener("wheel", (e) => {
         // Scroll to the next left or right item
-		showcaseMain.scrollBy({
-			left: e.deltaY,
-			behavior: 'smooth'
-		});
+        showcaseMain.scrollBy({
+            left: e.deltaY,
+            behavior: "smooth",
+        });
     });
 </script>
 
 <style scoped>
-	body {
-		touch-action: none;
-	}
+    body {
+        touch-action: none;
+    }
 
-	#showcase-main {
-		flex-direction: row;
-		transition: transform .5s ease-out;
-		overflow-x: scroll; /* Ermöglicht horizontales Scrollen */
-    	scroll-snap-type: x mandatory; /* Scroll-Snapping, damit die Elemente auf die Größe einrasten */
-	}
+    #showcase-main {
+        flex-direction: row;
+        transition: transform 0.5s ease-out;
+        overflow-x: scroll; /* Ermöglicht horizontales Scrollen */
+        scroll-snap-type: x mandatory; /* Scroll-Snapping, damit die Elemente auf die Größe einrasten */
+    }
 
-	#showcase-main > * {
-		@apply flex relative px-0 md:p-10 pb-0;
-		/* flex: 0 0 calc(100% - 200px); */
-		/* set flex width to screen width */
-		flex: 0 0 100vw;
-		scroll-snap-align: start;
-	}
+    #showcase-main > * {
+        @apply flex relative px-0 md:p-10 pb-0;
+        /* flex: 0 0 calc(100% - 200px); */
+        /* set flex width to screen width */
+        flex: 0 0 100vw;
+        scroll-snap-align: start;
+    }
 
-	#showcase-main > * > * {
-		@apply w-full h-full object-cover;
-	}
+    #showcase-main > * > * {
+        @apply w-full h-full object-cover;
+    }
 </style>
 
 <style scoped>
-	@keyframes appear {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
+    @keyframes appear {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 
-	@keyframes disappear {
-		from { opacity: 1; }
-		to { opacity: 0; }
-	}
+    @keyframes disappear {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
 
-	dialog {
-		background-color: black;
-		opacity: 0;
-	}
+    dialog {
+        background-color: black;
+        opacity: 0;
+    }
 
-	dialog.appear {
-		animation-name: appear;
-		animation-delay: 250ms;
-		animation-duration: 500ms;
-		animation-timing-function: ease-out;
-		animation-fill-mode: forwards;
-		animation-iteration-count: 1;
-	}
+    dialog.appear {
+        animation-name: appear;
+        animation-delay: 250ms;
+        animation-duration: 500ms;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+        animation-iteration-count: 1;
+    }
 
-	dialog.disappear {
-		animation-name: disappear;
-		animation-delay: 0ms;
-		animation-duration: 500ms;
-		animation-timing-function: ease-in;
-		animation-fill-mode: forwards;
-		animation-iteration-count: 1;
-	}
+    dialog.disappear {
+        animation-name: disappear;
+        animation-delay: 0ms;
+        animation-duration: 500ms;
+        animation-timing-function: ease-in;
+        animation-fill-mode: forwards;
+        animation-iteration-count: 1;
+    }
 </style>

@@ -1,96 +1,246 @@
 ---
-import BoxWrapper from 'src/wrappers/box-wrapper.astro';
-import Button from 'src/components/button.astro';
+import BoxWrapper from "src/wrappers/box-wrapper.astro";
+import Button from "src/components/button.astro";
 
-import { prismaClient } from 'src/global';
-import { redirectCustomerLogin } from 'src/utils/minis';
-import { fileNameToBoxFileUrlPath, isFileExtensionAImage } from 'src/utils/file-manager';
+import { prismaClient } from "src/global";
+import { redirectCustomerLogin } from "src/utils/minis";
+import {
+    fileNameToBoxFileUrlPath,
+    isFileExtensionAImage,
+} from "src/utils/file-manager";
 
 let box = [];
 let isAdmin = false;
 
 if (Astro.locals.admin) {
-	box = await prismaClient.box.findMany({
-		orderBy: { created_at: 'desc' },
-		include: { box_files: true }
-	});
-	isAdmin = true;
+    box = await prismaClient.box.findMany({
+        orderBy: { created_at: "desc" },
+        include: { box_files: true },
+    });
+    isAdmin = true;
 } else {
-	const customerId = Astro.locals?.customer?.id;
-	if (!customerId) return redirectCustomerLogin();
-	box = await prismaClient.box.findMany({
-		where: { owner_id: customerId },
-		orderBy: { created_at: 'desc' },
-		include: { box_files: true }
-	});
-	isAdmin = false;
+    const customerId = Astro.locals?.customer?.id;
+    if (!customerId) return redirectCustomerLogin();
+    box = await prismaClient.box.findMany({
+        where: { owner_id: customerId },
+        orderBy: { created_at: "desc" },
+        include: { box_files: true },
+    });
+    isAdmin = false;
 }
 
 function getBoxThumbnail(box: any) {
-	const firstImage = box.box_files.find((file: any) => isFileExtensionAImage(file.file_name));
-	const firstImageUrl = firstImage ? fileNameToBoxFileUrlPath(firstImage.id) : undefined;
-	return firstImageUrl || "/file.webp";
+    const firstImage = box.box_files.find((file: any) =>
+        isFileExtensionAImage(file.file_name),
+    );
+    const firstImageUrl = firstImage
+        ? fileNameToBoxFileUrlPath(firstImage.id)
+        : undefined;
+    return firstImageUrl || "/file.webp";
 }
 ---
 
 <BoxWrapper
-	title={isAdmin ? "All Boxes" : "My Boxes"}
-	subtitle={`${box.length} boxes`}
+    title={isAdmin ? "All Boxes" : "My Boxes"}
+    subtitle={`${box.length} boxes`}
 >
-	{box.map((item) => (
-		<article class="flex flex-col gap-1 p-2 border-2">
-			<a href={`/box/${item.id}`} class="w-full h-40">
-				<img
-					class="h-full w-full p-4 object-cover filter blur-[8px] brightness-50"
-					src={getBoxThumbnail(item)}
-					alt={`Thumbnail for ${item.name}`}
-				>
-			</a>
+    {
+        box.map((item) => (
+            <article class="flex flex-col gap-1 p-2 border-2">
+                <a href={`/box/${item.id}`} class="w-full h-40">
+                    <img
+                        class="h-full w-full p-4 object-cover filter blur-[8px] brightness-50"
+                        src={getBoxThumbnail(item)}
+                        alt={`Thumbnail for ${item.name}`}
+                    />
+                </a>
 
-			<div class="flex items-center justify-between gap-2">
-				<div class="flex flex-col p-1 overflow-hidden">
-					<h2 class="text-2xl font-bold truncate">
-						<a href={`/box/${item.id}`}>
-							{item.name}
-						</a>
-					</h2>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex flex-col p-1 overflow-hidden">
+                        <h2 class="text-2xl font-bold truncate">
+                            <a href={`/box/${item.id}`}>{item.name}</a>
+                        </h2>
 
+                        <div class="flex gap-1">
+                            <div class="flex items-center gap-1">
+                                {!item.is_public && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-lock-keyhole"
+                                    >
+                                        <circle cx="12" cy="16" r="1" />
+                                        <rect
+                                            x="3"
+                                            y="10"
+                                            width="18"
+                                            height="12"
+                                            rx="2"
+                                        />
+                                        <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                                    </svg>
+                                )}
+                                {item.is_public && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-lock-open"
+                                    >
+                                        <rect
+                                            width="18"
+                                            height="11"
+                                            x="3"
+                                            y="11"
+                                            rx="2"
+                                            ry="2"
+                                        />
+                                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                                    </svg>
+                                )}
 
-					<div class="flex gap-1">
-						<div class="flex items-center gap-1">
-							{!item.is_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>}
-							{item.is_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>}
-
-							{item.password_for_public && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg>}
-							{item.password_for_owner && <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>}
-						</div>
-						<p class="text-sm truncate">
-							{item.description}
-						</p>
-					</div>
-
-				</div>
-				<div class="flex gap-2">
-					<Button size="small" class="w-min" href={`/box/${item.id}`} openInNewTab>
-						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-					</Button>
-					{/*
+                                {item.password_for_public && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-users-round"
+                                    >
+                                        <path d="M18 21a8 8 0 0 0-16 0" />
+                                        <circle cx="10" cy="8" r="5" />
+                                        <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" />
+                                    </svg>
+                                )}
+                                {item.password_for_owner && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-user-round"
+                                    >
+                                        <circle cx="12" cy="8" r="5" />
+                                        <path d="M20 21a8 8 0 0 0-16 0" />
+                                    </svg>
+                                )}
+                            </div>
+                            <p class="text-sm truncate">{item.description}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <Button
+                            size="small"
+                            class="w-min"
+                            href={`/box/${item.id}`}
+                            openInNewTab
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-external-link"
+                            >
+                                <>
+                                    <path d="M15 3h6v6" />
+                                    <path d="M10 14 21 3" />
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                </>
+                            </svg>
+                        </Button>
+                        {/*
 					<Button size="small" class="w-min">
 						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
 					</Button>
 					*/}
-					<Button size="small" class="w-min" href={`/box/full/${item.id}`}>
-						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-					</Button>
-					{isAdmin &&
-						<form method="post" action={`/api/box-delete/${item.id}`}>
-							<Button submit size="small" typeButton="danger" class="w-min">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-							</Button>
-						</form>
-					}
-				</div>
-			</div>
-		</article>
-	))}
+                        <Button
+                            size="small"
+                            class="w-min"
+                            href={`/box/full/${item.id}`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-download"
+                            >
+                                <>
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" x2="12" y1="15" y2="3" />
+                                </>
+                            </svg>
+                        </Button>
+                        {isAdmin && (
+                            <form
+                                method="post"
+                                action={`/api/box-delete/${item.id}`}
+                            >
+                                <Button
+                                    submit
+                                    size="small"
+                                    typeButton="danger"
+                                    class="w-min"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-trash-2"
+                                    >
+                                        <path d="M3 6h18" />
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                        <line x1="10" x2="10" y1="11" y2="17" />
+                                        <line x1="14" x2="14" y1="11" y2="17" />
+                                    </svg>
+                                </Button>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            </article>
+        ))
+    }
 </BoxWrapper>

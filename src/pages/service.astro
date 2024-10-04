@@ -1,10 +1,10 @@
 ---
 export const prerender = false;
 
-import LayoutContent from 'src/layouts/LayoutContent.astro'
-import Button from 'src/components/button.astro';
+import LayoutContent from "src/layouts/LayoutContent.astro";
+import Button from "src/components/button.astro";
 
-import { Image } from 'astro:assets';
+import { Image } from "astro:assets";
 
 import img_ground_based_videography from "../assets/service/ground-based-videography.jpg";
 import img_editing_and_post_production from "../assets/service/editing-and-post-production.jpg";
@@ -19,108 +19,125 @@ import img_tooth_fairy from "../assets/service/tooth-fairy.jpg";
 import happy_clients_banner from "../assets/service/happy-clients-banner.png";
 
 let tile_data = [
-	{
-		title: "Aerial Videography",
-		image: img_aerial_videography,
-		description: "Our Aerial Videography service captures stunning footage from the sky, providing a unique perspective and breathtaking visuals for your project. Our team of experts leverages cutting-edge drones and innovative techniques to deliver exceptional results.",
-	},
-	{
-		title: "Aerial Photography",
-		image: img_aerial_photography,
-		description: "Our Aerial Photography service offers high-quality images from the sky, ideal for real estate, events, and more. With state-of-the-art drones and skilled operators, we capture stunning aerial shots that elevate your project.",
-	},
-	{
-		title: "Ground-based Videography",
-		image: img_ground_based_videography,
-		description: "Our Ground-based Videography service focuses on intimate close-ups and dynamic shots from the ground, providing a unique perspective and versatility to your project. Our team of experts uses state-of-the-art cameras and innovative techniques to capture stunning visuals.",
-	},
-	{
-		title: "FPV Service",
-		image: img_fpv_service,
-		description: "Our FPV Service offers the thrill of FPV flying, capturing dynamic footage and immersive experiences for your project. With skilled pilots and cutting-edge equipment, we deliver high-quality FPV content that engages and excites your audience.",
-	},
-	{
-		title: "Editing and Post-production",
-		image: img_editing_and_post_production,
-		description: "Our Editing and Post-production service transforms raw footage into polished, professional videos that captivate your audience. Our skilled team of editors and post-production specialists use the latest software and techniques to bring your vision to life.",
-	},
-	{
-		title: "Project Management",
-		image: img_project_management,
-		description: "Our Project Management service ensures seamless coordination and communication throughout the video production process. From pre-production to delivery, our experienced team manages every aspect of your project to ensure a successful outcome.",
-	},
-	{
-		title: "Live Broadcasting",
-		image: img_live_broadcasting,
-		description: "Our Live Broadcasting service offers real-time streaming of events, conferences, and more, allowing you to reach a global audience and engage with viewers in real-time. With state-of-the-art equipment and experienced operators, we deliver high-quality live broadcasts that captivate and inform your audience.",
-	},
-	{
-		title: "Cinematography",
-		image: img_cinematography,
-		description: "Our Cinematography service offers high-quality video production for film and television projects, delivering captivating visual narratives and stunning visuals. With a skilled team of cinematographers and cutting-edge technology, we bring cinematic excellence to every project we undertake.",
-	},
+    {
+        title: "Aerial Videography",
+        image: img_aerial_videography,
+        description:
+            "Our Aerial Videography service captures stunning footage from the sky, providing a unique perspective and breathtaking visuals for your project. Our team of experts leverages cutting-edge drones and innovative techniques to deliver exceptional results.",
+    },
+    {
+        title: "Aerial Photography",
+        image: img_aerial_photography,
+        description:
+            "Our Aerial Photography service offers high-quality images from the sky, ideal for real estate, events, and more. With state-of-the-art drones and skilled operators, we capture stunning aerial shots that elevate your project.",
+    },
+    {
+        title: "Ground-based Videography",
+        image: img_ground_based_videography,
+        description:
+            "Our Ground-based Videography service focuses on intimate close-ups and dynamic shots from the ground, providing a unique perspective and versatility to your project. Our team of experts uses state-of-the-art cameras and innovative techniques to capture stunning visuals.",
+    },
+    {
+        title: "FPV Service",
+        image: img_fpv_service,
+        description:
+            "Our FPV Service offers the thrill of FPV flying, capturing dynamic footage and immersive experiences for your project. With skilled pilots and cutting-edge equipment, we deliver high-quality FPV content that engages and excites your audience.",
+    },
+    {
+        title: "Editing and Post-production",
+        image: img_editing_and_post_production,
+        description:
+            "Our Editing and Post-production service transforms raw footage into polished, professional videos that captivate your audience. Our skilled team of editors and post-production specialists use the latest software and techniques to bring your vision to life.",
+    },
+    {
+        title: "Project Management",
+        image: img_project_management,
+        description:
+            "Our Project Management service ensures seamless coordination and communication throughout the video production process. From pre-production to delivery, our experienced team manages every aspect of your project to ensure a successful outcome.",
+    },
+    {
+        title: "Live Broadcasting",
+        image: img_live_broadcasting,
+        description:
+            "Our Live Broadcasting service offers real-time streaming of events, conferences, and more, allowing you to reach a global audience and engage with viewers in real-time. With state-of-the-art equipment and experienced operators, we deliver high-quality live broadcasts that captivate and inform your audience.",
+    },
+    {
+        title: "Cinematography",
+        image: img_cinematography,
+        description:
+            "Our Cinematography service offers high-quality video production for film and television projects, delivering captivating visual narratives and stunning visuals. With a skilled team of cinematographers and cutting-edge technology, we bring cinematic excellence to every project we undertake.",
+    },
 ];
 
-if (Astro.url.searchParams.has('tooth-fairy')) {
-	tile_data.push({
-		title: "Tooth Fairy",
-		image: img_tooth_fairy,
-		description: "In the world of video production, sometimes it takes more than just a little magic. That's where we come in: the tooth fairy for the tough job! We don't just sprinkle glitter over your project - we unpack the big tools. As the deadline approaches and the pressure mounts, we'll put on our pink wings, wave our magic wand and make sure your video is delivered squeaky clean and on time. From the finishing touches to the big challenge: no job is too difficult for us, no wish too wild. We don't just do magic - we deliver quality with bite!",
-	});
+if (Astro.url.searchParams.has("tooth-fairy")) {
+    tile_data.push({
+        title: "Tooth Fairy",
+        image: img_tooth_fairy,
+        description:
+            "In the world of video production, sometimes it takes more than just a little magic. That's where we come in: the tooth fairy for the tough job! We don't just sprinkle glitter over your project - we unpack the big tools. As the deadline approaches and the pressure mounts, we'll put on our pink wings, wave our magic wand and make sure your video is delivered squeaky clean and on time. From the finishing touches to the big challenge: no job is too difficult for us, no wish too wild. We don't just do magic - we deliver quality with bite!",
+    });
 }
 ---
 
 <LayoutContent title="Our services" tabTitle="SickLVL's services">
-	<p class="text-lg text-center mb-20 mx-auto max-w-[820px]">
-		We provide a comprehensive range of drone and camera-based video production
-		services to bring your vision to life. Our offerings encompass Aerial
-		Videography, capturing stunning footage from cutting-edge drones; Aerial
-		Photography for real estate and events; Ground-based Videography, focusing
-		on intimate close-ups and dynamic shots; FPV Service, offering the thrill of
-		FPV flying; Editing and Post-production by our skilled team to craft a
-		polished final product; and Project Management, ensuring seamless
-		coordination from pre-production to delivery. Elevate your story with us —
-		contact us today to explore our services and achieve your video production
-		goals.
-	</p>
+    <p class="text-lg text-center mb-20 mx-auto max-w-[820px]">
+        We provide a comprehensive range of drone and camera-based video
+        production services to bring your vision to life. Our offerings
+        encompass Aerial Videography, capturing stunning footage from
+        cutting-edge drones; Aerial Photography for real estate and events;
+        Ground-based Videography, focusing on intimate close-ups and dynamic
+        shots; FPV Service, offering the thrill of FPV flying; Editing and
+        Post-production by our skilled team to craft a polished final product;
+        and Project Management, ensuring seamless coordination from
+        pre-production to delivery. Elevate your story with us — contact us
+        today to explore our services and achieve your video production goals.
+    </p>
 
-	<div style="height: 40px;"></div>
+    <div style="height: 40px;"></div>
 
-	<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-		{tile_data.map(({ title, image, description }) => (
-			<article class="py-6 px-4 flex flex-col gap-5 items-center">
-				<Image src={image} alt={title} width={250} height={250} class="w-[250px] h-[250px] shadow-lg object-cover" />
-				<h2 class="text-center text-3xl font-bold">{title}</h2>
-				<p class="text-center">{description}</p>
-			</article>
-		))}
-	</section>
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {
+            tile_data.map(({ title, image, description }) => (
+                <article class="py-6 px-4 flex flex-col gap-5 items-center">
+                    <Image
+                        src={image}
+                        alt={title}
+                        width={250}
+                        height={250}
+                        class="w-[250px] h-[250px] shadow-lg object-cover"
+                    />
+                    <h2 class="text-center text-3xl font-bold">{title}</h2>
+                    <p class="text-center">{description}</p>
+                </article>
+            ))
+        }
+    </section>
 
-	<div style="height: 80px;"></div>
+    <div style="height: 80px;"></div>
 
-	<video
-		src="/playback.mp4"
-		autoplay
-		playsinline
-		loop
-		muted
-	></video>
+    <video src="/playback.mp4" autoplay playsinline loop muted></video>
 
-	<div style="height: 130px;"></div>
+    <div style="height: 130px;"></div>
 
-	<h2 class="font-inconsolata text-center text-4xl md:text-5xl font-bold tracking-widest">400+ Happy clients</h2>
-	<div style="height: 30px;"></div>
-	<Image
-		src={happy_clients_banner}
-		width={1280}
-		alt="Clients"
-		class="w-full max-w-screen-xl mx-auto no-select no-drag no-pe"
-	/>
+    <h2
+        class="font-inconsolata text-center text-4xl md:text-5xl font-bold tracking-widest"
+    >
+        400+ Happy clients
+    </h2>
+    <div style="height: 30px;"></div>
+    <Image
+        src={happy_clients_banner}
+        width={1280}
+        alt="Clients"
+        class="w-full max-w-screen-xl mx-auto no-select no-drag no-pe"
+    />
 
-	<div style="height: 55px;"></div>
+    <div style="height: 55px;"></div>
 
-	<article class="py-6 px-4 flex flex-col gap-5 items-center">
-		<h2 class="text-center text-3xl font-bold" style="text-wrap: balance;">Any questions for us?</h2>
-		<Button href="mailto:sicklevelproduction@gmail.com">➜ Contact</Button>
-	</article>
+    <article class="py-6 px-4 flex flex-col gap-5 items-center">
+        <h2 class="text-center text-3xl font-bold" style="text-wrap: balance;">
+            Any questions for us?
+        </h2>
+        <Button href="mailto:sicklevelproduction@gmail.com">➜ Contact</Button>
+    </article>
 </LayoutContent>

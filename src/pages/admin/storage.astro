@@ -10,43 +10,103 @@ if (!Astro.locals.admin) return redirectAdminLogin();
 import { platform } from "os";
 import diskusage from "diskusage";
 import getFolderSize from "get-folder-size";
-import prettyBytes from 'pretty-bytes';
+import prettyBytes from "pretty-bytes";
 
-const rootPath = platform() === 'win32' ? 'Z:' : '/';
+const rootPath = platform() === "win32" ? "Z:" : "/";
 const diskUsageRootFolderProm = diskusage.check(rootPath);
 const diskUsageBlobFolderProm = getFolderSize(blobFolderPath);
 const diskUsageBoxContentFolderProm = getFolderSize(boxContentFolderPath);
-const [diskUsageRootFolder, diskUsageBlobFolder, diskUsageBoxContentFolder] = await Promise.all([diskUsageRootFolderProm, diskUsageBlobFolderProm, diskUsageBoxContentFolderProm]);
+const [diskUsageRootFolder, diskUsageBlobFolder, diskUsageBoxContentFolder] =
+    await Promise.all([
+        diskUsageRootFolderProm,
+        diskUsageBlobFolderProm,
+        diskUsageBoxContentFolderProm,
+    ]);
 ---
 
 <LayoutAdmin tabTitle="Box">
-
-	<FunctionalFieldset title="Disk Usage">
-		<div class="w-full bg-gray-700 rounded-full h-2.5 relative">
-			<div class="bg-green-500 h-2.5 rounded-full absolute top-0 left-0" style={`width: ${diskUsageRootFolder.available / diskUsageRootFolder.total * 100}%`}></div>
-			{!diskUsageBoxContentFolder.errors &&
-				<div class="bg-sky-500 h-2.5 rounded-full absolute top-0" style={`width: ${((diskUsageBlobFolder.size / diskUsageRootFolder.total) + (diskUsageBoxContentFolder.size / diskUsageRootFolder.total)) * 100}%`}></div>
-			}
-			{/*
+    <FunctionalFieldset title="Disk Usage">
+        <div class="w-full bg-gray-700 rounded-full h-2.5 relative">
+            <div
+                class="bg-green-500 h-2.5 rounded-full absolute top-0 left-0"
+                style={`width: ${(diskUsageRootFolder.available / diskUsageRootFolder.total) * 100}%`}
+            >
+            </div>
+            {
+                !diskUsageBoxContentFolder.errors && (
+                    <div
+                        class="bg-sky-500 h-2.5 rounded-full absolute top-0"
+                        style={`width: ${(diskUsageBlobFolder.size / diskUsageRootFolder.total + diskUsageBoxContentFolder.size / diskUsageRootFolder.total) * 100}%`}
+                    />
+                )
+            }
+            {
+                /*
 			!diskUsageBlobFolder.errors &&
 				<div class="bg-purple-500 h-2.5 rounded-full absolute top-0 left-0" style={`width: ${diskUsageBlobFolder.size / diskUsageRootFolder.total * 100}%`}></div>
-			*/}
-		</div>
+			*/
+            }
+        </div>
 
-		<table class="p-2 border-2">
-			<tbody class="[&_td]:px-2 [&_td]:py-1">
-				<tr>
-					<td class="text-green-500">Free: {prettyBytes(diskUsageRootFolder.available)}</td>
-					<td class="text-yellow-500">Used: {prettyBytes(diskUsageBlobFolder.size + diskUsageBoxContentFolder.size)}</td>
-					<td class="text-gray-500">Used OS: {prettyBytes(diskUsageRootFolder.total - diskUsageRootFolder.available - diskUsageBlobFolder.size - diskUsageBoxContentFolder.size)}</td>
-				</tr>
-				<tr>
-					<td class="text-green-500">Free: {Math.round(diskUsageRootFolder.available / diskUsageRootFolder.total * 100)}%</td>
-					<td class="text-yellow-500">Used: {Math.round((diskUsageBlobFolder.size + diskUsageBoxContentFolder.size) / diskUsageRootFolder.total * 100)}%</td>
-					<td class="text-gray-500">Used OS: {Math.round((diskUsageRootFolder.total - diskUsageRootFolder.available - diskUsageBlobFolder.size - diskUsageBoxContentFolder.size) / diskUsageRootFolder.total * 100)}%</td>
-				</tr>
-			</tbody>
-		</table>
-	</FunctionalFieldset>
-
+        <table class="p-2 border-2">
+            <tbody class="[&_td]:px-2 [&_td]:py-1">
+                <tr>
+                    <td class="text-green-500"
+                        >Free: {prettyBytes(diskUsageRootFolder.available)}</td
+                    >
+                    <td class="text-yellow-500"
+                        >Used: {
+                            prettyBytes(
+                                diskUsageBlobFolder.size +
+                                    diskUsageBoxContentFolder.size,
+                            )
+                        }</td
+                    >
+                    <td class="text-gray-500"
+                        >Used OS: {
+                            prettyBytes(
+                                diskUsageRootFolder.total -
+                                    diskUsageRootFolder.available -
+                                    diskUsageBlobFolder.size -
+                                    diskUsageBoxContentFolder.size,
+                            )
+                        }</td
+                    >
+                </tr>
+                <tr>
+                    <td class="text-green-500"
+                        >Free: {
+                            Math.round(
+                                (diskUsageRootFolder.available /
+                                    diskUsageRootFolder.total) *
+                                    100,
+                            )
+                        }%</td
+                    >
+                    <td class="text-yellow-500"
+                        >Used: {
+                            Math.round(
+                                ((diskUsageBlobFolder.size +
+                                    diskUsageBoxContentFolder.size) /
+                                    diskUsageRootFolder.total) *
+                                    100,
+                            )
+                        }%</td
+                    >
+                    <td class="text-gray-500"
+                        >Used OS: {
+                            Math.round(
+                                ((diskUsageRootFolder.total -
+                                    diskUsageRootFolder.available -
+                                    diskUsageBlobFolder.size -
+                                    diskUsageBoxContentFolder.size) /
+                                    diskUsageRootFolder.total) *
+                                    100,
+                            )
+                        }%</td
+                    >
+                </tr>
+            </tbody>
+        </table>
+    </FunctionalFieldset>
 </LayoutAdmin>

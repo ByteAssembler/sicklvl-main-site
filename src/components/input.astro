@@ -1,75 +1,75 @@
 ---
-import type { InputFieldProps } from 'src/env';
+import type { InputFieldProps } from "src/env";
 
 interface Props extends InputFieldProps {}
 
 const {
-	type = "text",
-	name = "",
-	placeholder = "",
-	value = "",
-	min = 0,
-	max = 1000000,
-	required = false
+    type = "text",
+    name = "",
+    placeholder = "",
+    value = "",
+    min = 0,
+    max = 1000000,
+    required = false,
 } = Astro.props;
 ---
 
 <input
-	type={type}
-	name={name}
-	placeholder={placeholder}
-	value={value}
-	class="font-inconsolata text-lg font-bold tracking-widest"
-	min={min}
-	max={max}
-	required={required}
->
-
+    type={type}
+    name={name}
+    placeholder={placeholder}
+    value={value}
+    class="font-inconsolata text-lg font-bold tracking-widest"
+    min={min}
+    max={max}
+    required={required}
+/>
 
 <style scoped>
-	input {
-		border: 2px solid white;
-		background-color: black;
-		color: white;
-		overflow: visible;
+    input {
+        border: 2px solid white;
+        background-color: black;
+        color: white;
+        overflow: visible;
 
-		min-width: 0;
-		max-width: 100%;
-		width: 100%;
-	}
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+    }
 
-	input[type="text"],
-	input[type="email"],
-	input[type="tel"],
-	input[type="password"] {
-		padding: 0.5rem 0.75rem;
-	}
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"] {
+        padding: 0.5rem 0.75rem;
+    }
 
-	input[type="checkbox"] {
-		padding: 0.5rem 0.75rem;
-		width: 1rem;
-		height: 1rem;
-		margin-left: auto;
-		margin-right: auto;
-	}
+    input[type="checkbox"] {
+        padding: 0.5rem 0.75rem;
+        width: 1rem;
+        height: 1rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-	input:hover, input:active {
-		background-color: white;
-		color: black;
-	}
+    input:hover,
+    input:active {
+        background-color: white;
+        color: black;
+    }
 
-	/*
+    /*
 	input:hover::placeholder, input:active::placeholder {
 		background-color: white;
 		color: black;
 	}
 	*/
 
-	input:focus-visible {
-		outline: 1;
-		outline-width: 1px;
-		outline-offset: 2px;
-		outline-color: white;
-		outline-style: solid;
-	}
+    input:focus-visible {
+        outline: 1;
+        outline-width: 1px;
+        outline-offset: 2px;
+        outline-color: white;
+        outline-style: solid;
+    }
 </style>

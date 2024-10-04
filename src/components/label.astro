@@ -1,11 +1,15 @@
 ---
-import type { LabelProps } from 'src/env';
+import type { LabelProps } from "src/env";
 
 interface Props extends LabelProps {}
 
 const props = Astro.props;
 ---
 
-<label class="w-full select-none" for={props.for} onclick={`"(() => {document.querySelector('input[name="${props.for}"]'').focus();})()"`}>
-	<slot />
+<label
+    class="w-full select-none"
+    for={props.for}
+    onclick={`"(() => {document.querySelector('input[name="${props.for}"]'').focus();})()"`}
+>
+    <slot />
 </label>

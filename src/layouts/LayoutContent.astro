@@ -1,23 +1,29 @@
 ---
-import Layout from './Layout.astro'
-import Navigation from 'src/wrappers/navigation.astro';
+import Layout from "./Layout.astro";
+import Navigation from "src/wrappers/navigation.astro";
 // import NavigationBox from 'src/wrappers/navigation-box.astro';
 
 interface Props {
-	language?: string;
-	tabTitle: string;
-	title: string;
+    language?: string;
+    tabTitle: string;
+    title: string;
 }
 
 const { title, tabTitle, language } = Astro.props;
 ---
 
 <Layout {tabTitle} {language}>
-	<Navigation />
-	<main class="h-full w-full overflow-auto">
-		<h1 class="pb-[min(calc(6%_+_4rem),100px)] pt-[min(calc(6%_+_4rem+50px),150px)] px-6 font-inconsolata text-center text-5xl md:text-6xl font-bold tracking-widest">{title}</h1>
-		<div class="container px-6 md:px-8 mx-auto w-full pb-[min(calc(6%_+_4rem),100px)]">
-			<slot />
-		</div>
-	</main>
+    <Navigation />
+    <main class="h-full w-full overflow-auto">
+        <h1
+            class="pb-[min(calc(6%_+_4rem),100px)] pt-[min(calc(6%_+_4rem+50px),150px)] px-6 font-inconsolata text-center text-5xl md:text-6xl font-bold tracking-widest"
+        >
+            {title}
+        </h1>
+        <div
+            class="container px-6 md:px-8 mx-auto w-full pb-[min(calc(6%_+_4rem),100px)]"
+        >
+            <slot />
+        </div>
+    </main>
 </Layout>

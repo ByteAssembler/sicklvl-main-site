@@ -1,83 +1,83 @@
 ---
 export const prerender = true;
 
-import LayoutContent from 'src/layouts/LayoutContent.astro'
+import LayoutContent from "src/layouts/LayoutContent.astro";
 ---
 
 <LayoutContent title="Imprint" tabTitle="Imprint">
-	<main>
-		<div>
-			<section>
-				<h2>
-					Information according to § 5 TMG
-				</h2>
-				<address>
-					<p>SickLVL Production</p>
-					<p>Johann Kofler</p>
-					<p>39049 Sterzing, Italy</p>
-				</address>
-			</section>
+    <main>
+        <div>
+            <section>
+                <h2>Information according to § 5 TMG</h2>
+                <address>
+                    <p>SickLVL Production</p>
+                    <p>Johann Kofler</p>
+                    <p>39049 Sterzing, Italy</p>
+                </address>
+            </section>
 
-			<section>
-				<p>Represented by:</p>
-				<p>Tobias Marcotto</p>
-			</section>
+            <section>
+                <p>Represented by:</p>
+                <p>Tobias Marcotto</p>
+            </section>
 
-			<section>
-				<h2>
-					Contact
-				</h2>
-				<address>
-					<p>
-						Telephone:
-						<br>
-						<a class="underline" href="tel:+393773775619">
-							+39 377 377 5619
-						</a>
-					</p>
-					<p>
-						E-Mail:
-						<br>
-						<a class="underline" href="mailto:sicklevelproduction@gmail.com">
-							sicklevelproduction@gmail.com
-						</a>
-					</p>
-				</address>
-			</section>
-		</div>
-	</main>
+            <section>
+                <h2>Contact</h2>
+                <address>
+                    <p>
+                        Telephone:
+                        <br />
+                        <a class="underline" href="tel:+393773775619">
+                            +39 377 377 5619
+                        </a>
+                    </p>
+                    <p>
+                        E-Mail:
+                        <br />
+                        <a
+                            class="underline"
+                            href="mailto:sicklevelproduction@gmail.com"
+                        >
+                            sicklevelproduction@gmail.com
+                        </a>
+                    </p>
+                </address>
+            </section>
+        </div>
+    </main>
 </LayoutContent>
 
 <style scoped>
-	main {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		height: 100%;
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
 
-		gap: 2rem;
-	}
+        gap: 2rem;
+    }
 
-	section {
-		width: fit-content;
-	}
+    section {
+        width: fit-content;
+    }
 
-	section + section {
-		margin-top: .75rem;
-	}
+    section + section {
+        margin-top: 0.75rem;
+    }
 
-	h2 {
-		@apply font-august font-bold uppercase leading-[120%] text-4xl;
-		@apply mt-9 mb-2;
-		text-wrap-style: balance;
-		letter-spacing: .025em;
-	}
+    h2 {
+        @apply font-august font-bold uppercase leading-[120%] text-4xl;
+        @apply mt-9 mb-2;
+        text-wrap-style: balance;
+        letter-spacing: 0.025em;
+    }
 
-	address, p {
-		@apply text-xl text-left;
-	}
+    address,
+    p {
+        @apply text-xl text-left;
+    }
 
-	a {
-		text-wrap: balance;
-	}
+    a {
+        text-wrap: balance;
+    }
 </style>

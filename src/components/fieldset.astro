@@ -1,43 +1,60 @@
 ---
-import type { FieldsetProps } from 'src/env';
+import type { FieldsetProps } from "src/env";
 
 interface Props extends FieldsetProps {}
 
 const {
-	title = "Widget",
-	classParent = "",
-	class: className = "",
+    title = "Widget",
+    classParent = "",
+    class: className = "",
 
-	form = false,
-	formAction = "/",
-	formMethod = "POST",
+    form = false,
+    formAction = "/",
+    formMethod = "POST",
 }: Props = Astro.props;
 ---
 
 <fieldset class={classParent}>
-	<legend>{title}</legend>
+    <legend>{title}</legend>
 
-	{form && (
-		<form class:list={["h-full w-full flex flex-col items-center justify-center gap-4", className]} method={formMethod} action={formAction} enctype="multipart/form-data">
-			<slot />
-		</form>
-	)}
+    {
+        form && (
+            <form
+                class:list={[
+                    "h-full w-full flex flex-col items-center justify-center gap-4",
+                    className,
+                ]}
+                method={formMethod}
+                action={formAction}
+                enctype="multipart/form-data"
+            >
+                <slot />
+            </form>
+        )
+    }
 
-	{!form && (
-		<div class:list={["h-full w-full flex flex-col items-center justify-center gap-4", className]}>
-			<slot />
-		</div>
-	)}
+    {
+        !form && (
+            <div
+                class:list={[
+                    "h-full w-full flex flex-col items-center justify-center gap-4",
+                    className,
+                ]}
+            >
+                <slot />
+            </div>
+        )
+    }
 </fieldset>
 
 <style scoped>
-	fieldset {
-		@apply bg-black text-white border-2 border-white;
-		@apply p-4;
-		@apply font-inconsolata text-lg font-bold tracking-widest;
-	}
+    fieldset {
+        @apply bg-black text-white border-2 border-white;
+        @apply p-4;
+        @apply font-inconsolata text-lg font-bold tracking-widest;
+    }
 
-	fieldset legend {
-		@apply text-xl font-bold px-2;
-	}
+    fieldset legend {
+        @apply text-xl font-bold px-2;
+    }
 </style>

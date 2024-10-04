@@ -4,26 +4,26 @@ import { fileNameToBlobUrlPath } from "src/utils/file-manager";
 import { getImageWithPreferredWidth } from "src/utils/minis";
 
 const portfolioItemsFirst5 = await prismaClient.portfolioItem.findMany({
-	select: {
-		id: true,
-		thumbnail: {
-			select: {
-				image_variations: true,
-			},
-		},
-	},
-	orderBy: {
-		order: "asc",
-	},
-	take: 5,
+    select: {
+        id: true,
+        thumbnail: {
+            select: {
+                image_variations: true,
+            },
+        },
+    },
+    orderBy: {
+        order: "asc",
+    },
+    take: 5,
 });
 
 function getImage(pos: number, pics = portfolioItemsFirst5) {
-	if (pos < 0 || pos >= pics.length) return "/play.webp";
+    if (pos < 0 || pos >= pics.length) return "/play.webp";
 
-	const item = portfolioItemsFirst5[pos];
-	const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
-	return image ? fileNameToBlobUrlPath(image.file_name) : "/play.webp";
+    const item = portfolioItemsFirst5[pos];
+    const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
+    return image ? fileNameToBlobUrlPath(image.file_name) : "/play.webp";
 }
 
 const pic1src = `url(${getImage(0)})`;
@@ -37,78 +37,102 @@ const animationTimePerStep = `305ms`;
 const animationSlideoutTime = `305ms`;
 ---
 
-<section id="loading-box-wrapper" class="fixed inset-0 z-[99999] bg-black flex items-center justify-center">
-	<div id="loading-box" class="loading-box-animation">
-	</div>
+<section
+    id="loading-box-wrapper"
+    class="fixed inset-0 z-[99999] bg-black flex items-center justify-center"
+>
+    <div id="loading-box" class="loading-box-animation"></div>
 </section>
 
-<style is:global define:vars={{ animationCount, animationTimePerStep, animationSlideoutTime, pic1src, pic2src, pic3src, pic4src, pic5src }}>
-	@keyframes scale-loading-box {
-		0% {
-			--add-count: 0;
-			--picsrc: var(--pic1src);
-		}
-		20% {
-			--add-count: 1;
-			--picsrc: var(--pic2src);
-		}
-		40% {
-			--add-count: 2;
-			--picsrc: var(--pic3src);
-		}
-		60% {
-			--add-count: 3;
-			--picsrc: var(--pic4src);
-		}
-		80% {
-			--add-count: 4;
-			--picsrc: var(--pic5src);
-		}
-		100% {
-			--add-count: 5;
-			--picsrc: var(--pic5src);
-		}
-	}
+<style
+    is:global
+    define:vars={{
+        animationCount,
+        animationTimePerStep,
+        animationSlideoutTime,
+        pic1src,
+        pic2src,
+        pic3src,
+        pic4src,
+        pic5src,
+    }}
+>
+    @keyframes scale-loading-box {
+        0% {
+            --add-count: 0;
+            --picsrc: var(--pic1src);
+        }
+        20% {
+            --add-count: 1;
+            --picsrc: var(--pic2src);
+        }
+        40% {
+            --add-count: 2;
+            --picsrc: var(--pic3src);
+        }
+        60% {
+            --add-count: 3;
+            --picsrc: var(--pic4src);
+        }
+        80% {
+            --add-count: 4;
+            --picsrc: var(--pic5src);
+        }
+        100% {
+            --add-count: 5;
+            --picsrc: var(--pic5src);
+        }
+    }
 
-	@keyframes scale-loading-box-wrapper {
-		0% { transform: translateY(0); opacity: 1; }
-		100% { transform: translateY(-100%); opacity: 0.3; }
-	}
+    @keyframes scale-loading-box-wrapper {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100%);
+            opacity: 0.3;
+        }
+    }
 
-	#loading-box-wrapper {
-		--to-add: min(1vh, 1vw);
-		--add-count: 1;
+    #loading-box-wrapper {
+        --to-add: min(1vh, 1vw);
+        --add-count: 1;
 
-		animation: scale-loading-box-wrapper ease-out forwards;
-		animation-delay: calc(var(--animationTimePerStep) * var(--animationCount));
-		animation-duration: var(--animationSlideoutTime);
-	}
+        animation: scale-loading-box-wrapper ease-out forwards;
+        animation-delay: calc(
+            var(--animationTimePerStep) * var(--animationCount)
+        );
+        animation-duration: var(--animationSlideoutTime);
+    }
 
-	#loading-box {
-		width: calc(min(65vh, 65vw) + var(--to-add) * var(--add-count));
-		height: calc(min(65vh, 65vw) + var(--to-add) * var(--add-count));
+    #loading-box {
+        width: calc(min(65vh, 65vw) + var(--to-add) * var(--add-count));
+        height: calc(min(65vh, 65vw) + var(--to-add) * var(--add-count));
 
-		mask-image: url(/cursor.svg);
-		mask-repeat: no-repeat;
-		mask-size: contain;
-		mask-position: center;
-		mask-composite: exclude;
+        mask-image: url(/cursor.svg);
+        mask-repeat: no-repeat;
+        mask-size: contain;
+        mask-position: center;
+        mask-composite: exclude;
 
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
 
-		--picsrc: var(--pic1src);
-		background-image: var(--picsrc);
-	}
+        --picsrc: var(--pic1src);
+        background-image: var(--picsrc);
+    }
 
-	.loading-box-animation {
-		animation-name: scale-loading-box;
+    .loading-box-animation {
+        animation-name: scale-loading-box;
 
-		animation-duration: calc(var(--animationTimePerStep) * var(--animationCount));
-		animation-timing-function: linear;
-		animation-fill-mode: forwards;
-		animation-timing-function: step-end;
-		animation-iteration-count: 1;
-	}
+        animation-duration: calc(
+            var(--animationTimePerStep) * var(--animationCount)
+        );
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+        animation-timing-function: step-end;
+        animation-iteration-count: 1;
+    }
 </style>

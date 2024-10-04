@@ -1,90 +1,96 @@
 ---
 export const prerender = true;
 
-import LayoutContent from 'src/layouts/LayoutContent.astro'
-import CompanyInformation from 'src/wrappers/company-information.astro';
-import Button from 'src/components/button.astro';
+import LayoutContent from "src/layouts/LayoutContent.astro";
+import CompanyInformation from "src/wrappers/company-information.astro";
+import Button from "src/components/button.astro";
 
 const infos = [
-	{
-		info: "4+",
-		title: "Teams",
-		body: "We are a diverse team on the move, each dedicated to mastering their respective assignments. As a video production company, our varied teams bring creativity and expertise to ensure the success of every project we undertake.",
-	},
-	{
-		info: "2500+",
-		title: "Production hours",
-		body: "With over 2500 production hours of experience garnered through diverse projects, we, as a video production company, bring a wealth of expertise to every endeavor. Our seasoned team is dedicated to delivering exceptional results that reflect our commitment to quality and creativity.",
-	},
-	{
-		info: "5+",
-		title: "Fixed work locations",
-		body: "As a premier video production company, we're proud to operate from five key locations: South Tyrol, Monte Carlo, Ischgl, Vienna, Innsbruck, and St. Moritz. With our diverse presence, we bring unparalleled expertise and creativity to every project, capturing your story with precision and artistry.",
-	},
-	{
-		info: "20+",
-		title: "Countries where we operate",
-		body: "As a leading video production company, we proudly operate in over 20+ countries, delivering our innovative and high-quality services to a global clientele. Our international presence ensures that we bring your vision to life with a diverse and experienced approach.",
-	},
-	{
-		info: "3+",
-		title: "Cinematography projects",
-		body: "As a dynamic video production company, we extend our expertise to the cinema industry, undertaking projects that showcase our commitment to delivering captivating visual narratives. With cutting-edge technology and a skilled team, we bring cinematic excellence to every project we undertake.",
-	},
+    {
+        info: "4+",
+        title: "Teams",
+        body: "We are a diverse team on the move, each dedicated to mastering their respective assignments. As a video production company, our varied teams bring creativity and expertise to ensure the success of every project we undertake.",
+    },
+    {
+        info: "2500+",
+        title: "Production hours",
+        body: "With over 2500 production hours of experience garnered through diverse projects, we, as a video production company, bring a wealth of expertise to every endeavor. Our seasoned team is dedicated to delivering exceptional results that reflect our commitment to quality and creativity.",
+    },
+    {
+        info: "5+",
+        title: "Fixed work locations",
+        body: "As a premier video production company, we're proud to operate from five key locations: South Tyrol, Monte Carlo, Ischgl, Vienna, Innsbruck, and St. Moritz. With our diverse presence, we bring unparalleled expertise and creativity to every project, capturing your story with precision and artistry.",
+    },
+    {
+        info: "20+",
+        title: "Countries where we operate",
+        body: "As a leading video production company, we proudly operate in over 20+ countries, delivering our innovative and high-quality services to a global clientele. Our international presence ensures that we bring your vision to life with a diverse and experienced approach.",
+    },
+    {
+        info: "3+",
+        title: "Cinematography projects",
+        body: "As a dynamic video production company, we extend our expertise to the cinema industry, undertaking projects that showcase our commitment to delivering captivating visual narratives. With cutting-edge technology and a skilled team, we bring cinematic excellence to every project we undertake.",
+    },
 ];
 
 const partner = [
-	{
-		info: "",
-		title: "Out Of The Box Media",
-		url: "https://outofthebox-media.com/",
-		imageURL: "/out-of-the-box-media.svg",
-		body: "We are a social media marketing agency specializing primarily in paid advertising to ensure the highest quality for our premium clients. We have chosen to focus specifically on strategy development and its technical implementation, pooling all resources for this purpose, while content production is handled by our partner agency specializing in that area. This allows us to deliver a comprehensive package of the highest quality. As we do not believe in one-size-fits-all solutions, we tailor our approach to the specific needs of each company to help them achieve their goals.",
-	},
-	{
-		info: "",
-		title: "Cinedeath",
-		url: "https://cinedeath.com/",
-		imageURL: "/cinedeath.webp",
-		imageWidth: 80,
-		body: "Cinedeath, is specialized in offering premium presets, LUTs (Lookup Tables), and effect bundles in the highest quality imaginable. The products are meticulously designed to transform ordinary footage into breathtaking cinematic experiences. Whether you're a filmmaker, photographer, or content creator, our tools empower you to infuse your projects with the essence of Hollywood magic. Each preset, LUT, and effect bundle in the collection is curated by industry experts who understand the nuances of visual storytelling. They prioritize innovation and quality, ensuring that every product delivers unparalleled results. With Cinedeath, you can unlock a world of creative possibilities and bring your vision to life with unparalleled cinematic flair.",
-	},
-	{
-		info: "",
-		title: "Foxeer",
-		url: "https://www.foxeer.com/",
-		imageURL: "/foxeer.webp",
-		imageWidth: 260,
-		body: "FOXEER is a leading FPV drone company catering to the growing enthusiasm for FPV racing drones. Established in 2014 and headquartered in Shenzhen, China, FOXEER specializes in the research and development of FPV products such as cameras, HD action cameras, VTx, VRx, flight control systems, antennas, ESCs, motors, and more. With a commitment to quality and customer satisfaction, FOXEER aims to provide high-quality products and a comprehensive FPV solution to pilots worldwide. The company operates from a real factory spanning over 5000 square meters and has established a global network of hundreds of dealers.",
-	},
-]
+    {
+        info: "",
+        title: "Out Of The Box Media",
+        url: "https://outofthebox-media.com/",
+        imageURL: "/out-of-the-box-media.svg",
+        body: "We are a social media marketing agency specializing primarily in paid advertising to ensure the highest quality for our premium clients. We have chosen to focus specifically on strategy development and its technical implementation, pooling all resources for this purpose, while content production is handled by our partner agency specializing in that area. This allows us to deliver a comprehensive package of the highest quality. As we do not believe in one-size-fits-all solutions, we tailor our approach to the specific needs of each company to help them achieve their goals.",
+    },
+    {
+        info: "",
+        title: "Cinedeath",
+        url: "https://cinedeath.com/",
+        imageURL: "/cinedeath.webp",
+        imageWidth: 80,
+        body: "Cinedeath, is specialized in offering premium presets, LUTs (Lookup Tables), and effect bundles in the highest quality imaginable. The products are meticulously designed to transform ordinary footage into breathtaking cinematic experiences. Whether you're a filmmaker, photographer, or content creator, our tools empower you to infuse your projects with the essence of Hollywood magic. Each preset, LUT, and effect bundle in the collection is curated by industry experts who understand the nuances of visual storytelling. They prioritize innovation and quality, ensuring that every product delivers unparalleled results. With Cinedeath, you can unlock a world of creative possibilities and bring your vision to life with unparalleled cinematic flair.",
+    },
+    {
+        info: "",
+        title: "Foxeer",
+        url: "https://www.foxeer.com/",
+        imageURL: "/foxeer.webp",
+        imageWidth: 260,
+        body: "FOXEER is a leading FPV drone company catering to the growing enthusiasm for FPV racing drones. Established in 2014 and headquartered in Shenzhen, China, FOXEER specializes in the research and development of FPV products such as cameras, HD action cameras, VTx, VRx, flight control systems, antennas, ESCs, motors, and more. With a commitment to quality and customer satisfaction, FOXEER aims to provide high-quality products and a comprehensive FPV solution to pilots worldwide. The company operates from a real factory spanning over 5000 square meters and has established a global network of hundreds of dealers.",
+    },
+];
 ---
 
 <LayoutContent title="About US" tabTitle="About SickLVL">
-	<p class="text-lg text-center mb-20 mx-auto max-w-[820px]">
-		We are a full-service drone and camera-based video production company,
-		dedicated to telling captivating stories and capturing stunning visuals
-		from every angle. With a focus on both aerial and ground-based
-		videography, we bring a unique perspective and versatility to every
-		project. Our team of experts leverages the latest drone technology,
-		state-of-the-art cameras, and innovative techniques to produce
-		exceptional results. From breathtaking aerial shots to intimate
-		close-ups, we are dedicated to delivering stunning visuals and
-		unforgettable experiences to our clients. Join us and let us elevate
-		your story.
-	</p>
+    <p class="text-lg text-center mb-20 mx-auto max-w-[820px]">
+        We are a full-service drone and camera-based video production company,
+        dedicated to telling captivating stories and capturing stunning visuals
+        from every angle. With a focus on both aerial and ground-based
+        videography, we bring a unique perspective and versatility to every
+        project. Our team of experts leverages the latest drone technology,
+        state-of-the-art cameras, and innovative techniques to produce
+        exceptional results. From breathtaking aerial shots to intimate
+        close-ups, we are dedicated to delivering stunning visuals and
+        unforgettable experiences to our clients. Join us and let us elevate
+        your story.
+    </p>
 
-	<div style="height: 40px;"></div>
-	<CompanyInformation entries={infos} />
-	<div style="height: 120px;"></div>
+    <div style="height: 40px;"></div>
+    <CompanyInformation entries={infos} />
+    <div style="height: 120px;"></div>
 
-	<h2 class="font-inconsolata text-center text-4xl md:text-5xl font-bold tracking-widest">Partner</h2>
-	<div style="height: 60px;"></div>
-	<CompanyInformation entries={partner} />
-	<div style="height: 50px;"></div>
+    <h2
+        class="font-inconsolata text-center text-4xl md:text-5xl font-bold tracking-widest"
+    >
+        Partner
+    </h2>
+    <div style="height: 60px;"></div>
+    <CompanyInformation entries={partner} />
+    <div style="height: 50px;"></div>
 
-	<article class="py-6 px-4 flex flex-col gap-5 items-center">
-		<h2 class="text-center text-3xl font-bold" style="text-wrap: balance;">Any questions for us?</h2>
-		<Button href="mailto:sicklevelproduction@gmail.com">➜ Contact</Button>
-	</article>
+    <article class="py-6 px-4 flex flex-col gap-5 items-center">
+        <h2 class="text-center text-3xl font-bold" style="text-wrap: balance;">
+            Any questions for us?
+        </h2>
+        <Button href="mailto:sicklevelproduction@gmail.com">➜ Contact</Button>
+    </article>
 </LayoutContent>

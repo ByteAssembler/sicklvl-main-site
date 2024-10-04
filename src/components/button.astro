@@ -1,130 +1,154 @@
 ---
-import type { ButtonProps } from 'src/env';
+import type { ButtonProps } from "src/env";
 
 interface Props extends ButtonProps {}
 
 const {
-	id = "",
-	href = "",
-	openInNewTab = false,
-	submit = false,
-	class: className = "",
-	onclick = "",
-	size = "medium",
-	typeButton = "secondary",
-	datasets = {},
+    id = "",
+    href = "",
+    openInNewTab = false,
+    submit = false,
+    class: className = "",
+    onclick = "",
+    size = "medium",
+    typeButton = "secondary",
+    datasets = {},
 } = Astro.props;
 ---
 
-{href && (
-	<a
-		id={id}
-		href={href}
-		class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
-		onclick={onclick}
-		data-size={size}
-		data-type={typeButton}
-		target={openInNewTab ? "_blank" : "_self"}
-		{...datasets}
-	>
-		<slot />
-	</a>
-)}
+{
+    href && (
+        <a
+            id={id}
+            href={href}
+            class:list={[
+                "font-inconsolata text-lg font-bold tracking-widest",
+                className,
+            ]}
+            onclick={onclick}
+            data-size={size}
+            data-type={typeButton}
+            target={openInNewTab ? "_blank" : "_self"}
+            {...datasets}
+        >
+            <slot />
+        </a>
+    )
+}
 
-{!href && (
-	<button
-		id={id}
-		type={submit ? "submit" : "button"}
-		class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
-		onclick={onclick}
-		data-size={size}
-		data-type={typeButton}
-		{...datasets}
-	>
-		<slot />
-	</button>
-)}
+{
+    !href && (
+        <button
+            id={id}
+            type={submit ? "submit" : "button"}
+            class:list={[
+                "font-inconsolata text-lg font-bold tracking-widest",
+                className,
+            ]}
+            onclick={onclick}
+            data-size={size}
+            data-type={typeButton}
+            {...datasets}
+        >
+            <slot />
+        </button>
+    )
+}
 
 <style scoped>
-	a {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-	button, a {
-		border: 2px solid white;
-		background-color: black;
-		color: white;
-		overflow: visible;
+    button,
+    a {
+        border: 2px solid white;
+        background-color: black;
+        color: white;
+        overflow: visible;
 
-		transition: background-color 0.3s, color 0.3s;
-		text-align: center;
-	}
+        transition:
+            background-color 0.3s,
+            color 0.3s;
+        text-align: center;
+    }
 
-	button[data-size="small"], a[data-size="small"] {
-		font-size: 0.75rem;
-		height: 2rem;
-		padding: 0.25rem 0.5rem;
-	}
+    button[data-size="small"],
+    a[data-size="small"] {
+        font-size: 0.75rem;
+        height: 2rem;
+        padding: 0.25rem 0.5rem;
+    }
 
-	button[data-size="medium"], a[data-size="medium"] {
-		font-size: 1rem;
-		height: 3rem;
-		padding: 0.5rem 0.75rem;
-	}
+    button[data-size="medium"],
+    a[data-size="medium"] {
+        font-size: 1rem;
+        height: 3rem;
+        padding: 0.5rem 0.75rem;
+    }
 
-	button[data-size="large"], a[data-size="large"] {
-		font-size: 1.25rem;
-		height: 4rem;
-		padding: 0.75rem 1rem;
-	}
+    button[data-size="large"],
+    a[data-size="large"] {
+        font-size: 1.25rem;
+        height: 4rem;
+        padding: 0.75rem 1rem;
+    }
 
-	button[data-type="primary"], a[data-type="primary"] {
-		border: 2px solid white;
-		background-color: white;
-		color: black;
-	}
+    button[data-type="primary"],
+    a[data-type="primary"] {
+        border: 2px solid white;
+        background-color: white;
+        color: black;
+    }
 
-	button[data-type="primary"]:hover, a[data-type="primary"]:hover {
-		@apply bg-black text-white;
-	}
+    button[data-type="primary"]:hover,
+    a[data-type="primary"]:hover {
+        @apply bg-black text-white;
+    }
 
-	button[data-type="secondary"], a[data-type="secondary"] {
-		border: 2px solid white;
-		background-color: black;
-		color: white;
-	}
+    button[data-type="secondary"],
+    a[data-type="secondary"] {
+        border: 2px solid white;
+        background-color: black;
+        color: white;
+    }
 
-	button[data-type="secondary"]:hover, a[data-type="secondary"]:hover {
-		@apply bg-white text-black;
-	}
+    button[data-type="secondary"]:hover,
+    a[data-type="secondary"]:hover {
+        @apply bg-white text-black;
+    }
 
-	button[data-type="danger"], a[data-type="danger"] {
-		border: 2px solid white;
-		background-color: black;
-		color: red;
-	}
+    button[data-type="danger"],
+    a[data-type="danger"] {
+        border: 2px solid white;
+        background-color: black;
+        color: red;
+    }
 
-	button[data-type="danger"]:hover, a[data-type="danger"]:hover {
-		@apply bg-white;
-		color: red;
-	}
+    button[data-type="danger"]:hover,
+    a[data-type="danger"]:hover {
+        @apply bg-white;
+        color: red;
+    }
 
-	button:hover, button:active,
-	a:hover, a:active {
-		background-color: white;
-		color: black;
-	}
+    button:hover,
+    button:active,
+    a:hover,
+    a:active {
+        background-color: white;
+        color: black;
+    }
 
-	button:active,
-	button:focus-visible,
-	a:active,
-	a:focus-visible {
-		outline: 1;
-		outline-width: 1px;
-		outline-offset: 2px;
-		outline-color: white;
-		outline-style: solid;
-	}
+    button:active,
+    button:focus-visible,
+    a:active,
+    a:focus-visible {
+        outline: 1;
+        outline-width: 1px;
+        outline-offset: 2px;
+        outline-color: white;
+        outline-style: solid;
+    }
 </style>

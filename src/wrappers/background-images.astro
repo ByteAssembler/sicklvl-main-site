@@ -4,263 +4,310 @@ import { fileNameToBlobUrlPath } from "src/utils/file-manager";
 import { getImageWithPreferredWidth } from "src/utils/minis";
 
 const items = await prismaClient.portfolioItem.findMany({
-	orderBy: {
-		order: 'asc',
-	},
-	select: {
-		title: true,
-		slug: true,
-		thumbnail: {
-			select: {
-				id: true,
-				image_variations: {
-					select: {
-						id: true,
-						file_name: true,
-						width: true,
-					},
-				},
-			},
-		},
-	},
+    orderBy: {
+        order: "asc",
+    },
+    select: {
+        title: true,
+        slug: true,
+        thumbnail: {
+            select: {
+                id: true,
+                image_variations: {
+                    select: {
+                        id: true,
+                        file_name: true,
+                        width: true,
+                    },
+                },
+            },
+        },
+    },
 });
 
 // NOTE: Focus animation time is 300ms
 ---
 
 <section class="select-none" id="container-grid">
-	<div id="container-grid-box" class="h-full w-full absolute inset-0">
-		{items.map((item) => {
-			const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
+    <div id="container-grid-box" class="h-full w-full absolute inset-0">
+        {
+            items.map((item) => {
+                const image = getImageWithPreferredWidth(
+                    item.thumbnail.image_variations,
+                );
 
-			return (
-				<article class="not-focused" style={image ? `background-image: url(${fileNameToBlobUrlPath(image.file_name)})` : ""}>
-					<a class="h-full w-full flex items-center justify-center" href={`/portfolio/${item.slug}`}>
-						<div class="overflow-hidden px-[5%]">
-							<h2 class="drop-shadow font-august text-center text-[calc(2.8vw+.2rem)] font-bold tracking-wide overflow-hidden transition-transform">
-								{item.title}
-							</h2>
-						</div>
-					</a>
-				</article>
-			);
-		})}
-	</div>
+                return (
+                    <article
+                        class="not-focused"
+                        style={
+                            image
+                                ? `background-image: url(${fileNameToBlobUrlPath(image.file_name)})`
+                                : ""
+                        }
+                    >
+                        <a
+                            class="h-full w-full flex items-center justify-center"
+                            href={`/portfolio/${item.slug}`}
+                        >
+                            <div class="overflow-hidden px-[5%]">
+                                <h2 class="drop-shadow font-august text-center text-[calc(2.8vw+.2rem)] font-bold tracking-wide overflow-hidden transition-transform">
+                                    {item.title}
+                                </h2>
+                            </div>
+                        </a>
+                    </article>
+                );
+            })
+        }
+    </div>
 </section>
 
 <style is:global>
-	body {
-		touch-action: none;
-	}
+    body {
+        touch-action: none;
+    }
 
-	#container-grid {
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-		position: relative;
-	}
+    #container-grid {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
 
-	#container-grid article {
-		@apply w-[64vw] h-[36vw] md:w-[32vw] md:h-[18vw];
+    #container-grid article {
+        @apply w-[64vw] h-[36vw] md:w-[32vw] md:h-[18vw];
 
-		object-fit: cover;
-		position: absolute;
+        object-fit: cover;
+        position: absolute;
 
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: 100% 100%;
-		/* background-size: cover; */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        /* background-size: cover; */
 
-		transition: transform 180ms ease-out, filter 300ms ease-out, background-size 300ms ease-out;
+        transition:
+            transform 180ms ease-out,
+            filter 300ms ease-out,
+            background-size 300ms ease-out;
 
-		filter: brightness(0.7);
+        filter: brightness(0.7);
 
-		cursor: pointer;
-	}
+        cursor: pointer;
+    }
 
-	#container-grid article.not-focused:hover {
-		filter: brightness(0.9);
-		background-size: 108% 108%;
-	}
+    #container-grid article.not-focused:hover {
+        filter: brightness(0.9);
+        background-size: 108% 108%;
+    }
 
-	#container-grid article.not-focused h2 {
-		transition-duration: 200ms;
-		transition-timing-function: cubic-bezier(.6,.38,.38,.94);
-		transform: translateY(100%);
-	}
+    #container-grid article.not-focused h2 {
+        transition-duration: 200ms;
+        transition-timing-function: cubic-bezier(0.6, 0.38, 0.38, 0.94);
+        transform: translateY(100%);
+    }
 
-	#container-grid article.not-focused:hover h2 {
-		transform: translateY(0%);
-	}
+    #container-grid article.not-focused:hover h2 {
+        transform: translateY(0%);
+    }
 
-	#container-grid .focused {
-		transition: 300ms ease-out;
-		transform: none !important;
+    #container-grid .focused {
+        transition: 300ms ease-out;
+        transform: none !important;
 
-		position: fixed !important;
-		inset: 0;
+        position: fixed !important;
+        inset: 0;
 
-		width: 100%;
-		height: 100%;
+        width: 100%;
+        height: 100%;
 
-		z-index: 20;
+        z-index: 20;
 
-		background-size: cover;
+        background-size: cover;
 
-		filter: brightness(0.85);
-	}
+        filter: brightness(0.85);
+    }
 
-	#container-grid article.focused h2 {
-		display: none;
-	}
+    #container-grid article.focused h2 {
+        display: none;
+    }
 </style>
 
 <script>
-	function setup() {
-		const grid = document.getElementById('container-grid');
-		if (!grid) return;
-		const articlesInGrid = grid.querySelectorAll('article');
+    function setup() {
+        const grid = document.getElementById("container-grid");
+        if (!grid) return;
+        const articlesInGrid = grid.querySelectorAll("article");
 
-		const containerGridBox = document.getElementById('container-grid-box');
+        const containerGridBox = document.getElementById("container-grid-box");
 
-		const gridItemCount = containerGridBox?.children.length || 0;
-		let imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
-		let imgHeight = 9 * 2;  // Höhe der Bilder in vw (16:9 Verhältnis)
-		let imgXGap = 2; // Abstand zwischen den Bildern in vw
-		let imgYGap = 2.5; // Abstand zwischen den Bildern in vw
+        const gridItemCount = containerGridBox?.children.length || 0;
+        let imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
+        let imgHeight = 9 * 2; // Höhe der Bilder in vw (16:9 Verhältnis)
+        let imgXGap = 2; // Abstand zwischen den Bildern in vw
+        let imgYGap = 2.5; // Abstand zwischen den Bildern in vw
 
-		let gridX = Math.ceil(Math.sqrt(gridItemCount));
-		let gridY = Math.ceil(gridItemCount / gridX);
+        let gridX = Math.ceil(Math.sqrt(gridItemCount));
+        let gridY = Math.ceil(gridItemCount / gridX);
 
-		let mouseX = 0;
-		let mouseY = 0;
-		let animationFrameRequested = false;
+        let mouseX = 0;
+        let mouseY = 0;
+        let animationFrameRequested = false;
 
-		// On event: @media (min-width: 768px) {
-		// Define the media query
-		const mediaQuery = window.matchMedia('(min-width: 768px)');
+        // On event: @media (min-width: 768px) {
+        // Define the media query
+        const mediaQuery = window.matchMedia("(min-width: 768px)");
 
-		// Function to handle the media query change
-		function handleTabletChange(e: MediaQueryList) {
-			if (e.matches) {
-				imgWidth = 16 * 2;
-				imgHeight = 9 * 2;
-				imgXGap = 2;
-				imgYGap = 2.5;
-			} else { // less than
-				imgWidth = 16 * 2 * 2;
-				imgHeight = 9 * 2 * 2;
-				imgXGap = 2;
-				imgYGap = 2.5;
-			}
-		}
+        // Function to handle the media query change
+        function handleTabletChange(e: MediaQueryList) {
+            if (e.matches) {
+                imgWidth = 16 * 2;
+                imgHeight = 9 * 2;
+                imgXGap = 2;
+                imgYGap = 2.5;
+            } else {
+                // less than
+                imgWidth = 16 * 2 * 2;
+                imgHeight = 9 * 2 * 2;
+                imgXGap = 2;
+                imgYGap = 2.5;
+            }
+        }
 
-		// Register the event listener for when the media query matches
-		mediaQuery.addEventListener('change', handleTabletChange);
+        // Register the event listener for when the media query matches
+        mediaQuery.addEventListener("change", handleTabletChange);
 
-		// Check the initial state
-		handleTabletChange(mediaQuery);
+        // Check the initial state
+        handleTabletChange(mediaQuery);
 
-		// Funktion, um Grid-Größe und Positionierung zu berechnen
-		function updateGridLayout() {
-			const viewportWidth = window.innerWidth;
-			const viewportHeight = window.innerHeight;
+        // Funktion, um Grid-Größe und Positionierung zu berechnen
+        function updateGridLayout() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
 
-			// Berechne die gesamte Breite und Höhe des Grids in vw
-			const totalGridWidth = gridX * (imgWidth + imgXGap) - imgXGap;
-			const totalGridHeightVw = gridY * (imgHeight + imgYGap) - imgYGap;
+            // Berechne die gesamte Breite und Höhe des Grids in vw
+            const totalGridWidth = gridX * (imgWidth + imgXGap) - imgXGap;
+            const totalGridHeightVw = gridY * (imgHeight + imgYGap) - imgYGap;
 
-			// Konvertiere die Grid-Höhe von vw in eine Höhe basierend auf der Viewport-Breite
-			const totalGridHeightPx = (totalGridHeightVw * viewportWidth) / 100;  // Höhe des Grids in Pixeln
+            // Konvertiere die Grid-Höhe von vw in eine Höhe basierend auf der Viewport-Breite
+            const totalGridHeightPx = (totalGridHeightVw * viewportWidth) / 100; // Höhe des Grids in Pixeln
 
-			// Berechne das Padding, um das Grid zu zentrieren (horizontal und vertikal)
-			const paddingX = (viewportWidth - totalGridWidth * (viewportWidth / 100)) / 2;
-			const paddingY = (viewportHeight - totalGridHeightPx) / 2;
+            // Berechne das Padding, um das Grid zu zentrieren (horizontal und vertikal)
+            const paddingX =
+                (viewportWidth - totalGridWidth * (viewportWidth / 100)) / 2;
+            const paddingY = (viewportHeight - totalGridHeightPx) / 2;
 
-			// Setze das Padding dynamisch auf das Container-Grid
-			if (containerGridBox) {
-				containerGridBox.style.paddingLeft = `${paddingX}px`;
-				containerGridBox.style.paddingTop = `${paddingY}px`;
-			}
+            // Setze das Padding dynamisch auf das Container-Grid
+            if (containerGridBox) {
+                containerGridBox.style.paddingLeft = `${paddingX}px`;
+                containerGridBox.style.paddingTop = `${paddingY}px`;
+            }
 
-			// Berechne die maximale Verschiebung (Translation) basierend auf dem Viewport
-			const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
-			const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
+            // Berechne die maximale Verschiebung (Translation) basierend auf dem Viewport
+            const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
+            const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
 
-			// Positioniere alle Artikel neu
-			for (let i = 0; i < gridItemCount; i++) {
-				const article = articlesInGrid[i];
-				const x = i % gridX;
-				const y = Math.floor(i / gridX);
-				updateImagePosition(article, x, y, 0.5, 0.5, maxTranslateX, maxTranslateY);
-			}
-		}
+            // Positioniere alle Artikel neu
+            for (let i = 0; i < gridItemCount; i++) {
+                const article = articlesInGrid[i];
+                const x = i % gridX;
+                const y = Math.floor(i / gridX);
+                updateImagePosition(
+                    article,
+                    x,
+                    y,
+                    0.5,
+                    0.5,
+                    maxTranslateX,
+                    maxTranslateY,
+                );
+            }
+        }
 
-		// Funktion, um die Position eines Bildes dynamisch zu aktualisieren
-		/**
-		 * Updates the position of an image element.
-		 * @param {HTMLElement} ele - The image element.
-		 * @param {number} gridXPos - The X position in the grid.
-		 * @param {number} gridYPos - The Y position in the grid.
-		 * @param {number} mouseX - The X position of the mouse.
-		 * @param {number} mouseY - The Y position of the mouse.
-		 * @param {number} maxTranslateX - The maximum translation in the X direction.
-		 * @param {number} maxTranslateY - The maximum translation in the Y direction.
-		 */
-		function updateImagePosition(ele: HTMLElement, gridXPos: number, gridYPos: number, mouseX: number, mouseY: number, maxTranslateX: number, maxTranslateY: number) {
-			// Berechne den Korrekturwert für die X- und Y-Achse, um das Padding auf beiden Seiten zu balancieren
-			const translateX = gridXPos * (imgWidth + imgXGap) + ((mouseX - 0.5) * maxTranslateX);
-			const translateY = gridYPos * (imgHeight + imgYGap) + ((mouseY - 0.5) * maxTranslateY);
+        // Funktion, um die Position eines Bildes dynamisch zu aktualisieren
+        /**
+         * Updates the position of an image element.
+         * @param {HTMLElement} ele - The image element.
+         * @param {number} gridXPos - The X position in the grid.
+         * @param {number} gridYPos - The Y position in the grid.
+         * @param {number} mouseX - The X position of the mouse.
+         * @param {number} mouseY - The Y position of the mouse.
+         * @param {number} maxTranslateX - The maximum translation in the X direction.
+         * @param {number} maxTranslateY - The maximum translation in the Y direction.
+         */
+        function updateImagePosition(
+            ele: HTMLElement,
+            gridXPos: number,
+            gridYPos: number,
+            mouseX: number,
+            mouseY: number,
+            maxTranslateX: number,
+            maxTranslateY: number,
+        ) {
+            // Berechne den Korrekturwert für die X- und Y-Achse, um das Padding auf beiden Seiten zu balancieren
+            const translateX =
+                gridXPos * (imgWidth + imgXGap) +
+                (mouseX - 0.5) * maxTranslateX;
+            const translateY =
+                gridYPos * (imgHeight + imgYGap) +
+                (mouseY - 0.5) * maxTranslateY;
 
-			// Setze die neue Position des Artikels
-			ele.style.transform = `translate(${translateX}vw, ${translateY}vw)`;
-		}
+            // Setze die neue Position des Artikels
+            ele.style.transform = `translate(${translateX}vw, ${translateY}vw)`;
+        }
 
-		// Funktion, um die Artikel basierend auf Mausbewegungen zu verschieben
-		function updateImages() {
-			const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
-			const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
-			let index = 0;
-			for (const ele of articlesInGrid) {
-				const x = index % gridX;
-				const y = Math.floor(index / gridX);
-				updateImagePosition(ele, x, y, mouseX, mouseY, maxTranslateX, maxTranslateY);
-				index++;
-			}
-			animationFrameRequested = false;
-		}
+        // Funktion, um die Artikel basierend auf Mausbewegungen zu verschieben
+        function updateImages() {
+            const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
+            const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
+            let index = 0;
+            for (const ele of articlesInGrid) {
+                const x = index % gridX;
+                const y = Math.floor(index / gridX);
+                updateImagePosition(
+                    ele,
+                    x,
+                    y,
+                    mouseX,
+                    mouseY,
+                    maxTranslateX,
+                    maxTranslateY,
+                );
+                index++;
+            }
+            animationFrameRequested = false;
+        }
 
-		// Event-Listener für Mausbewegung
-		window.addEventListener('mousemove', (e) => {
-			mouseX = e.clientX / window.innerWidth;
-			mouseY = e.clientY / window.innerHeight;
+        // Event-Listener für Mausbewegung
+        window.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX / window.innerWidth;
+            mouseY = e.clientY / window.innerHeight;
 
-			if (!animationFrameRequested) {
-				requestAnimationFrame(updateImages);
-				animationFrameRequested = true;
-			}
-		});
+            if (!animationFrameRequested) {
+                requestAnimationFrame(updateImages);
+                animationFrameRequested = true;
+            }
+        });
 
-		window.addEventListener("touchmove", (e) => {
-			const touch = e.touches[0];
-			console.log(touch);
+        window.addEventListener("touchmove", (e) => {
+            const touch = e.touches[0];
+            console.log(touch);
 
-			// Invertiere die X und Y-Achse, um die Bewegung zu korrigieren
-			mouseX = 1 - (touch.clientX / window.innerWidth);
-			mouseY = 1 - (touch.clientY / window.innerHeight);
+            // Invertiere die X und Y-Achse, um die Bewegung zu korrigieren
+            mouseX = 1 - touch.clientX / window.innerWidth;
+            mouseY = 1 - touch.clientY / window.innerHeight;
 
-			if (!animationFrameRequested) {
-				requestAnimationFrame(updateImages);
-				animationFrameRequested = true;
-			}
-		});
+            if (!animationFrameRequested) {
+                requestAnimationFrame(updateImages);
+                animationFrameRequested = true;
+            }
+        });
 
-		// Event-Listener für Fenstergrößenänderung
-		window.addEventListener('resize', updateGridLayout);
+        // Event-Listener für Fenstergrößenänderung
+        window.addEventListener("resize", updateGridLayout);
 
-		// Initiales Layout berechnen
-		updateGridLayout();
-	}
+        // Initiales Layout berechnen
+        updateGridLayout();
+    }
 
-	setup();
+    setup();
 </script>

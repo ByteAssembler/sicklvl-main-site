@@ -3,8 +3,8 @@ import "../styles/font-august.css";
 import "../styles/defaults.css";
 
 interface Props {
-	language?: string;
-	tabTitle: string;
+    language?: string;
+    tabTitle: string;
 }
 
 const { tabTitle, language } = Astro.props;
@@ -12,37 +12,38 @@ const { tabTitle, language } = Astro.props;
 
 <!doctype html>
 <html lang={language ?? "en"}>
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="sitemap" href="/sitemap-index.xml" />
-		<link
-			rel="icon"
-			type="image/webp"
-			href="/favicon-dark.webp"
-			media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)"
-		/>
-		<link
-			rel="icon"
-			type="image/webp"
-			href="/favicon-light.webp"
-			media="(prefers-color-scheme: dark)"
-		/>
-		<title>{tabTitle}</title>
-	</head>
-	<body class="font-inconsolata">
-		<slot />
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="sitemap" href="/sitemap-index.xml" />
+        <link
+            rel="icon"
+            type="image/webp"
+            href="/favicon-dark.webp"
+            media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)"
+        />
+        <link
+            rel="icon"
+            type="image/webp"
+            href="/favicon-light.webp"
+            media="(prefers-color-scheme: dark)"
+        />
+        <title>{tabTitle}</title>
+    </head>
+    <body class="font-inconsolata">
+        <slot />
+    </body>
 </html>
 
 <style is:global>
-	html, body {
-		background: black;
-		color: white;
-		fill: white;
+    html,
+    body {
+        background: black;
+        color: white;
+        fill: white;
 
-		height: 100%;
-		width: 100%;
-		margin: 0;
-	}
+        height: 100%;
+        width: 100%;
+        margin: 0;
+    }
 </style>

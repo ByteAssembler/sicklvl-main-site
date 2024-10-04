@@ -1,57 +1,65 @@
-import { z, } from "astro/zod";
+import { z } from "astro/zod";
 
-export function errorConditionerObj<A, B>(result: z.SafeParseReturnType<A, B>): null | { path: string, code: string, message: string }[] {
-	if (!result.success) {
-		let list = [];
+export function errorConditionerObj<A, B>(
+    result: z.SafeParseReturnType<A, B>,
+): null | { path: string; code: string; message: string }[] {
+    if (!result.success) {
+        let list = [];
 
-		// Iterate over issues
-		for (const issue of result.error.issues) {
-			const path = issue.path.join(".");
-			const code = issue.code;
-			const message = issue.message;
+        // Iterate over issues
+        for (const issue of result.error.issues) {
+            const path = issue.path.join(".");
+            const code = issue.code;
+            const message = issue.message;
 
-			list.push({
-				path,
-				code,
-				message,
-			});
-		}
+            list.push({
+                path,
+                code,
+                message,
+            });
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	return null;
+    return null;
 }
 
-export function errorConditionerHtmlZod(result: z.SafeParseReturnType<any, any>, name: string): string {
-	const list = errorConditionerObj(result);
-	if (!list) return "";
+export function errorConditionerHtmlZod(
+    result: z.SafeParseReturnType<any, any>,
+    name: string,
+): string {
+    const list = errorConditionerObj(result);
+    if (!list) return "";
 
-	let table = `<table><thead><tr><th><code>Path</code></th><th><code>Code</code></th><th><code>Message</code></th></tr>`;
-	for (const item of list)
-		table += `<tr><td><code>${item.path}</code></td><td><code>${item.code}</code></td><td><code>${item.message}</code></td></tr>`;
-	table += `</thead><tbody>`;
+    let table = `<table><thead><tr><th><code>Path</code></th><th><code>Code</code></th><th><code>Message</code></th></tr>`;
+    for (const item of list)
+        table += `<tr><td><code>${item.path}</code></td><td><code>${item.code}</code></td><td><code>${item.message}</code></td></tr>`;
+    table += `</thead><tbody>`;
 
-	return errorConditionerHtml(name, table);
+    return errorConditionerHtml(name, table);
 }
 
-export function errorConditionerHtmlHttpResponse(result: z.SafeParseReturnType<any, any>, name: string): Response | null {
-	const errorConditionerResult = errorConditionerHtmlZod(result, name);
+export function errorConditionerHtmlHttpResponse(
+    result: z.SafeParseReturnType<any, any>,
+    name: string,
+): Response | null {
+    const errorConditionerResult = errorConditionerHtmlZod(result, name);
 
-	if (!errorConditionerResult) return null;
+    if (!errorConditionerResult) return null;
 
-	return new Response(
-		errorConditionerResult,
-		{
-			headers: {
-				"content-type": "text/html; charset=utf-8",
-			},
-		}
-	);
+    return new Response(errorConditionerResult, {
+        headers: {
+            "content-type": "text/html; charset=utf-8",
+        },
+    });
 }
 
-export function errorConditionerHtml(name: string | null | undefined, htmlContent?: string): string {
-	const style = `
+export function errorConditionerHtml(
+    name: string | null | undefined,
+    htmlContent?: string,
+): string {
+    const style = `
 	html, body {
 		font-family: Arial, sans-serif;
 		background-color: black;
@@ -75,7 +83,7 @@ export function errorConditionerHtml(name: string | null | undefined, htmlConten
 		font-weight: bolder;
 	}`;
 
-	return `
+    return `
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -85,21 +93,22 @@ export function errorConditionerHtml(name: string | null | undefined, htmlConten
 		<style>${style}</style>
 	</head>
 	<body>
-		<h1><span style="color: red;">${name ? 'ERROR:' : 'ERROR'}</span> ${name ?? ''}</h1>
-		${htmlContent ?? ''}
+		<h1><span style="color: red;">${name ? "ERROR:" : "ERROR"}</span> ${name ?? ""}</h1>
+		${htmlContent ?? ""}
 	</body>
 	</html>
 `;
 }
 
-export function errorConditionerHtmlResponse(name: string | null | undefined, htmlContent?: string, status: number = 400): Response {
-	return new Response(
-		errorConditionerHtml(name, htmlContent),
-		{
-			status,
-			headers: {
-				"content-type": "text/html; charset=utf-8",
-			},
-		}
-	);
+export function errorConditionerHtmlResponse(
+    name: string | null | undefined,
+    htmlContent?: string,
+    status: number = 400,
+): Response {
+    return new Response(errorConditionerHtml(name, htmlContent), {
+        status,
+        headers: {
+            "content-type": "text/html; charset=utf-8",
+        },
+    });
 }

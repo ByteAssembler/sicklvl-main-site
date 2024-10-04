@@ -1,11 +1,11 @@
 ---
-import LayoutExtended from 'src/layouts/LayoutExtended.astro'
-import PerfectImage from 'src/components/perfect-image.astro';
-import Showcase from 'src/components/showcase.astro';
-import PerfectVideo from 'src/components/perfect-video.astro';
-import { fileNameToBlobUrlPath } from 'src/utils/file-manager';
-import { getPortfolioWithInfos } from 'src/utils/portfolio';
-import { getImageWithPreferredWidth, redirect } from 'src/utils/minis';
+import LayoutExtended from "src/layouts/LayoutExtended.astro";
+import PerfectImage from "src/components/perfect-image.astro";
+import Showcase from "src/components/showcase.astro";
+import PerfectVideo from "src/components/perfect-video.astro";
+import { fileNameToBlobUrlPath } from "src/utils/file-manager";
+import { getPortfolioWithInfos } from "src/utils/portfolio";
+import { getImageWithPreferredWidth, redirect } from "src/utils/minis";
 
 const redirectToURL = "/";
 
@@ -17,7 +17,8 @@ if (!t) return redirect(redirectToURL);
 ---
 
 <LayoutExtended tabTitle={t.current.title}>
-	{/*
+    {
+        /*
 	<div class="absolute inset-0 h-full w-full flex items-center justify-center select-none" aria-hidden="true">
 		<div class="px-5 md:px-10">
 			<span class="drop-shadow-lg block max-w-full text-wrap font-august text-center text-[12vw] 2xl:text-[180px] leading-[120%] font-bold tracking-[13px] uppercase whitespace-nowrap" title={t.current.title}>
@@ -25,238 +26,353 @@ if (!t) return redirect(redirectToURL);
 			</span>
 		</div>
 	</div>
-	*/}
+	*/
+    }
 
-	<Showcase
-		in="portfolio"
-		onlyCustomFiles={false}
-		images={[
-			...t.current.image_gallery?.images.map(img => ({ image_variations: img.image_variations })).flat(),
-			{ image_variations: t.current.thumbnail.image_variations },
-		]}
-		single_images={[]}
-		videos={[
-			...t.current.video_gallery.videos.map(video => ({
-				id: video.id,
-				file_name: video.file_name,
-				thumbnail: {
-					image_variations: video.thumbnail?.image_variations || []
-				}
-			})),
-			...(
-				t.current.background_video ? [{
-					id: t.current.background_video.id,
-					file_name: t.current.background_video.file_name,
-					thumbnail: {
-						image_variations: t.current.background_video.thumbnail?.image_variations || []
-					}
-				}] : []
-			)
-		]}
-	/>
+    <Showcase
+        in="portfolio"
+        onlyCustomFiles={false}
+        images={[
+            ...t.current.image_gallery?.images
+                .map((img) => ({ image_variations: img.image_variations }))
+                .flat(),
+            { image_variations: t.current.thumbnail.image_variations },
+        ]}
+        single_images={[]}
+        videos={[
+            ...t.current.video_gallery.videos.map((video) => ({
+                id: video.id,
+                file_name: video.file_name,
+                thumbnail: {
+                    image_variations: video.thumbnail?.image_variations || [],
+                },
+            })),
+            ...(t.current.background_video
+                ? [
+                      {
+                          id: t.current.background_video.id,
+                          file_name: t.current.background_video.file_name,
+                          thumbnail: {
+                              image_variations:
+                                  t.current.background_video.thumbnail
+                                      ?.image_variations || [],
+                          },
+                      },
+                  ]
+                : []),
+        ]}
+    />
 
-	<div class="absolute inset-0 h-full w-full overflow-hidden">
-		<div
-			id="portfolio-taskbar"
-			class:list={[
-				"absolute bottom-0 left-0 right-0",
-				"bg-gradient-to-t from-black to-transparent",
-				"overflow-hidden pt-[120px] flex box-content h-24",
-				"[&>*]:pt-[30px] [&>*]:pb-[33px] [&>*]:px-10",
-				"[&>*]:overflow-hidden",
-				"[&_.extra-padding]:px-10",
-				"[&>*]:border-t-2 [&>*+*]:border-l-2 [&>*]:border-[rgba(255,255,255,0.1)] [&>*+*]:border-[rgba(255,255,255,0.1)]",
-				"[&>*]:relative [&>*>*]:absolute [&>*>*]:inset-0",
+    <div class="absolute inset-0 h-full w-full overflow-hidden">
+        <div
+            id="portfolio-taskbar"
+            class:list={[
+                "absolute bottom-0 left-0 right-0",
+                "bg-gradient-to-t from-black to-transparent",
+                "overflow-hidden pt-[120px] flex box-content h-24",
+                "[&>*]:pt-[30px] [&>*]:pb-[33px] [&>*]:px-10",
+                "[&>*]:overflow-hidden",
+                "[&_.extra-padding]:px-10",
+                "[&>*]:border-t-2 [&>*+*]:border-l-2 [&>*]:border-[rgba(255,255,255,0.1)] [&>*+*]:border-[rgba(255,255,255,0.1)]",
+                "[&>*]:relative [&>*>*]:absolute [&>*>*]:inset-0",
 
-				"LG:[&>*]:border-l-0",
+                "LG:[&>*]:border-l-0",
 
-				"[&_.content]:flex [&_.content]:items-center [&_.content]:justify-center",
-				"[&_.bg]:bg-white [&_.bg]:h-full [&_.bg]:w-full [&_.bg]:absolute [&_.bg]:inset-0 [&_.bg]:transition-all [&_.bg]:duration-200 [&_.bg]:ease",
+                "[&_.content]:flex [&_.content]:items-center [&_.content]:justify-center",
+                "[&_.bg]:bg-white [&_.bg]:h-full [&_.bg]:w-full [&_.bg]:absolute [&_.bg]:inset-0 [&_.bg]:transition-all [&_.bg]:duration-200 [&_.bg]:ease",
 
-				"portfolio-taskbar-small-screen animation-bottom-fade-in",
-			]}
-		>
+                "portfolio-taskbar-small-screen animation-bottom-fade-in",
+            ]}
+        >
+            <a
+                class="portfolio-taskbar--back group min-w-fit max-w-20"
+                href="/"
+            >
+                <div
+                    class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"
+                >
+                </div>
+                <div
+                    class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 10 10"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <g clip-path="url(#clip0_19_2)">
+                            <rect width="2" height="2" fill="white"></rect>
+                            <rect x="4" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect x="8" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect y="4" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect x="4" y="4" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect x="8" y="4" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect y="8" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect x="4" y="8" width="2" height="2" fill="white"
+                            ></rect>
+                            <rect x="8" y="8" width="2" height="2" fill="white"
+                            ></rect>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_19_2">
+                                <rect width="10" height="10" fill="white"
+                                ></rect>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </div>
+            </a>
 
-			<a class="portfolio-taskbar--back group min-w-fit max-w-20" href="/">
-				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
-				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
-					<svg width="20" height="20" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g clip-path="url(#clip0_19_2)">
-						<rect width="2" height="2" fill="white"/>
-						<rect x="4" width="2" height="2" fill="white"/>
-						<rect x="8" width="2" height="2" fill="white"/>
-						<rect y="4" width="2" height="2" fill="white"/>
-						<rect x="4" y="4" width="2" height="2" fill="white"/>
-						<rect x="8" y="4" width="2" height="2" fill="white"/>
-						<rect y="8" width="2" height="2" fill="white"/>
-						<rect x="4" y="8" width="2" height="2" fill="white"/>
-						<rect x="8" y="8" width="2" height="2" fill="white"/>
-						</g>
-						<defs>
-						<clipPath id="clip0_19_2">
-						<rect width="10" height="10" fill="white"/>
-						</clipPath>
-						</defs>
-					</svg>
-				</div>
-			</a>
+            <div class="portfolio-taskbar--menu min-w-[30%] overflow-hidden">
+                <div class="content">
+                    <h1
+                        class="font-august text-4xl leading-[120%] font-bold tracking-[3px] uppercase whitespace-nowrap"
+                        title={t.current.title}
+                    >
+                        {t.current.title}
+                    </h1>
+                </div>
+            </div>
 
-			<div class="portfolio-taskbar--menu min-w-[30%] overflow-hidden">
-				<div class="content">
-					<h1 class="font-august text-4xl leading-[120%] font-bold tracking-[3px] uppercase whitespace-nowrap" title={t.current.title}>
-						{t.current.title}
-					</h1>
-				</div>
-			</div>
+            <button
+                id="portfolio-taskbar-show-more-btn"
+                class="portfolio-taskbar--buttons select-none group min-w-56 max-w-64"
+            >
+                <div
+                    class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"
+                >
+                </div>
+                <div
+                    class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black"
+                >
+                    <span
+                        class="font-inconsolata text-lg font-bold uppercase tracking-widest"
+                    >
+                        SHOW MORE
+                    </span>
+                </div>
+            </button>
 
-			<button id="portfolio-taskbar-show-more-btn" class="portfolio-taskbar--buttons select-none group min-w-56 max-w-64">
-				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
-				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
-					<span class="font-inconsolata text-lg font-bold uppercase tracking-widest">
-						SHOW MORE
-					</span>
-				</div>
-			</button>
+            <div
+                class="portfolio-taskbar--description min-w-64 w-full overflow-hidden"
+            >
+                <div class="content extra-padding">
+                    <p
+                        class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest"
+                        title={t.current.description}
+                    >
+                        {t.current.description}
+                    </p>
+                </div>
+            </div>
 
-			<div class="portfolio-taskbar--description min-w-64 w-full overflow-hidden">
-				<div class="content extra-padding">
-					<p class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={t.current.description}>
-						{t.current.description}
-					</p>
-				</div>
-			</div>
+            <div class="portfolio-taskbar--stage min-w-32 w-fit max-w-40">
+                <div class="content">
+                    <span
+                        class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest"
+                        title={t.current_portfolio_count +
+                            " out of " +
+                            t.max_portfolio_count}
+                    >
+                        {t.current_portfolio_count} / {t.max_portfolio_count}
+                    </span>
+                </div>
+            </div>
 
-			<div class="portfolio-taskbar--stage min-w-32 w-fit max-w-40">
-				<div class="content">
-					<span class="truncate font-inconsolata text-lg font-bold uppercase tracking-widest" title={t.current_portfolio_count + " out of " + t.max_portfolio_count}>
-						{t.current_portfolio_count} / {t.max_portfolio_count}
-					</span>
-				</div>
-			</div>
+            <a
+                class="portfolio-taskbar--left group min-w-fit max-w-20"
+                href={"/portfolio/" + t.prev.slug}
+                title={t.prev.title}
+            >
+                <div
+                    class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"
+                >
+                </div>
+                <div
+                    class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black"
+                >
+                    <svg
+                        width="11"
+                        height="19"
+                        viewBox="0 0 11 19"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M2.15859e-05 9.59603L0.725647 8.80166L8.46565 0.191658L10.4141 1.78041L3.38614 9.59583L10.4141 17.4112L8.46565 19L0.725647 10.39L2.15859e-05 9.59603Z"
+                            fill="white"></path>
+                    </svg>
+                </div>
+            </a>
+            <a
+                class="portfolio-taskbar--right group min-w-fit max-w-20"
+                href={"/portfolio/" + t.next.slug}
+                title={t.next.title}
+            >
+                <div
+                    class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"
+                >
+                </div>
+                <div
+                    class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black"
+                >
+                    <svg
+                        width="11"
+                        height="19"
+                        viewBox="0 0 11 19"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M10.414 9.59604L9.68841 8.80166L1.94842 0.191661L-7.94201e-07 1.78041L7.02792 9.59583L-7.32762e-08 17.4113L1.94842 19L9.68841 10.39L10.414 9.59604Z"
+                            fill="white"></path>
+                    </svg>
+                </div>
+            </a>
+        </div>
+    </div>
 
-			<a class="portfolio-taskbar--left group min-w-fit max-w-20" href={"/portfolio/" + t.prev.slug} title={t.prev.title}>
-				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
-				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
-					<svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M2.15859e-05 9.59603L0.725647 8.80166L8.46565 0.191658L10.4141 1.78041L3.38614 9.59583L10.4141 17.4112L8.46565 19L0.725647 10.39L2.15859e-05 9.59603Z" fill="white"/>
-					</svg>
-				</div>
-			</a>
-			<a class="portfolio-taskbar--right group min-w-fit max-w-20" href={"/portfolio/" + t.next.slug} title={t.next.title}>
-				<div class="bg transform translate-y-[100%] group-hover:translate-y-[0%]"></div>
-				<div class="content group-hover:[&_*]:fill-black group-hover:[&_*]:text-black">
-					<svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M10.414 9.59604L9.68841 8.80166L1.94842 0.191661L-7.94201e-07 1.78041L7.02792 9.59583L-7.32762e-08 17.4113L1.94842 19L9.68841 10.39L10.414 9.59604Z" fill="white"/>
-					</svg>
-				</div>
-			</a>
-		</div>
-	</div>
-
-	{t.current.background_video ? (
-		<PerfectVideo
-			inForUrl="portfolio"
-			class="h-full w-full object-cover select-none pointer-events-none"
-			controls={false}
-			muted={true}
-			loop={true}
-			autoplay={true}
-			playsinline={true}
-			poster={getImageWithPreferredWidth(t.current.thumbnail.image_variations, 1280) || '/play.webp'}
-			videoUrl={fileNameToBlobUrlPath(t.current.background_video?.file_name)}
-		/>
-	) : (
-		<PerfectImage
-			inForUrl="portfolio"
-			class="h-full w-full object-cover select-none"
-			images={t.current.thumbnail.image_variations}
-			alt={t.current.title}
-		/>
-	)}
+    {
+        t.current.background_video ? (
+            <PerfectVideo
+                inForUrl="portfolio"
+                class="h-full w-full object-cover select-none pointer-events-none"
+                controls={false}
+                muted={true}
+                loop={true}
+                autoplay={true}
+                playsinline={true}
+                poster={
+                    getImageWithPreferredWidth(
+                        t.current.thumbnail.image_variations,
+                        1280,
+                    ) || "/play.webp"
+                }
+                videoUrl={fileNameToBlobUrlPath(
+                    t.current.background_video?.file_name,
+                )}
+            />
+        ) : (
+            <PerfectImage
+                inForUrl="portfolio"
+                class="h-full w-full object-cover select-none"
+                images={t.current.thumbnail.image_variations}
+                alt={t.current.title}
+            />
+        )
+    }
 </LayoutExtended>
 
 <script>
-	const portfolioTaskbar = document.getElementById("portfolio-taskbar");
-	const showMoreBtn = document.getElementById("portfolio-taskbar-show-more-btn");
-	const dialog: HTMLDialogElement | null = document.getElementById("showcase") as HTMLDialogElement;
+    const portfolioTaskbar = document.getElementById("portfolio-taskbar");
+    const showMoreBtn = document.getElementById(
+        "portfolio-taskbar-show-more-btn",
+    );
+    const dialog: HTMLDialogElement | null = document.getElementById(
+        "showcase",
+    ) as HTMLDialogElement;
 
-	const navigationTopLeft = document.getElementById("navigation-desktop");
-	const navigationTopRight = document.getElementById("navigation-mobile-button");
+    const navigationTopLeft = document.getElementById("navigation-desktop");
+    const navigationTopRight = document.getElementById(
+        "navigation-mobile-button",
+    );
 
-	function openShowMoreDialog() {
-		dialog?.classList.remove("disappear");
-		dialog?.classList.add("appear");
+    function openShowMoreDialog() {
+        dialog?.classList.remove("disappear");
+        dialog?.classList.add("appear");
 
-		portfolioTaskbar?.classList.remove("animation-bottom-fade-in");
-		portfolioTaskbar?.classList.add("animation-bottom-fade-out");
+        portfolioTaskbar?.classList.remove("animation-bottom-fade-in");
+        portfolioTaskbar?.classList.add("animation-bottom-fade-out");
 
-		navigationTopLeft?.classList.remove("animation-top-fade-in");
-		navigationTopLeft?.classList.add("animation-top-fade-out");
+        navigationTopLeft?.classList.remove("animation-top-fade-in");
+        navigationTopLeft?.classList.add("animation-top-fade-out");
 
-		navigationTopRight?.classList.remove("animation-top-fade-in");
-		navigationTopRight?.classList.add("animation-top-fade-out");
+        navigationTopRight?.classList.remove("animation-top-fade-in");
+        navigationTopRight?.classList.add("animation-top-fade-out");
 
-		dialog?.showModal();
-	}
+        dialog?.showModal();
+    }
 
-	function closeShowMoreDialog() {
-		dialog?.classList.remove("appear");
-		dialog?.classList.add("disappear");
+    function closeShowMoreDialog() {
+        dialog?.classList.remove("appear");
+        dialog?.classList.add("disappear");
 
-		portfolioTaskbar?.classList.add("animation-bottom-fade-in");
-		portfolioTaskbar?.classList.remove("animation-bottom-fade-out");
+        portfolioTaskbar?.classList.add("animation-bottom-fade-in");
+        portfolioTaskbar?.classList.remove("animation-bottom-fade-out");
 
-		navigationTopLeft?.classList.add("animation-top-fade-in");
-		navigationTopLeft?.classList.remove("animation-top-fade-out");
+        navigationTopLeft?.classList.add("animation-top-fade-in");
+        navigationTopLeft?.classList.remove("animation-top-fade-out");
 
-		navigationTopRight?.classList.add("animation-top-fade-in");
-		navigationTopRight?.classList.remove("animation-top-fade-out");
+        navigationTopRight?.classList.add("animation-top-fade-in");
+        navigationTopRight?.classList.remove("animation-top-fade-out");
 
-		setTimeout(() => dialog?.close(), 500);
-	}
+        setTimeout(() => dialog?.close(), 500);
+    }
 
-	showMoreBtn?.addEventListener("click", openShowMoreDialog);
+    showMoreBtn?.addEventListener("click", openShowMoreDialog);
 
-	// On dialog close event
-	dialog?.addEventListener("close", closeShowMoreDialog);
+    // On dialog close event
+    dialog?.addEventListener("close", closeShowMoreDialog);
 </script>
 
 <style is:global>
-	main {
-		overflow: hidden;
-	}
+    main {
+        overflow: hidden;
+    }
 
-	.portfolio-taskbar--menu { grid-area: portfolio-taskbar--menu; }
-	.portfolio-taskbar--description { grid-area: portfolio-taskbar--description; }
-	.portfolio-taskbar--buttons { grid-area: portfolio-taskbar--buttons; }
-	.portfolio-taskbar--left { grid-area: portfolio-taskbar--left; }
-	.portfolio-taskbar--right { grid-area: portfolio-taskbar--right; }
-	.portfolio-taskbar--back { grid-area: portfolio-taskbar--back; }
-	.portfolio-taskbar--stage { grid-area: portfolio-taskbar--stage; }
+    .portfolio-taskbar--menu {
+        grid-area: portfolio-taskbar--menu;
+    }
+    .portfolio-taskbar--description {
+        grid-area: portfolio-taskbar--description;
+    }
+    .portfolio-taskbar--buttons {
+        grid-area: portfolio-taskbar--buttons;
+    }
+    .portfolio-taskbar--left {
+        grid-area: portfolio-taskbar--left;
+    }
+    .portfolio-taskbar--right {
+        grid-area: portfolio-taskbar--right;
+    }
+    .portfolio-taskbar--back {
+        grid-area: portfolio-taskbar--back;
+    }
+    .portfolio-taskbar--stage {
+        grid-area: portfolio-taskbar--stage;
+    }
 
-	.portfolio-taskbar--stage {
-		display: none;
-	}
+    .portfolio-taskbar--stage {
+        display: none;
+    }
 
-	@media (max-width: 1024px) {
-		.portfolio-taskbar-small-screen {
-			display: grid !important;
-			grid-template-columns: 1fr 1fr 1fr;
-			grid-template-rows: 1fr 1fr 1fr 1fr;
-			grid-auto-columns: 1fr;
-			gap: 0px 0px;
-			grid-auto-flow: row;
-			grid-template-areas:
-				"portfolio-taskbar--menu portfolio-taskbar--menu portfolio-taskbar--menu"
-				"portfolio-taskbar--description portfolio-taskbar--description portfolio-taskbar--description"
-				"portfolio-taskbar--buttons portfolio-taskbar--buttons portfolio-taskbar--buttons"
-				"portfolio-taskbar--left portfolio-taskbar--back portfolio-taskbar--right";
-			overflow: auto;
-			height: unset;
-		}
+    @media (max-width: 1024px) {
+        .portfolio-taskbar-small-screen {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr;
+            grid-auto-columns: 1fr;
+            gap: 0px 0px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                "portfolio-taskbar--menu portfolio-taskbar--menu portfolio-taskbar--menu"
+                "portfolio-taskbar--description portfolio-taskbar--description portfolio-taskbar--description"
+                "portfolio-taskbar--buttons portfolio-taskbar--buttons portfolio-taskbar--buttons"
+                "portfolio-taskbar--left portfolio-taskbar--back portfolio-taskbar--right";
+            overflow: auto;
+            height: unset;
+        }
 
-		.portfolio-taskbar-small-screen > * {
-			max-width: unset;
-		}
-	}
+        .portfolio-taskbar-small-screen > * {
+            max-width: unset;
+        }
+    }
 </style>

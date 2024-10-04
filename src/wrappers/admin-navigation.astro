@@ -1,43 +1,47 @@
 ---
 const navigation = [
-	{
-		title: 'Admin',
-		href: '/admin',
-	},
-	{
-		title: 'Customer',
-		href: '/admin/customer',
-	},
-	{
-		title: 'Box',
-		href: '/admin/box',
-	},
-	{
-		title: 'Storage',
-		href: '/admin/storage',
-	},
-]
+    {
+        title: "Admin",
+        href: "/admin",
+    },
+    {
+        title: "Customer",
+        href: "/admin/customer",
+    },
+    {
+        title: "Box",
+        href: "/admin/box",
+    },
+    {
+        title: "Storage",
+        href: "/admin/storage",
+    },
+];
 
 function isActive(href: string) {
-	return Astro.url.pathname === href;
+    return Astro.url.pathname === href;
 }
 ---
 
-<nav class="h-16 w-full border-b-2 px-6 select-none overflow-y-hidden overflow-x-auto">
-	<ul class="h-full flex items-center justify-center">
-		{navigation.map((item) =>
-			<li class:list={[
-				"float-left mx-2 px-3 py-1 border-2",
-				isActive(item.href) && "font-bold",
-				{
-					"border-white": isActive(item.href),
-					"border-transparent": !isActive(item.href),
-				}
-			]}>
-				<a href={item.href}>
-					{item.title}
-				</a>
-			</li>
-		)}
-	</ul>
+<nav
+    class="h-16 w-full border-b-2 px-6 select-none overflow-y-hidden overflow-x-auto"
+>
+    <ul class="h-full flex items-center justify-center">
+        {
+            navigation.map((item) => (
+                <li
+                    class:list={[
+                        "float-left mx-2 px-3 py-1 border-2",
+                        isActive(item.href) && "font-bold",
+                        {
+                            "border-white": isActive(item.href),
+                            "border-transparent": !isActive(item.href),
+                        },
+                    ]}
+                >
+                    <a href={item.href}>{item.title}</a>
+                </li>
+            ))
+        }
+    </ul>
 </nav>

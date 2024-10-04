@@ -7,18 +7,18 @@ import { redirectToAdmin, unauthorized } from "src/utils/minis";
 import { portfolioDeleteBySlug } from "src/utils/portfolio";
 
 export const POST: APIRoute = async ({ params, locals }) => {
-	if (!locals.admin) return unauthorized();
+    if (!locals.admin) return unauthorized();
 
-	// Get slug parameter
-	const { slug } = params;
-	if (!slug || typeof slug !== "string") {
-		return errorConditionerHtmlResponse("Slug is required");
-	}
+    // Get slug parameter
+    const { slug } = params;
+    if (!slug || typeof slug !== "string") {
+        return errorConditionerHtmlResponse("Slug is required");
+    }
 
-	const result = await portfolioDeleteBySlug(slug);
-	if (result) {
-		return redirectToAdmin();
-	} else {
-		return errorConditionerHtmlResponse("Item not moved");
-	}
+    const result = await portfolioDeleteBySlug(slug);
+    if (result) {
+        return redirectToAdmin();
+    } else {
+        return errorConditionerHtmlResponse("Item not moved");
+    }
 };

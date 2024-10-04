@@ -1,7 +1,7 @@
 ---
-import type { NavigationLink } from 'src/env';
-import HamburgerButton from 'src/components/hamburger-button.astro';
-import Logo from 'src/components/logo.astro';
+import type { NavigationLink } from "src/env";
+import HamburgerButton from "src/components/hamburger-button.astro";
+import Logo from "src/components/logo.astro";
 
 interface Props {
     links: NavigationLink[];
@@ -9,121 +9,189 @@ interface Props {
 const { links } = Astro.props;
 ---
 
-<button id="navigation-mobile-button" class="sm:hidden z-[1000005] fixed top-4 right-4" style="background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);" onclick="(async () => {
+<button
+    id="navigation-mobile-button"
+    class="sm:hidden z-[1000005] fixed top-4 right-4"
+    style="background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);"
+    onclick="(async () => {
 	document.getElementById('navigation-mobile')?.showModal();
 	document.getElementById('navigation-mobile')?.classList.add('open');
-})()">
+})()"
+>
     <HamburgerButton />
 </button>
 
 <script>
-	const dialog = document.getElementById('navigation-mobile');
+    const dialog = document.getElementById("navigation-mobile");
 
-	dialog?.addEventListener("cancel", (e) => {
-		e.preventDefault();
-		delayCloseDialog(dialog);
-	});
+    dialog?.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        delayCloseDialog(dialog);
+    });
 
-	let cancelTimeout: any | null = null;
-	function delayCloseDialog(d: HTMLDialogElement | any) {
+    let cancelTimeout: any | null = null;
+    function delayCloseDialog(d: HTMLDialogElement | any) {
         if (!cancelTimeout) {
-			d.classList.remove('open');
+            d.classList.remove("open");
 
-			cancelTimeout = setTimeout(() => {
-				d?.close();
-				cancelTimeout = null;
-			}, 650);
-			return;
-		}
+            cancelTimeout = setTimeout(() => {
+                d?.close();
+                cancelTimeout = null;
+            }, 650);
+            return;
+        }
     }
 
-	const dialogCloseIntern = document.getElementById('navigation-mobile-close');
-	dialogCloseIntern?.addEventListener("click", (e) => {
-		e.preventDefault();
-		delayCloseDialog(dialog);
-	});
+    const dialogCloseIntern = document.getElementById(
+        "navigation-mobile-close",
+    );
+    dialogCloseIntern?.addEventListener("click", (e) => {
+        e.preventDefault();
+        delayCloseDialog(dialog);
+    });
 </script>
 
-<dialog id="navigation-mobile" class="overflow-hidden bg-transparent h-full w-full max-h-full max-w-full">
-    <div class="wrapper overflow-hidden h-full w-full max-h-full max-w-full flex items-center justify-center">
-		<div class="beam"></div>
-		<div class="beam"></div>
-		<div class="beam"></div>
-		<div class="beam"></div>
-		<div class="beam"></div>
+<dialog
+    id="navigation-mobile"
+    class="overflow-hidden bg-transparent h-full w-full max-h-full max-w-full"
+>
+    <div
+        class="wrapper overflow-hidden h-full w-full max-h-full max-w-full flex items-center justify-center"
+    >
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
 
-		<!-- Close Button -->
-		<button id="navigation-mobile-close" class="absolute top-7 right-7">
-			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-			</svg>
-		</button>
+        <!-- Close Button -->
+        <button id="navigation-mobile-close" class="absolute top-7 right-7">
+            <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
 
-		<div class="beam-content">
-			<Logo width={225} />
+        <div class="beam-content">
+            <Logo width={225} />
 
-			<ul>
-				{links.map((link) => (
-					<li>
-						{link.href === Astro.url.pathname ? (
-							link.size === "medium" ? (
-								<span class="cursor-pointer text-3xl font-bold underline text-black/70" style="text-underline-offset: 4px;">{link.text}</span>
-							) : (
-								<span class="cursor-pointer text-2xl font-bold underline text-black/70" style="text-underline-offset: 4px;">{link.text}</span>
-							)
-						) : (
-							link.size === "medium" ? (
-								<a class="cursor-pointer text-3xl font-extrabold text-black" href={link.href}>
-									{link.text}
-								</a>
-							) : (
-								<a class="cursor-pointer text-2xl font-bold text-black/70" href={link.href}>
-									{link.text}
-								</a>
-							)
-						)}
-					</li>
-				))}
-			</ul>
-		</div>
-	</div>
+            <ul>
+                {
+                    links.map((link) => (
+                        <li>
+                            {link.href === Astro.url.pathname ? (
+                                link.size === "medium" ? (
+                                    <span
+                                        class="cursor-pointer text-3xl font-bold underline text-black/70"
+                                        style="text-underline-offset: 4px;"
+                                    >
+                                        {link.text}
+                                    </span>
+                                ) : (
+                                    <span
+                                        class="cursor-pointer text-2xl font-bold underline text-black/70"
+                                        style="text-underline-offset: 4px;"
+                                    >
+                                        {link.text}
+                                    </span>
+                                )
+                            ) : link.size === "medium" ? (
+                                <a
+                                    class="cursor-pointer text-3xl font-extrabold text-black"
+                                    href={link.href}
+                                >
+                                    {link.text}
+                                </a>
+                            ) : (
+                                <a
+                                    class="cursor-pointer text-2xl font-bold text-black/70"
+                                    href={link.href}
+                                >
+                                    {link.text}
+                                </a>
+                            )}
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+    </div>
 </dialog>
 
 <style scoped>
-	:root {
-		--navigation-mobile-beam-width: 20%;
-		--navigation-mobile-start-delay: 0ms;
-	}
+    :root {
+        --navigation-mobile-beam-width: 20%;
+        --navigation-mobile-start-delay: 0ms;
+    }
 
-	ul {
-		padding-top: 40%;
-	}
+    ul {
+        padding-top: 40%;
+    }
 
-	li + li {
-		margin-top: 1rem;
-	}
+    li + li {
+        margin-top: 1rem;
+    }
 
-	.beam:nth-child(1) { left: calc(var(--navigation-mobile-beam-width) * 0); transition-delay: calc(var(--navigation-mobile-start-delay) + 10ms); }
-	.beam:nth-child(2) { left: calc(var(--navigation-mobile-beam-width) * 1); transition-delay: calc(var(--navigation-mobile-start-delay) + 20ms); }
-	.beam:nth-child(3) { left: calc(var(--navigation-mobile-beam-width) * 2); transition-delay: calc(var(--navigation-mobile-start-delay) + 30ms); }
-	.beam:nth-child(4) { left: calc(var(--navigation-mobile-beam-width) * 3); transition-delay: calc(var(--navigation-mobile-start-delay) + 40ms); }
-	.beam:nth-child(5) { left: calc(var(--navigation-mobile-beam-width) * 4); transition-delay: calc(var(--navigation-mobile-start-delay) + 50ms); }
-	.beam:nth-child(6) { left: calc(var(--navigation-mobile-beam-width) * 5); transition-delay: calc(var(--navigation-mobile-start-delay) + 60ms); }
+    .beam:nth-child(1) {
+        left: calc(var(--navigation-mobile-beam-width) * 0);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 10ms);
+    }
+    .beam:nth-child(2) {
+        left: calc(var(--navigation-mobile-beam-width) * 1);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 20ms);
+    }
+    .beam:nth-child(3) {
+        left: calc(var(--navigation-mobile-beam-width) * 2);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 30ms);
+    }
+    .beam:nth-child(4) {
+        left: calc(var(--navigation-mobile-beam-width) * 3);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 40ms);
+    }
+    .beam:nth-child(5) {
+        left: calc(var(--navigation-mobile-beam-width) * 4);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 50ms);
+    }
+    .beam:nth-child(6) {
+        left: calc(var(--navigation-mobile-beam-width) * 5);
+        transition-delay: calc(var(--navigation-mobile-start-delay) + 60ms);
+    }
 
-	dialog[open] .beam:nth-child(1) { transition-delay: 50ms; }
-	dialog[open] .beam:nth-child(2) { transition-delay: 100ms; }
-	dialog[open] .beam:nth-child(3) { transition-delay: 150ms; }
-	dialog[open] .beam:nth-child(4) { transition-delay: 200ms; }
-	dialog[open] .beam:nth-child(5) { transition-delay: 250ms; }
-	dialog[open] .beam:nth-child(6) { transition-delay: 300ms; }
+    dialog[open] .beam:nth-child(1) {
+        transition-delay: 50ms;
+    }
+    dialog[open] .beam:nth-child(2) {
+        transition-delay: 100ms;
+    }
+    dialog[open] .beam:nth-child(3) {
+        transition-delay: 150ms;
+    }
+    dialog[open] .beam:nth-child(4) {
+        transition-delay: 200ms;
+    }
+    dialog[open] .beam:nth-child(5) {
+        transition-delay: 250ms;
+    }
+    dialog[open] .beam:nth-child(6) {
+        transition-delay: 300ms;
+    }
 
-	dialog.open .beam {
-		transform: translateY(0);
-	}
+    dialog.open .beam {
+        transform: translateY(0);
+    }
 
-	dialog::backdrop {
-		background: none;
-	}
+    dialog::backdrop {
+        background: none;
+    }
 
     .beam {
         transition: transform 350ms ease-out;
@@ -133,39 +201,39 @@ const { links } = Astro.props;
         width: var(--navigation-mobile-beam-width);
         height: 100%;
 
-		position: absolute;
-		top: 0;
-		left: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
-	.beam-content {
-		position: relative;
-		padding: 1rem;
+    .beam-content {
+        position: relative;
+        padding: 1rem;
 
-		opacity: 0;
+        opacity: 0;
 
-		transition: opacity 150ms ease-out;
-		transition-delay: 0ms;
-	}
+        transition: opacity 150ms ease-out;
+        transition-delay: 0ms;
+    }
 
-	dialog.open .beam-content {
-		opacity: 1;
+    dialog.open .beam-content {
+        opacity: 1;
 
-		transition: opacity 150ms ease-out;
-		transition-delay: 350ms;
-	}
+        transition: opacity 150ms ease-out;
+        transition-delay: 350ms;
+    }
 
-	#navigation-mobile-close {
-		opacity: 0;
+    #navigation-mobile-close {
+        opacity: 0;
 
-		transition: opacity 150ms ease-out;
-		transition-delay: 0ms;
-	}
+        transition: opacity 150ms ease-out;
+        transition-delay: 0ms;
+    }
 
-	dialog.open #navigation-mobile-close {
-		opacity: 1;
+    dialog.open #navigation-mobile-close {
+        opacity: 1;
 
-		transition: opacity 150ms ease-out;
-		transition-delay: 350ms;
-	}
+        transition: opacity 150ms ease-out;
+        transition-delay: 350ms;
+    }
 </style>

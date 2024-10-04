@@ -1,32 +1,27 @@
 ---
-import Layout from 'src/layouts/Layout.astro'
-import BoxBlockWrapper from './box-block-wrapper.astro';
+import Layout from "src/layouts/Layout.astro";
+import BoxBlockWrapper from "./box-block-wrapper.astro";
 
 interface Props {
-	title?: string;
-	subtitle?: string;
+    title?: string;
+    subtitle?: string;
 }
 
-const {
-	title = "",
-	subtitle
-} = Astro.props;
+const { title = "", subtitle } = Astro.props;
 ---
 
 <Layout tabTitle="Your Boxes">
-	<header class="container mx-auto h-[95px] p-5 flex items-center justify-between gap-4">
-		<div class="flex flex-col overflow-hidden">
-			<h1 class="text-3xl font-bold truncate">
-				{title}
-			</h1>
-			<!-- TODO CLASSES -->
-			{subtitle && (
-				<p class="truncate">
-					{subtitle}
-				</p>
-			)}
-		</div>
-		<!--
+    <header
+        class="container mx-auto h-[95px] p-5 flex items-center justify-between gap-4"
+    >
+        <div class="flex flex-col overflow-hidden">
+            <h1 class="text-3xl font-bold truncate">
+                {title}
+            </h1>
+            <!-- TODO CLASSES -->
+            {subtitle && <p class="truncate">{subtitle}</p>}
+        </div>
+        <!--
 		<form method="post" action={`/box/${portfolioItem?.id || "AAA"}/upload`} id="box-file-upload-form" class="flex gap-4">
 			<FileUpload id="box-file-upload" class="hidden"></FileUpload>
 
@@ -39,8 +34,8 @@ const {
 			</Button>
 		</form>
 		-->
-	</header>
-	<BoxBlockWrapper>
-		<slot />
-	</BoxBlockWrapper>
+    </header>
+    <BoxBlockWrapper>
+        <slot />
+    </BoxBlockWrapper>
 </Layout>

@@ -1,104 +1,110 @@
 ---
-import type { FileUploadProps } from 'src/env';
+import type { FileUploadProps } from "src/env";
 
 interface Props extends FileUploadProps {}
 
 const {
-	name = "",
-	size = "normal",
-	multiple = true,
-	accept = "*",
-	required = false,
-	id = "",
-	class: className = "",
+    name = "",
+    size = "normal",
+    multiple = true,
+    accept = "*",
+    required = false,
+    id = "",
+    class: className = "",
 } = Astro.props;
 ---
 
 <input
-	type="file"
-	data-size={size}
-	name={name}
-	multiple={multiple}
-	accept={accept}
-	id={id}
-	required={required}
-	class:list={["font-inconsolata text-lg font-bold tracking-widest", className]}
->
-
+    type="file"
+    data-size={size}
+    name={name}
+    multiple={multiple}
+    accept={accept}
+    id={id}
+    required={required}
+    class:list={[
+        "font-inconsolata text-lg font-bold tracking-widest",
+        className,
+    ]}
+/>
 
 <style scoped>
-	input {
-		border: 2px solid white;
-		background-color: black;
-		color: white;
-		overflow: visible;
+    input {
+        border: 2px solid white;
+        background-color: black;
+        color: white;
+        overflow: visible;
 
-		min-width: 0;
-		max-width: 100%;
-		width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
 
-		height: 3rem;
+        height: 3rem;
 
-		cursor: pointer;
-	}
+        cursor: pointer;
+    }
 
-	input::file-selector-button {
-		margin-right: 15px;
-		padding: 0 15px;
-	}
+    input::file-selector-button {
+        margin-right: 15px;
+        padding: 0 15px;
+    }
 
-	input *, input::placeholder, input::-webkit-file-upload-button, input::file-selector-button {
-		height: 100%;
-	}
+    input *,
+    input::placeholder,
+    input::-webkit-file-upload-button,
+    input::file-selector-button {
+        height: 100%;
+    }
 
-	input:hover, input:active {
-		background-color: white;
-		color: black;
-	}
+    input:hover,
+    input:active {
+        background-color: white;
+        color: black;
+    }
 
-	/*
+    /*
 	input:hover::placeholder, input:active::placeholder {
 		background-color: white;
 		color: black;
 	}
 	*/
 
-	input:focus-visible {
-		outline: 1;
-		outline-width: 1px;
-		outline-offset: 2px;
-		outline-color: white;
-		outline-style: solid;
-	}
+    input:focus-visible {
+        outline: 1;
+        outline-width: 1px;
+        outline-offset: 2px;
+        outline-color: white;
+        outline-style: solid;
+    }
 
-	input[type=file]::file-selector-button {
-		background-color: black;
-		color: white;
-		overflow: visible;
+    input[type="file"]::file-selector-button {
+        background-color: black;
+        color: white;
+        overflow: visible;
 
-		min-width: 0;
-		max-width: 100%;
+        min-width: 0;
+        max-width: 100%;
 
-		border: none;
-		border-right: 2px solid white;
+        border: none;
+        border-right: 2px solid white;
 
-		cursor: pointer;
-	}
+        cursor: pointer;
+    }
 
-	input[type=file]:hover::file-selector-button,
-	input[type=file]::file-selector-button:hover {
-		border-color: black;
-		background-color: white;
-		color: black;
-	}
+    input[type="file"]:hover::file-selector-button,
+    input[type="file"]::file-selector-button:hover {
+        border-color: black;
+        background-color: white;
+        color: black;
+    }
 
-	input[data-size="small"]::file-selector-button {
-		display: none;
-	}
+    input[data-size="small"]::file-selector-button {
+        display: none;
+    }
 
-	input[data-size="small"] {
-		padding: 0 0.5rem;
-		width: 150px;
-		height: 2rem;
-	}
+    input[data-size="small"] {
+        padding: 0 0.5rem;
+        width: 150px;
+        height: 2rem;
+    }
 </style>

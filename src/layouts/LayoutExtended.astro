@@ -1,23 +1,23 @@
 ---
-import Layout from './Layout.astro'
-import Navigation from 'src/wrappers/navigation.astro';
+import Layout from "./Layout.astro";
+import Navigation from "src/wrappers/navigation.astro";
 // import NavigationBox from 'src/wrappers/navigation-box.astro';
 
 interface Props {
-	language?: string;
-	tabTitle: string;
-	title?: string;
-	mainClass?: string;
+    language?: string;
+    tabTitle: string;
+    title?: string;
+    mainClass?: string;
 }
 
 const { title, tabTitle, language, mainClass } = Astro.props;
 ---
 
 <Layout {tabTitle} {language}>
-	{title && <h1 class="hidden">{title}</h1>}
-	<!-- <PageLoadingAnimation /> -->
-	<Navigation />
-	<main class:list={["h-full w-full", mainClass]}>
-		<slot />
-	</main>
+    {title && <h1 class="hidden">{title}</h1>}
+    <!-- <PageLoadingAnimation /> -->
+    <Navigation />
+    <main class:list={["h-full w-full", mainClass]}>
+        <slot />
+    </main>
 </Layout>

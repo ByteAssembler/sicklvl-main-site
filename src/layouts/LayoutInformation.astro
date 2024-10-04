@@ -2,13 +2,13 @@
 import Layout from "src/layouts/Layout.astro";
 
 interface Props {
-	title: string;
-	link: string;
+    title: string;
+    link: string;
 }
 
 const { title, link } = Astro.props;
 ---
 
 <Layout tabTitle={title}>
-	<iframe title={title} class="h-full w-full" src={link}></iframe>
+    <iframe title={title} class="h-full w-full" src={link}></iframe>
 </Layout>

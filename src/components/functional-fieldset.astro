@@ -6,33 +6,45 @@ import UniversalComponent from "./universal-component.astro";
 import type { ComponentProps } from "src/env";
 
 interface Props {
-	title?: string;
-	form?: boolean;
-	formAction?: string;
-	formMethod?: string;
-	submit?: boolean;
-	class?: string;
-	classFieldset?: string;
+    title?: string;
+    form?: boolean;
+    formAction?: string;
+    formMethod?: string;
+    submit?: boolean;
+    class?: string;
+    classFieldset?: string;
 
-	entries?: (ComponentProps & {
-		title: string;
-		name: string;
-	})[];
+    entries?: (ComponentProps & {
+        title: string;
+        name: string;
+    })[];
 }
 const props: Props = Astro.props;
 ---
 
-<Fieldset {...props} classParent={props.classFieldset} class={["gap-4 [&>*]:w-full [&>*]:flex [&>*]:flex-col [&>*]:gap-1.5", props.class]}>
-	{props.entries && props.entries.map((item) => (
-		<div>
-			<Label for={item.name}>{item.title}</Label>
-			<UniversalComponent {...item} />
-		</div>
-	))}
-	<slot />
-	{props.submit && (
-		<div class="pt-4">
-			<Button submit>Submit</Button>
-		</div>
-	)}
+<Fieldset
+    {...props}
+    classParent={props.classFieldset}
+    class={[
+        "gap-4 [&>*]:w-full [&>*]:flex [&>*]:flex-col [&>*]:gap-1.5",
+        props.class,
+    ]}
+>
+    {
+        props.entries &&
+            props.entries.map((item) => (
+                <div>
+                    <Label for={item.name}>{item.title}</Label>
+                    <UniversalComponent {...item} />
+                </div>
+            ))
+    }
+    <slot />
+    {
+        props.submit && (
+            <div class="pt-4">
+                <Button submit>Submit</Button>
+            </div>
+        )
+    }
 </Fieldset>

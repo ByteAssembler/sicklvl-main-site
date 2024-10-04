@@ -1,113 +1,139 @@
 ---
-import Layout from 'src/layouts/Layout.astro'
-import Button from 'src/components/button.astro';
-import Showcase from 'src/components/showcase.astro';
+import Layout from "src/layouts/Layout.astro";
+import Button from "src/components/button.astro";
+import Showcase from "src/components/showcase.astro";
 
-import { redirect } from 'src/utils/minis';
-import { fileNameToBoxFileUrlPath, isFileExtensionAImage } from 'src/utils/file-manager';
-import { AccessResult, BOXhasAccessToFolder } from 'src/utils/box-utils';
+import { redirect } from "src/utils/minis";
+import {
+    fileNameToBoxFileUrlPath,
+    isFileExtensionAImage,
+} from "src/utils/file-manager";
+import { AccessResult, BOXhasAccessToFolder } from "src/utils/box-utils";
 
-import FunctionalFieldset from 'src/components/functional-fieldset.astro';
-import { BOX_PASSWORD_COOKIE_NAME, prismaClient } from 'src/global';
+import FunctionalFieldset from "src/components/functional-fieldset.astro";
+import { BOX_PASSWORD_COOKIE_NAME, prismaClient } from "src/global";
 
 const slug = Astro.params.box_slug;
-if (!slug) return redirect('/box');
+if (!slug) return redirect("/box");
 
 const box = await prismaClient.box.findUnique({
-	where: { id: slug },
-	include: { box_files: true }
+    where: { id: slug },
+    include: { box_files: true },
 });
-if (!box) return redirect('/box');
+if (!box) return redirect("/box");
 
 // Check if method is POST and password is set
-if (Astro.request.method === 'POST') {
+if (Astro.request.method === "POST") {
     // Check if there is a body in the request
     if (!Astro.request.body) return redirect(`/box/${slug}`);
 
     try {
-		const body = Astro.request.body;
-		const bodyReader = body.getReader();
-		const content = await bodyReader.read();
-		const contentString = new TextDecoder().decode(content.value);
+        const body = Astro.request.body;
+        const bodyReader = body.getReader();
+        const content = await bodyReader.read();
+        const contentString = new TextDecoder().decode(content.value);
 
-		const possiblePasswords = contentString
-			.replaceAll("\r", "")
-			.split("\n")
-			.map((line) => line.trim())
+        const possiblePasswords = contentString
+            .replaceAll("\r", "")
+            .split("\n")
+            .map((line) => line.trim());
 
-		for (const password of possiblePasswords) {
-			if (box.password === password) {
-				// Set cookie for 1 year
-				const expires = new Date();
-				expires.setFullYear(expires.getFullYear() + 1);
+        for (const password of possiblePasswords) {
+            if (box.password === password) {
+                // Set cookie for 1 year
+                const expires = new Date();
+                expires.setFullYear(expires.getFullYear() + 1);
 
-				Astro.cookies.set(
-					BOX_PASSWORD_COOKIE_NAME,
-					password,
-					{
-						secure: import.meta.env.PROD,
-						httpOnly: true,
-						sameSite: "strict",
-						expires,
-						path: "/box",
-					}
-				);
+                Astro.cookies.set(BOX_PASSWORD_COOKIE_NAME, password, {
+                    secure: import.meta.env.PROD,
+                    httpOnly: true,
+                    sameSite: "strict",
+                    expires,
+                    path: "/box",
+                });
 
-				return redirect(`/box/${slug}`);
-			}
-		}
-	} catch (error) {
-		console.error(error);
-		return redirect(`/box/${slug}`);
-	}
+                return redirect(`/box/${slug}`);
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        return redirect(`/box/${slug}`);
+    }
 }
 
 const isAdmin = Astro.locals?.admin;
 const customerId = Astro.locals?.customer?.id;
 const password = Astro.cookies.get(BOX_PASSWORD_COOKIE_NAME);
 
-const accessResult = BOXhasAccessToFolder(box, isAdmin, customerId, password?.value);
-if (accessResult === AccessResult.NotAllowed) return redirect('/box');
+const accessResult = BOXhasAccessToFolder(
+    box,
+    isAdmin,
+    customerId,
+    password?.value,
+);
+if (accessResult === AccessResult.NotAllowed) return redirect("/box");
 
 const passwordIncorrect = accessResult === AccessResult.PasswordIncorrect;
 const accessAllowed = accessResult === AccessResult.Allowed;
 
-const firstImage = box.box_files.find((file) => isFileExtensionAImage(file.file_name));
-const firstImageUrl = firstImage ? fileNameToBoxFileUrlPath(firstImage.id) : undefined;
+const firstImage = box.box_files.find((file) =>
+    isFileExtensionAImage(file.file_name),
+);
+const firstImageUrl = firstImage
+    ? fileNameToBoxFileUrlPath(firstImage.id)
+    : undefined;
 ---
 
 <Layout tabTitle={"Box " + box.name}>
-	<Showcase in="box-files" onlyCustomFiles={true} files={box.box_files} />
-	<main
-		class="h-full w-full container mx-auto flex flex-col md:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 p-5"
-	>
+    <Showcase in="box-files" onlyCustomFiles={true} files={box.box_files} />
+    <main
+        class="h-full w-full container mx-auto flex flex-col md:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 p-5"
+    >
+        {
+            firstImageUrl && (
+                <img
+                    src={firstImageUrl}
+                    alt="Box Image"
+                    class="z-10 absolute inset-0 w-full h-full object-cover filter blur-lg brightness-50 select-none pointer-events-none"
+                />
+            )
+        }
 
-		{firstImageUrl && (
-			<img
-				src={firstImageUrl}
-				alt="Box Image"
-				class="z-10 absolute inset-0 w-full h-full object-cover filter blur-lg brightness-50 select-none pointer-events-none"
-			/>
-		)}
-
-		<div class="z-20 flex flex-col gap-2 md:order-2 MD:max-w-96">
-			<div class="flex items-center gap-2">
-				<h1 class="text-5xl font-bold text-center truncate">
-					{box.name}
-				</h1>
-				<Button size="small" class="w-min" href={`/box/full/${box.id}`}>
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-				</Button>
-			</div>
-			<p class="text-center text-base">
-				{box.description}
-			</p>
-		</div>
-		<div class:list={[
-			"z-20 h-[500px] max-w-96 w-full flex flex-col md:order-1",
-			accessAllowed && "border-2",
-		]}>
-			<!--
+        <div class="z-20 flex flex-col gap-2 md:order-2 MD:max-w-96">
+            <div class="flex items-center gap-2">
+                <h1 class="text-5xl font-bold text-center truncate">
+                    {box.name}
+                </h1>
+                <Button size="small" class="w-min" href={`/box/full/${box.id}`}>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-download"
+                        ><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                        ></path><polyline points="7 10 12 15 17 10"
+                        ></polyline><line x1="12" x2="12" y1="15" y2="3"
+                        ></line></svg
+                    >
+                </Button>
+            </div>
+            <p class="text-center text-base">
+                {box.description}
+            </p>
+        </div>
+        <div
+            class:list={[
+                "z-20 h-[500px] max-w-96 w-full flex flex-col md:order-1",
+                accessAllowed && "border-2",
+            ]}
+        >
+            <!--
 			<div class="border-b-2 p-2">
 				<h2 class="text-2xl font-bold">
 					Files
@@ -115,68 +141,161 @@ const firstImageUrl = firstImage ? fileNameToBoxFileUrlPath(firstImage.id) : und
 			</div>
 			-->
 
-			{passwordIncorrect && (
-				<FunctionalFieldset
-					title={"Box is protected"}
-					form
-					formAction={`/box/${box.id}`}
-					formMethod="post"
-					submit
-					classFieldset="h-full"
-					entries={[
-						{ type: "password", title: "Password*", placeholder: "Enter customer's password", name: "password", required: true },
-					]}
-				/>
-			)}
+            {
+                passwordIncorrect && (
+                    <FunctionalFieldset
+                        title={"Box is protected"}
+                        form
+                        formAction={`/box/${box.id}`}
+                        formMethod="post"
+                        submit
+                        classFieldset="h-full"
+                        entries={[
+                            {
+                                type: "password",
+                                title: "Password*",
+                                placeholder: "Enter customer's password",
+                                name: "password",
+                                required: true,
+                            },
+                        ]}
+                    />
+                )
+            }
 
-			{accessAllowed && (
-				<section class="h-full flex flex-col gap-2 overflow-auto p-2">
-					{box.box_files.map((item, index) => (
-						<article class="flex flex-col gap-1 p-2 border-2">
-							<div class="flex items-center justify-between gap-2">
-								<div class="flex flex-col p-1 overflow-hidden">
-									<h2 class="text-2xl font-bold truncate">
-										{item.file_name}
-									</h2>
-									<p class="text-sm truncate">
-										{item.download_count > 0 && `${item.download_count} Downloads`}
-									</p>
-								</div>
-								<div class="flex gap-2">
-									<Button size="small" class="w-min" datasets={{
-										"data-start-index": index,
-										"data-showcase-button": item.file_name,
-									}}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-									</Button>
-									<Button size="small" class="w-min" href={fileNameToBoxFileUrlPath(item.id, true)}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-									</Button>
-									{isAdmin &&
-										<form method="post" action={`/api/box-file-delete/${item.id}`}>
-											<Button submit size="small" typeButton="danger" class="w-min">
-												<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-											</Button>
-										</form>
-									}
-								</div>
-							</div>
-						</article>
-					))}
-				</section>
-			)}
-
-		</div>
-	</main>
+            {
+                accessAllowed && (
+                    <section class="h-full flex flex-col gap-2 overflow-auto p-2">
+                        {box.box_files.map((item, index) => (
+                            <article class="flex flex-col gap-1 p-2 border-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex flex-col p-1 overflow-hidden">
+                                        <h2 class="text-2xl font-bold truncate">
+                                            {item.file_name}
+                                        </h2>
+                                        <p class="text-sm truncate">
+                                            {item.download_count > 0 &&
+                                                `${item.download_count} Downloads`}
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <Button
+                                            size="small"
+                                            class="w-min"
+                                            datasets={{
+                                                "data-start-index": index,
+                                                "data-showcase-button":
+                                                    item.file_name,
+                                            }}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide lucide-eye"
+                                            >
+                                                <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            class="w-min"
+                                            href={fileNameToBoxFileUrlPath(
+                                                item.id,
+                                                true,
+                                            )}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide lucide-download"
+                                            >
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                <polyline points="7 10 12 15 17 10" />
+                                                <line
+                                                    x1="12"
+                                                    x2="12"
+                                                    y1="15"
+                                                    y2="3"
+                                                />
+                                            </svg>
+                                        </Button>
+                                        {isAdmin && (
+                                            <form
+                                                method="post"
+                                                action={`/api/box-file-delete/${item.id}`}
+                                            >
+                                                <Button
+                                                    submit
+                                                    size="small"
+                                                    typeButton="danger"
+                                                    class="w-min"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="14"
+                                                        height="14"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        class="lucide lucide-trash-2"
+                                                    >
+                                                        <path d="M3 6h18" />
+                                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                                        <line
+                                                            x1="10"
+                                                            x2="10"
+                                                            y1="11"
+                                                            y2="17"
+                                                        />
+                                                        <line
+                                                            x1="14"
+                                                            x2="14"
+                                                            y1="11"
+                                                            y2="17"
+                                                        />
+                                                    </svg>
+                                                </Button>
+                                            </form>
+                                        )}
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </section>
+                )
+            }
+        </div>
+    </main>
 </Layout>
 
 <script>
-	const dialog = document.getElementById("showcase") as HTMLDialogElement;
-	const buttons = document.querySelectorAll("[data-showcase-button]");
-	buttons.forEach((button) => {
-		button.addEventListener("click", (e) => {
-			dialog.dataset.startIndex = (e.currentTarget as HTMLElement)?.dataset.startIndex;
-			dialog.showModal();
-		});
-	});
+    const dialog = document.getElementById("showcase") as HTMLDialogElement;
+    const buttons = document.querySelectorAll("[data-showcase-button]");
+    buttons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+            dialog.dataset.startIndex = (
+                e.currentTarget as HTMLElement
+            )?.dataset.startIndex;
+            dialog.showModal();
+        });
+    });
 </script>

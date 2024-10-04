@@ -1,27 +1,30 @@
 ---
-import type { PerfectVideoProps } from 'src/env';
-import { fileNameToBlobUrlPath, fileNameToBoxFileUrlPath } from 'src/utils/file-manager';
+import type { PerfectVideoProps } from "src/env";
+import {
+    fileNameToBlobUrlPath,
+    fileNameToBoxFileUrlPath,
+} from "src/utils/file-manager";
 
 interface Props extends PerfectVideoProps {}
 
 const {
-	title = "",
+    title = "",
     class: cls = "",
 
     width: wid,
     height: hei,
 
-	videoUrl,
+    videoUrl,
 
-	controls,
-	muted = false,
-	loop = false,
-	autoplay = false,
-	playsinline = true,
-	poster,
-	disablepictureinpicture = true,
+    controls,
+    muted = false,
+    loop = false,
+    autoplay = false,
+    playsinline = true,
+    poster,
+    disablepictureinpicture = true,
 
-	inForUrl,
+    inForUrl,
 } = Astro.props;
 
 function urlGetter(id: string, name: string) {
@@ -35,33 +38,32 @@ function urlGetter(id: string, name: string) {
 let posterImage;
 
 if (poster) {
-	if (Array.isArray(poster)) {
-		if (poster.length === 0) {
-			posterImage = "";
-		} else if (poster.length > 0) {
-			posterImage = urlGetter(poster[0].id, poster[0].file_name);
-		}
-	} else if (typeof poster === "object") {
-		posterImage = urlGetter(poster.id, poster.file_name);
-	} else if (typeof poster === "string") {
-		posterImage = poster;
-	}
+    if (Array.isArray(poster)) {
+        if (poster.length === 0) {
+            posterImage = "";
+        } else if (poster.length > 0) {
+            posterImage = urlGetter(poster[0].id, poster[0].file_name);
+        }
+    } else if (typeof poster === "object") {
+        posterImage = urlGetter(poster.id, poster.file_name);
+    } else if (typeof poster === "string") {
+        posterImage = poster;
+    }
 } else {
-	posterImage = "/play.webp";
+    posterImage = "/play.webp";
 }
 ---
 
 <video
-	title={title}
+    title={title}
     class={cls}
     src={videoUrl}
     width={wid ?? "auto"}
     height={hei ?? "auto"}
-	controls={controls}
-	muted={muted}
-	loop={loop}
-	autoplay={autoplay}
-	playsinline={playsinline}
-	poster={posterImage}
-	disablepictureinpicture={disablepictureinpicture}
-/>
+    controls={controls}
+    muted={muted}
+    loop={loop}
+    autoplay={autoplay}
+    playsinline={playsinline}
+    poster={posterImage}
+    disablepictureinpicture={disablepictureinpicture}></video>

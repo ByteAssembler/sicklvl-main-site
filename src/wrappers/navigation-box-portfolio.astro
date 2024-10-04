@@ -1,5 +1,9 @@
-<ul id="scrollable-container" class="flex flex-row flex-nowrap gap-8 p-8 h-full max-h-full overflow-y-hidden overflow-x-auto">
-    {/*
+<ul
+    id="scrollable-container"
+    class="flex flex-row flex-nowrap gap-8 p-8 h-full max-h-full overflow-y-hidden overflow-x-auto"
+>
+    {
+        /*
     {portfolio.map((item) => (
         <li class="snap-center" style="flex: 0 0 auto">
             <a href={`/portfolio/${item.slug}`}>
@@ -7,17 +11,18 @@
             </a>
         </li>
     ))}
-    */}
+    */
+    }
 </ul>
 
 <script>
-	// snap-x snap-mandatory
+    // snap-x snap-mandatory
     const scrollable = document.getElementById("scrollable-container");
     scrollable?.addEventListener("wheel", (event) => {
         if (event.deltaY !== 0) {
-			event.preventDefault();
+            event.preventDefault();
 
-			scrollable.scrollLeft += event.deltaY;
-		}
+            scrollable.scrollLeft += event.deltaY;
+        }
     });
 </script>

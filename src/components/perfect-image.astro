@@ -1,6 +1,9 @@
 ---
-import type { PerfectImageProps } from 'src/env';
-import { fileNameToBlobUrlPath, fileNameToBoxFileUrlPath } from 'src/utils/file-manager';
+import type { PerfectImageProps } from "src/env";
+import {
+    fileNameToBlobUrlPath,
+    fileNameToBoxFileUrlPath,
+} from "src/utils/file-manager";
 
 interface Props extends PerfectImageProps {}
 
@@ -25,21 +28,33 @@ function urlGetter(id: string, name: string) {
     }
 }
 
-const allowedImages = forceSizesW == null || forceSizesW.length === 0
-    ? images
-    : images.filter(({ width }) => forceSizesW.includes(width))
-        .sort((a, b) => {
-            // The order should be the same as the forceSizesW
-            return forceSizesW.indexOf(a.width) - forceSizesW.indexOf(b.width);
-        });
+const allowedImages =
+    forceSizesW == null || forceSizesW.length === 0
+        ? images
+        : images
+              .filter(({ width }) => forceSizesW.includes(width))
+              .sort((a, b) => {
+                  // The order should be the same as the forceSizesW
+                  return (
+                      forceSizesW.indexOf(a.width) -
+                      forceSizesW.indexOf(b.width)
+                  );
+              });
 
 const src = urlGetter(
     allowedImages && allowedImages.length > 0 ? allowedImages[0].id : "",
-    allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : ""
+    allowedImages && allowedImages.length > 0 ? allowedImages[0].file_name : "",
 );
 
-const srcset = Array.isArray(allowedImages) && allowedImages.length > 1 ? allowedImages.map(({ id, file_name, width }) => `${urlGetter(id, file_name)} ${width}w`).join(", ") : "";
-
+const srcset =
+    Array.isArray(allowedImages) && allowedImages.length > 1
+        ? allowedImages
+              .map(
+                  ({ id, file_name, width }) =>
+                      `${urlGetter(id, file_name)} ${width}w`,
+              )
+              .join(", ")
+        : "";
 ---
 
 <img

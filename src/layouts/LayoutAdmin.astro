@@ -3,16 +3,18 @@ import Layout from "src/layouts/Layout.astro";
 import AdminNavigation from "src/wrappers/admin-navigation.astro";
 
 interface Props {
-	language?: string;
-	tabTitle: string;
+    language?: string;
+    tabTitle: string;
 }
 
 const { tabTitle, language } = Astro.props;
 ---
 
 <Layout tabTitle={"Admin Panel - " + tabTitle} {language}>
-	<AdminNavigation />
-	<main class="h-[100%-4rem] w-full overflow-auto flex flex-wrap items-start justify-center gap-6 p-8">
-		<slot />
-	</main>
+    <AdminNavigation />
+    <main
+        class="h-[100%-4rem] w-full overflow-auto flex flex-wrap items-start justify-center gap-6 p-8"
+    >
+        <slot />
+    </main>
 </Layout>

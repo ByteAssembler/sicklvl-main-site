@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap");
 
 /*
 @font-face {
@@ -11,11 +11,11 @@
 */
 
 @font-face {
-	font-family: 'August';
-	src: url('/august-light.ttf') format('truetype');
-	font-weight: 300;
-	font-style: normal;
-	font-display: swap
+    font-family: "August";
+    src: url("/august-light.ttf") format("truetype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
 }
 
 /*
@@ -29,9 +29,9 @@
 */
 
 @font-face {
-	font-family: 'August';
-	src: url('/august-bold.ttf') format('truetype');
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap
+    font-family: "August";
+    src: url("/august-bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
