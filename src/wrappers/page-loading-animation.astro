@@ -19,11 +19,11 @@ const portfolioItemsFirst5 = await prismaClient.portfolioItem.findMany({
 });
 
 function getImage(pos: number, pics = portfolioItemsFirst5) {
-    if (pos < 0 || pos >= pics.length) return "/play.webp";
+    if (pos < 0 || pos >= pics.length) return "/gold-square.png";
 
     const item = portfolioItemsFirst5[pos];
     const image = getImageWithPreferredWidth(item.thumbnail.image_variations);
-    return image ? fileNameToBlobUrlPath(image.file_name) : "/play.webp";
+    return image ? fileNameToBlobUrlPath(image.file_name) : "/gold-square.png";
 }
 
 const pic1src = `url(${getImage(0)})`;
@@ -96,7 +96,7 @@ const animationSlideoutTime = `305ms`;
     }
 
     #loading-box-wrapper {
-        --to-add: min(1vh, 1vw);
+        --to-add: min(2vh, 2vw);
         --add-count: 1;
 
         animation: scale-loading-box-wrapper ease-out forwards;
