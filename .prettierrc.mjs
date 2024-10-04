@@ -3,4 +3,6 @@
 export default {
     plugins: ["prettier-plugin-astro"],
     tabWidth: 4,
+    endOfLine: "lf",
+    trailingComma: "all",
 };
