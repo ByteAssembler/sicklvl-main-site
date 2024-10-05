@@ -8,6 +8,7 @@ import FileUpload from "./file-upload.astro";
 import Fieldset from "./fieldset.astro";
 import PerfectImage from "./perfect-image.astro";
 import PerfectVideo from "./perfect-video.astro";
+import FilesOrFolderUpload from "./files-or-folder-upload.astro";
 
 type Props = ComponentProps;
 let props = Astro.props;
@@ -20,6 +21,7 @@ const renderOther = [
     "fieldset",
     "file",
     "select",
+    "files-or-folder",
 ].includes(props?.type ?? "text");
 ---
 
@@ -33,6 +35,9 @@ const renderOther = [
             {props.type === "fieldset" && <Fieldset {...props} />}
             {props.type === "file" && <FileUpload {...props} />}
             {props.type === "select" && <Select {...props} />}
+            {props.type === "files-or-folder" && (
+                <FilesOrFolderUpload {...props} />
+            )}
         </>
     ) : (
         // @ts-ignore

@@ -97,10 +97,24 @@ export async function saveFilesInBox(folder: Box, files: File[] | null) {
     let fileIds: string[] = [];
 
     for (const file of files) {
+        let fileName = file.name;
+        while (fileName.includes("/") || fileName.includes("\\")) {
+            // Remove the slashes in the front until there are none left
+            // Go from left to right - leave the part on the right side
+
+            fileName = fileName.slice(fileName.indexOf("/") + 1);
+        }
+        fileName = fileName.trim();
+
+        if (fileName.length === 0) {
+            console.error("File name is empty");
+            continue;
+        }
+
         // Create a BoxFile record in the database
         const boxFile = await prismaClient.boxFile.create({
             data: {
-                file_name: file.name,
+                file_name: fileName,
                 file_name_extension: extname(file.name),
                 mime: file.type,
                 type: getFileTypeByMime(file.type),
@@ -117,7 +131,7 @@ export async function saveFilesInBox(folder: Box, files: File[] | null) {
             boxFile.id,
         );
         if (filePath === "") {
-            console.error(`Failed to save file: ${file.name}`);
+            console.error(`Failed to save file: ${file.name} OR ${fileName}`);
 
             // Delete the BoxFile record
             await prismaClient.boxFile.delete({

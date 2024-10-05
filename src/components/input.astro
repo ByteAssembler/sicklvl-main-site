@@ -5,17 +5,24 @@ interface Props extends InputFieldProps {}
 
 const {
     type = "text",
+    class: className = "",
+    id = "",
     name = "",
     placeholder = "",
     value = "",
     min = 0,
     max = 1000000,
     required = false,
+
+    oninput = "",
+    onchange = "",
 } = Astro.props;
 ---
 
 <input
     type={type}
+    class={className}
+    id={id}
     name={name}
     placeholder={placeholder}
     value={value}
@@ -23,6 +30,8 @@ const {
     min={min}
     max={max}
     required={required}
+    oninput={oninput}
+    onchange={onchange}
 />
 
 <style scoped>

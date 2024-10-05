@@ -71,7 +71,11 @@ const [customer, boxes] = await prismaClient.$transaction([
                 title: "Password for owner (and public)",
                 name: "password_for_owner",
             },
-            { type: "file", title: "Files*", multiple: true, name: "files" },
+            {
+                type: "files-or-folder",
+                title: "Files*",
+                name: "files",
+            },
             {
                 type: "select",
                 title: "Customer*",

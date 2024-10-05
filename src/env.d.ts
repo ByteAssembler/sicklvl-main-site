@@ -50,7 +50,8 @@ type ComponentProps =
     | LabelProps
     | ButtonProps
     | FieldsetProps
-    | FileUploadProps;
+    | FileUploadProps
+    | FilesOrFolderUploadProps;
 
 interface PerfectImageProps {
     type?: "image";
@@ -91,16 +92,18 @@ interface PerfectVideoProps {
 
 interface InputFieldProps {
     type?:
-        | "text"
-        | "email"
-        | "password"
-        | "number"
-        | "tel"
-        | "url"
-        | "checkbox"
-        | "radio"
-        | "submit"
-        | "reset";
+    | "text"
+    | "email"
+    | "password"
+    | "number"
+    | "tel"
+    | "url"
+    | "checkbox"
+    | "radio"
+    | "submit"
+    | "reset";
+    class?: string;
+    id?: string;
     name?: string;
     placeholder?: string;
     value?: string;
@@ -108,6 +111,9 @@ interface InputFieldProps {
     min?: number;
     max?: number;
     required?: boolean;
+
+    oninput?: string;
+    onchange?: string;
 }
 
 // InputSelectProps
@@ -117,11 +123,11 @@ interface InputSelectProps {
     multiple?: boolean;
     options: (
         | {
-              text?: string;
-              value: string;
-              selected?: boolean;
-              disabled?: boolean;
-          }
+            text?: string;
+            value: string;
+            selected?: boolean;
+            disabled?: boolean;
+        }
         | string
     )[];
     required?: boolean;
@@ -160,6 +166,16 @@ interface FileUploadProps {
     size?: "normal" | "small";
     name?: string;
     multiple?: boolean;
+    accept?: string;
+    required?: boolean;
+    class?: string;
+    id?: string;
+}
+
+interface FilesOrFolderUploadProps {
+    type?: "files-or-folder";
+    size?: "normal" | "small";
+    name?: string;
     accept?: string;
     required?: boolean;
     class?: string;
