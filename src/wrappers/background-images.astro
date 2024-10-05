@@ -195,20 +195,27 @@ const itemCountY = Math.ceil(items.length / itemCountX);
         // Resize event handling with debouncing
         let resizeTimeout: ReturnType<typeof setTimeout> | undefined =
             undefined;
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
+
+        function onResize() {
+            if (section && grid) {
                 sectionBounds = section.getBoundingClientRect();
                 gridBounds = grid.getBoundingClientRect();
+            }
 
-                const mediaQuery = window.matchMedia("(max-width: 768px)");
-                if (mediaQuery.matches) {
-                    // Set onXAixsFreezed to true if the grid height is smaller than the section height
-                    onXAixsFreezed = gridBounds.height < sectionBounds.height;
-                } else {
-                    onXAixsFreezed = false;
-                }
-            }, 100);
+            const mediaQuery = window.matchMedia("(max-width: 768px)");
+            if (mediaQuery.matches) {
+                // Set onXAixsFreezed to true if the grid height is smaller than the section height
+                onXAixsFreezed = gridBounds.height < sectionBounds.height;
+            } else {
+                onXAixsFreezed = false;
+            }
+        }
+
+        onResize();
+
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(onResize, 100);
         });
 
         let offsetX = 0;
@@ -216,7 +223,7 @@ const itemCountY = Math.ceil(items.length / itemCountX);
         let isMouseMoving = false;
 
         // Mousemove handler
-        function handleMouseMove(e: { clientX: any; clientY: any }) {
+        function handleMouseMove(e: { clientX: number; clientY: number }) {
             if (!allowMove) return;
 
             const currentPositionX = e.clientX;
@@ -233,6 +240,26 @@ const itemCountY = Math.ceil(items.length / itemCountX);
                 (gridBounds.height - sectionBounds.height);
 
             // Set flag to indicate mouse is moving
+            isMouseMoving = true;
+        }
+
+        // Touchmove handler for mobile
+        function handleTouchMove(e: TouchEvent) {
+            if (!allowMove) return;
+
+            const touch = e.touches[0]; // Get the first touch point
+            const currentPositionX = touch.clientX;
+            const currentPositionY = touch.clientY;
+
+            offsetX =
+                ((currentPositionX - sectionBounds.left) /
+                    sectionBounds.width) *
+                (gridBounds.width - sectionBounds.width);
+            offsetY =
+                ((currentPositionY - sectionBounds.top) /
+                    sectionBounds.height) *
+                (gridBounds.height - sectionBounds.height);
+
             isMouseMoving = true;
         }
 
@@ -272,8 +299,11 @@ const itemCountY = Math.ceil(items.length / itemCountX);
 
         requestAnimationFrame(animate);
 
-        // Add event listener for mouse movement
+        // Event listeners for mouse movement
         window.addEventListener("mousemove", handleMouseMove);
+
+        // Event listeners for touch movement
+        window.addEventListener("touchmove", handleTouchMove);
     }
 
     setup();
