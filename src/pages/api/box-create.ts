@@ -91,6 +91,61 @@ export async function POST(context: APIContext): Promise<Response> {
     return redirectToAdmin("box");
 }
 
+const fileNameBlacklist = [
+    // Windows
+    "desktop.ini",
+    "thumbs.db",
+    "autorun.inf",
+    "ntuser.ini",
+    "boot.ini",
+    "bootfont.bin",
+    "bootmgr",
+    "bootmgr.efi",
+    "iconcache.db",
+    "ntldr",
+    "ntuser.dat",
+    "ntuser.dat.log",
+
+    // Linux
+    ".bash_history",
+    ".bash_logout",
+    ".bash_profile",
+    ".bashrc",
+    ".cache",
+    ".config",
+    ".local",
+    ".profile",
+    ".ssh",
+    ".viminfo",
+    ".zsh_history",
+    ".zshrc",
+    "authorized_keys",
+    "known_hosts",
+    "passwd",
+    "shadow",
+    "sudoers",
+
+    // MacOS
+    ".DS_Store",
+    ".localized",
+    ".Spotlight-V100",
+    ".Trashes",
+    ".fseventsd",
+    ".hotfiles.btree",
+    ".vol",
+    ".DocumentRevisions-V100",
+    ".PKInstallSandboxManager",
+    ".PKInstallSandboxManager-SystemSoftware",
+    ".bash_sessions",  // Additional Mac file often seen
+
+    // Other shared files
+    ".git",
+    ".gitignore",
+    ".htaccess",
+    ".htpasswd",
+    ".well-known",
+];
+
 export async function saveFilesInBox(folder: Box, files: File[] | null) {
     if (!files) return [];
 
@@ -108,6 +163,11 @@ export async function saveFilesInBox(folder: Box, files: File[] | null) {
 
         if (fileName.length === 0) {
             console.error("File name is empty");
+            continue;
+        }
+
+        if (fileNameBlacklist.includes(fileName.toLowerCase())) {
+            console.error(`File name is blacklisted: ${fileName}`);
             continue;
         }
 
