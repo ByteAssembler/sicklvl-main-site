@@ -145,6 +145,9 @@ const itemCountY = Math.ceil(items.length / itemCountX);
         background-size: cover;
 
         filter: brightness(0.85) blur(0.35rem);
+
+        pointer-events: none;
+        cursor: wait;
     }
 
     #container-grid article.focused h2 {
@@ -176,6 +179,10 @@ const itemCountY = Math.ceil(items.length / itemCountX);
 
                     article.classList.add("focused");
                     article.classList.remove("not-focused");
+
+                    // Body cancel pointer events
+                    document.body.style.pointerEvents = "none";
+                    document.body.style.cursor = "wait";
                 });
             }
         }
