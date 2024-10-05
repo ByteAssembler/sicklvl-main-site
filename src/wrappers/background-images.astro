@@ -3,7 +3,7 @@ import { prismaClient } from "src/global";
 import { fileNameToBlobUrlPath } from "src/utils/file-manager";
 import { getImageWithPreferredWidth } from "src/utils/minis";
 
-const items = await prismaClient.portfolioItem.findMany({
+let items = await prismaClient.portfolioItem.findMany({
     orderBy: {
         order: "asc",
     },
@@ -25,11 +25,16 @@ const items = await prismaClient.portfolioItem.findMany({
     },
 });
 
-// NOTE: Focus animation time is 300ms
+const itemCountX = Math.ceil(Math.sqrt(items.length));
+const itemCountY = Math.ceil(items.length / itemCountX);
 ---
 
-<section class="select-none" id="container-grid">
-    <div id="container-grid-box" class="h-full w-full absolute inset-0">
+<section id="container-grid" class="select-none">
+    <div
+        id="container-grid-box"
+        data-item-count-x={itemCountX}
+        data-item-count-y={itemCountY}
+    >
         {
             items.map((item) => {
                 const image = getImageWithPreferredWidth(
@@ -62,33 +67,51 @@ const items = await prismaClient.portfolioItem.findMany({
     </div>
 </section>
 
-<style is:global>
-    body {
-        touch-action: none;
+<style scoped define:vars={{ itemCountX, itemCountY }}>
+    html,
+    body,
+    main,
+    section {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
     }
 
     #container-grid {
-        width: 100%;
-        height: 100%;
         overflow: hidden;
+        background-color: black;
+        box-sizing: border-box;
+    }
+
+    #container-grid-box {
         position: relative;
+
+        height: min-content;
+        width: min-content;
+
+        padding: 25vh 25vw;
+
+        display: grid;
+        gap: 2.5vw 2vw;
+        grid-template-columns: repeat(var(--itemCountX), 32vw);
+        grid-template-rows: repeat(var(--itemCountY), 18vw);
+    }
+
+    @media (max-width: 768px) {
+        #container-grid-box {
+            padding: 0 50px;
+            grid-template-columns: repeat(var(--itemCountX), calc(16vw * 5));
+            grid-template-rows: repeat(var(--itemCountY), calc(9vw * 5));
+        }
     }
 
     #container-grid article {
-        @apply w-[64vw] h-[36vw] md:w-[32vw] md:h-[18vw];
-
-        object-fit: cover;
-        position: absolute;
-
         background-position: center;
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        /* background-size: cover; */
 
-        transition:
-            transform 180ms ease-out,
-            filter 300ms ease-out,
-            background-size 300ms ease-out;
+        transition: all 300ms ease-out;
 
         filter: brightness(0.7);
 
@@ -110,21 +133,18 @@ const items = await prismaClient.portfolioItem.findMany({
         transform: translateY(0%);
     }
 
-    #container-grid .focused {
-        transition: 300ms ease-out;
-        transform: none !important;
+    #container-grid article.focused {
+        transition:
+            filter 0ms linear,
+            all 120ms ease-out !important;
 
-        position: fixed !important;
+        position: absolute;
         inset: 0;
-
-        width: 100%;
-        height: 100%;
-
         z-index: 20;
 
         background-size: cover;
 
-        filter: brightness(0.85);
+        filter: brightness(0.85) blur(0.35rem);
     }
 
     #container-grid article.focused h2 {
@@ -133,180 +153,119 @@ const items = await prismaClient.portfolioItem.findMany({
 </style>
 
 <script>
+    const section = document.getElementById("container-grid");
+    const grid = document.getElementById("container-grid-box");
+    const allArticlesInGrid = document.querySelectorAll(
+        "#container-grid article",
+    );
+
     function setup() {
-        const grid = document.getElementById("container-grid");
-        if (!grid) return;
-        const articlesInGrid = grid.querySelectorAll("article");
+        if (!section || !grid) return;
 
-        const containerGridBox = document.getElementById("container-grid-box");
+        let allowMove = true;
+        let onXAixsFreezed = false;
 
-        const gridItemCount = containerGridBox?.children.length || 0;
-        let imgWidth = 16 * 2; // Breite der Bilder in vw (16:9 Verhältnis)
-        let imgHeight = 9 * 2; // Höhe der Bilder in vw (16:9 Verhältnis)
-        let imgXGap = 2; // Abstand zwischen den Bildern in vw
-        let imgYGap = 2.5; // Abstand zwischen den Bildern in vw
+        {
+            for (const article of allArticlesInGrid) {
+                const anchroTag = article.querySelector("a");
 
-        let gridX = Math.ceil(Math.sqrt(gridItemCount));
-        let gridY = Math.ceil(gridItemCount / gridX);
+                if (!anchroTag) continue;
 
-        let mouseX = 0;
-        let mouseY = 0;
-        let animationFrameRequested = false;
+                article.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    allowMove = false;
 
-        // On event: @media (min-width: 768px) {
-        // Define the media query
-        const mediaQuery = window.matchMedia("(min-width: 768px)");
-
-        // Function to handle the media query change
-        function handleTabletChange(e: MediaQueryListEvent | MediaQueryList) {
-            if (e.matches) {
-                imgWidth = 16 * 2;
-                imgHeight = 9 * 2;
-                imgXGap = 2;
-                imgYGap = 2.5;
-            } else {
-                // less than
-                imgWidth = 16 * 2 * 2;
-                imgHeight = 9 * 2 * 2;
-                imgXGap = 2;
-                imgYGap = 2.5;
+                    article.classList.add("focused");
+                    article.classList.remove("not-focused");
+                });
             }
         }
 
-        // Register the event listener for when the media query matches
-        mediaQuery.addEventListener("change", handleTabletChange);
+        let sectionBounds = section.getBoundingClientRect();
+        let gridBounds = grid.getBoundingClientRect();
 
-        // Check the initial state
-        handleTabletChange(mediaQuery);
+        // Resize event handling with debouncing
+        let resizeTimeout: ReturnType<typeof setTimeout> | undefined =
+            undefined;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                sectionBounds = section.getBoundingClientRect();
+                gridBounds = grid.getBoundingClientRect();
 
-        // Funktion, um Grid-Größe und Positionierung zu berechnen
-        function updateGridLayout() {
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-
-            // Berechne die gesamte Breite und Höhe des Grids in vw
-            const totalGridWidth = gridX * (imgWidth + imgXGap) - imgXGap;
-            const totalGridHeightVw = gridY * (imgHeight + imgYGap) - imgYGap;
-
-            // Konvertiere die Grid-Höhe von vw in eine Höhe basierend auf der Viewport-Breite
-            const totalGridHeightPx = (totalGridHeightVw * viewportWidth) / 100; // Höhe des Grids in Pixeln
-
-            // Berechne das Padding, um das Grid zu zentrieren (horizontal und vertikal)
-            const paddingX =
-                (viewportWidth - totalGridWidth * (viewportWidth / 100)) / 2;
-            const paddingY = (viewportHeight - totalGridHeightPx) / 2;
-
-            // Setze das Padding dynamisch auf das Container-Grid
-            if (containerGridBox) {
-                containerGridBox.style.paddingLeft = `${paddingX}px`;
-                containerGridBox.style.paddingTop = `${paddingY}px`;
-            }
-
-            // Berechne die maximale Verschiebung (Translation) basierend auf dem Viewport
-            const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
-            const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
-
-            // Positioniere alle Artikel neu
-            for (let i = 0; i < gridItemCount; i++) {
-                const article = articlesInGrid[i];
-                const x = i % gridX;
-                const y = Math.floor(i / gridX);
-                updateImagePosition(
-                    article,
-                    x,
-                    y,
-                    0.5,
-                    0.5,
-                    maxTranslateX,
-                    maxTranslateY,
-                );
-            }
-        }
-
-        // Funktion, um die Position eines Bildes dynamisch zu aktualisieren
-        /**
-         * Updates the position of an image element.
-         * @param {HTMLElement} ele - The image element.
-         * @param {number} gridXPos - The X position in the grid.
-         * @param {number} gridYPos - The Y position in the grid.
-         * @param {number} mouseX - The X position of the mouse.
-         * @param {number} mouseY - The Y position of the mouse.
-         * @param {number} maxTranslateX - The maximum translation in the X direction.
-         * @param {number} maxTranslateY - The maximum translation in the Y direction.
-         */
-        function updateImagePosition(
-            ele: HTMLElement,
-            gridXPos: number,
-            gridYPos: number,
-            mouseX: number,
-            mouseY: number,
-            maxTranslateX: number,
-            maxTranslateY: number,
-        ) {
-            // Berechne den Korrekturwert für die X- und Y-Achse, um das Padding auf beiden Seiten zu balancieren
-            const translateX =
-                gridXPos * (imgWidth + imgXGap) +
-                (mouseX - 0.5) * maxTranslateX;
-            const translateY =
-                gridYPos * (imgHeight + imgYGap) +
-                (mouseY - 0.5) * maxTranslateY;
-
-            // Setze die neue Position des Artikels
-            ele.style.transform = `translate(${translateX}vw, ${translateY}vw)`;
-        }
-
-        // Funktion, um die Artikel basierend auf Mausbewegungen zu verschieben
-        function updateImages() {
-            const maxTranslateX = -((imgWidth + imgXGap) * (gridX - 1));
-            const maxTranslateY = -((imgHeight + imgYGap) * (gridY - 1));
-            let index = 0;
-            for (const ele of articlesInGrid) {
-                const x = index % gridX;
-                const y = Math.floor(index / gridX);
-                updateImagePosition(
-                    ele,
-                    x,
-                    y,
-                    mouseX,
-                    mouseY,
-                    maxTranslateX,
-                    maxTranslateY,
-                );
-                index++;
-            }
-            animationFrameRequested = false;
-        }
-
-        // Event-Listener für Mausbewegung
-        window.addEventListener("mousemove", (e) => {
-            mouseX = e.clientX / window.innerWidth;
-            mouseY = e.clientY / window.innerHeight;
-
-            if (!animationFrameRequested) {
-                requestAnimationFrame(updateImages);
-                animationFrameRequested = true;
-            }
+                const mediaQuery = window.matchMedia("(max-width: 768px)");
+                if (mediaQuery.matches) {
+                    // Set onXAixsFreezed to true if the grid height is smaller than the section height
+                    onXAixsFreezed = gridBounds.height < sectionBounds.height;
+                } else {
+                    onXAixsFreezed = false;
+                }
+            }, 100);
         });
 
-        window.addEventListener("touchmove", (e) => {
-            const touch = e.touches[0];
-            console.log(touch);
+        let offsetX = 0;
+        let offsetY = 0;
+        let isMouseMoving = false;
 
-            // Invertiere die X und Y-Achse, um die Bewegung zu korrigieren
-            mouseX = 1 - touch.clientX / window.innerWidth;
-            mouseY = 1 - touch.clientY / window.innerHeight;
+        // Mousemove handler
+        function handleMouseMove(e: { clientX: any; clientY: any }) {
+            if (!allowMove) return;
 
-            if (!animationFrameRequested) {
-                requestAnimationFrame(updateImages);
-                animationFrameRequested = true;
+            const currentPositionX = e.clientX;
+            const currentPositionY = e.clientY;
+
+            // Calculate offsets based on mouse position
+            offsetX =
+                ((currentPositionX - sectionBounds.left) /
+                    sectionBounds.width) *
+                (gridBounds.width - sectionBounds.width);
+            offsetY =
+                ((currentPositionY - sectionBounds.top) /
+                    sectionBounds.height) *
+                (gridBounds.height - sectionBounds.height);
+
+            // Set flag to indicate mouse is moving
+            isMouseMoving = true;
+        }
+
+        let center = true;
+        let centerInProcess = false;
+        // Animation loop using requestAnimationFrame
+        function animate() {
+            if (grid && allowMove) {
+                if (center && !centerInProcess) {
+                    centerInProcess = true;
+                    grid.style.transition = "none";
+
+                    offsetX = (gridBounds.width - sectionBounds.width) / 2;
+                    offsetY = (gridBounds.height - sectionBounds.height) / 2;
+                    if (onXAixsFreezed)
+                        offsetY =
+                            (gridBounds.height - sectionBounds.height) / 2;
+                    grid.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
+
+                    setTimeout(() => {
+                        center = false;
+                        grid.style.transition = "transform 180ms ease-out";
+
+                        centerInProcess = false;
+                    }, 180);
+                } else if (isMouseMoving) {
+                    if (onXAixsFreezed)
+                        offsetY =
+                            (gridBounds.height - sectionBounds.height) / 2;
+
+                    grid.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
+                    isMouseMoving = false;
+                }
+                requestAnimationFrame(animate);
             }
-        });
+        }
 
-        // Event-Listener für Fenstergrößenänderung
-        window.addEventListener("resize", updateGridLayout);
+        requestAnimationFrame(animate);
 
-        // Initiales Layout berechnen
-        updateGridLayout();
+        // Add event listener for mouse movement
+        window.addEventListener("mousemove", handleMouseMove);
     }
 
     setup();
