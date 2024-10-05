@@ -172,7 +172,6 @@ const itemCountY = Math.ceil(items.length / itemCountX);
                 if (!anchroTag) continue;
 
                 article.addEventListener("click", async (e) => {
-                    e.preventDefault();
                     allowMove = false;
 
                     article.classList.add("focused");
