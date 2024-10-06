@@ -276,9 +276,9 @@ const itemCountY = Math.ceil(items.length / itemCountX);
 
                     offsetX = (gridBounds.width - sectionBounds.width) / 2;
                     offsetY = (gridBounds.height - sectionBounds.height) / 2;
-                    if (onXAixsFreezed)
-                        offsetY =
-                            (gridBounds.height - sectionBounds.height) / 2;
+                    // if (onXAixsFreezed)
+                    //     offsetY =
+                    //         (gridBounds.height - sectionBounds.height) / 2;
                     grid.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
 
                     setTimeout(() => {
@@ -288,9 +288,9 @@ const itemCountY = Math.ceil(items.length / itemCountX);
                         centerInProcess = false;
                     }, 180);
                 } else if (isMouseMoving) {
-                    if (onXAixsFreezed)
-                        offsetY =
-                            (gridBounds.height - sectionBounds.height) / 2;
+                    // if (onXAixsFreezed)
+                    //     offsetY =
+                    //         (gridBounds.height - sectionBounds.height) / 2;
 
                     grid.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
                     isMouseMoving = false;
