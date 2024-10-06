@@ -3,12 +3,24 @@
     "compilerOptions": {
         "baseUrl": "./",
         "paths": {
-            "$assets/*": ["/src/assets/*"],
-            "$components/*": ["/src/components/*"],
-            "$wrappers/*": ["/src/wrappers/*"],
-            "$components": ["/src/components"],
-            "$layouts/*": ["/src/layouts/*"],
-            "$pages/*": ["/src/pages/*"]
+            "$assets/*": [
+                "/src/assets/*"
+            ],
+            "$components/*": [
+                "/src/components/*"
+            ],
+            "$wrappers/*": [
+                "/src/wrappers/*"
+            ],
+            "$components": [
+                "/src/components"
+            ],
+            "$layouts/*": [
+                "/src/layouts/*"
+            ],
+            "$pages/*": [
+                "/src/pages/*"
+            ]
         }
     }
 }
