@@ -93,9 +93,6 @@ export class LargeFileUploader {
     }
 
     public async handleUpload(context: APIContext): Promise<Response> {
-        const { id } = context.params;
-        if (!id) return errorConditionerHtmlResponse("Slug is required");
-
         // Extract metadata from headers
         const metadata = context.request.headers.get("x-file-metadata");
         if (!metadata) return errorConditionerHtmlResponse("Missing metadata");
