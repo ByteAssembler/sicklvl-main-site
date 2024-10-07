@@ -25,7 +25,7 @@
             return;
         }
         const file = files[0];
-        const chunkSize = 1024 * 1024 * 10; // 10MB
+        const chunkSize = 1024 * 1024 * 5; // 5MB
         const totalChunks = Math.ceil(file.size / chunkSize);
         const randomPrefix =
             Math.random().toString(36).substring(7) +
@@ -80,6 +80,7 @@
                             headers: {
                                 "x-file-metadata": JSON.stringify({
                                     randomPrefix: randomPrefix,
+                                    totalChunks: totalChunks,
                                     totalFileSize: file.size,
                                     mimeType: file.type,
                                     fileName: file.name,
