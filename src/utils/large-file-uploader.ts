@@ -116,7 +116,7 @@ export class LargeFileUploader {
         if (combine) {
             try {
                 await this.combineChunks(fileName, randomPrefix, totalChunks);
-                return new Response("DONE", { status: 200 });
+                return new Response("DONE", { status: 201 });
             } catch (error) {
                 // Delete all chunks if there's an error during combination
                 await this.deleteAllChunks(randomPrefix, fileName, totalChunks);
