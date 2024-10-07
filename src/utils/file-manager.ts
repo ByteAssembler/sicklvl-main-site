@@ -9,6 +9,11 @@ import sharp from "sharp";
 
 const rootFolderPath = import.meta.env.STORAGE_FOLDER_PATH || process.cwd();
 
+export const fileManagerTempFolderPath = path.join(
+    rootFolderPath,
+    "drive",
+    "tmp",
+);
 export const blobFolderPath = path.join(rootFolderPath, "drive", "blob");
 export const boxContentFolderPath = path.join(
     rootFolderPath,
@@ -133,6 +138,27 @@ export async function saveSingleBuffer(
     }
 
     return true;
+}
+
+export async function ownFileManagerFile(
+    srcFullFilePath: string,
+    destFullFilePath: string
+) {
+    // const srcFolderPath;
+    // const destFolderPath;
+
+    // await fs.mkdir(srcFullFilePath, { recursive: true });
+    // await fs.mkdir(destFullFilePath, { recursive: true });
+
+
+
+    // Move the file / rename it
+    try {
+        await fs.rename(srcFullFilePath, destFullFilePath);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 export async function saveSingleFile(
@@ -283,15 +309,15 @@ export async function saveVideo(
     folder_path: string = blobFolderPath,
 ): Promise<
     | {
-          video_mime: string;
-          video_file_name: string;
-          video_file_path_full: string;
-          thumbnail: SingleImageMemory;
-          success: true;
-      }
+        video_mime: string;
+        video_file_name: string;
+        video_file_path_full: string;
+        thumbnail: SingleImageMemory;
+        success: true;
+    }
     | {
-          success: false;
-      }
+        success: false;
+    }
 > {
     const filePath = await saveSingleFile(file, folder_path, file_video_name);
     if (!filePath) return { success: false };

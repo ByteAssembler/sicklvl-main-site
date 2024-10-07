@@ -7,7 +7,7 @@
         "start": "astro dev",
         "build": "astro check && astro build",
         "preview": "astro preview",
-        "production": "HOST=0.0.0.0 node --max-http-header-size=1000000000 dist/server/entry.mjs",
+        "production": "HOST=0.0.0.0 node dist/server/entry.mjs",
         "astro": "astro"
     },
     "dependencies": {
@@ -23,6 +23,7 @@
         "fluent-ffmpeg": "^2.1.3",
         "get-folder-size": "^5.0.0",
         "lucia": "^3.2.0",
+        "mime-types": "^2.1.35",
         "pretty-bytes": "^6.1.1",
         "sharp": "^0.33.5",
         "tailwindcss": "^3.4.13",
@@ -32,6 +33,7 @@
     "devDependencies": {
         "@types/archiver": "^6.0.2",
         "@types/fluent-ffmpeg": "^2.1.26",
+        "@types/mime-types": "^2.1.4",
         "@types/node": "^22.7.4",
         "prettier": "^3.3.3",
         "prettier-plugin-astro": "^0.14.1",

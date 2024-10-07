@@ -13,18 +13,7 @@
 </html>
 
 <script>
-    async function uploadFile() {
-        const fileInput = document.getElementById("fileInput");
-        if (!fileInput) {
-            console.error("File input element not found");
-            return;
-        }
-        const files = (fileInput as HTMLInputElement).files;
-        if (!files || files.length === 0) {
-            console.error("No files selected");
-            return;
-        }
-        const file = files[0];
+    async function uploadFile(urlLocation: string, file: File) {
         const chunkSize = 1024 * 1024 * 5; // 5MB
         const totalChunks = Math.ceil(file.size / chunkSize);
         const randomPrefix =
@@ -48,24 +37,21 @@
 
                 await new Promise((resolve) => setTimeout(resolve, 1000));
 
-                const response = await fetch(
-                    "/api/box-large-files-upload/test-id",
-                    {
-                        method: "POST",
-                        headers: {
-                            "x-file-metadata": JSON.stringify({
-                                randomPrefix: randomPrefix,
-                                chunkIndex: chunkIndex,
-                                totalChunks: totalChunks,
-                                totalFileSize: file.size,
-                                mimeType: file.type,
-                                fileName: file.name,
-                                combine: false,
-                            }),
-                        },
-                        body: buffer,
+                const response = await fetch(urlLocation, {
+                    method: "POST",
+                    headers: {
+                        "x-file-metadata": JSON.stringify({
+                            randomPrefix: randomPrefix,
+                            chunkIndex: chunkIndex,
+                            totalChunks: totalChunks,
+                            totalFileSize: file.size,
+                            mimeType: file.type,
+                            fileName: file.name,
+                            combine: false,
+                        }),
                     },
-                );
+                    body: buffer,
+                });
 
                 console.log(`Chunk ${chunkIndex + 1} uploaded`);
 
@@ -73,22 +59,19 @@
                 if (uploadedChunks === totalChunks) {
                     console.log("All chunks uploaded");
 
-                    const combine = await fetch(
-                        `/api/box-large-files-upload/test-id`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "x-file-metadata": JSON.stringify({
-                                    randomPrefix: randomPrefix,
-                                    totalChunks: totalChunks,
-                                    totalFileSize: file.size,
-                                    mimeType: file.type,
-                                    fileName: file.name,
-                                    combine: true,
-                                }),
-                            },
+                    const combine = await fetch(urlLocation, {
+                        method: "POST",
+                        headers: {
+                            "x-file-metadata": JSON.stringify({
+                                randomPrefix: randomPrefix,
+                                totalChunks: totalChunks,
+                                totalFileSize: file.size,
+                                mimeType: file.type,
+                                fileName: file.name,
+                                combine: true,
+                            }),
                         },
-                    );
+                    });
                 }
             };
 

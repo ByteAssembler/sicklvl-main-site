@@ -1,29 +1,30 @@
 // pages/api/login.ts
-import type { Box } from "@prisma/client";
+import path, { extname } from "path";
 import type { APIContext } from "astro";
 import { z } from "astro/zod";
-import { extname } from "path";
+import { lookup } from 'mime-types';
+import fs from "fs/promises";
 import { prismaClient } from "src/global";
+import type { Box } from "@prisma/client";
 import {
     errorConditionerHtmlHttpResponse,
     errorConditionerHtmlResponse,
 } from "src/utils/error-conditioner";
 import {
     checkboxBooleanOptDefFalseSchema,
-    multiFileSchema,
 } from "src/utils/form-validation";
 import {
     boxContentFolderPath,
+    fileManagerTempFolderPath,
     getFileTypeByMime,
-    saveSingleFile,
+    ownFileManagerFile,
 } from "src/utils/file-manager";
 import { redirect, redirectToAdmin, unauthorized } from "src/utils/minis";
+import { checkFileExists } from "src/utils/filesystem-utils";
 
 const boxCreateSchema = z.object({
     name: z.string().min(3).max(255),
-    files: multiFileSchema.refine((obj) => obj && obj.length > 0, {
-        message: "At least one file is required",
-    }),
+    // files: z.array(z.string()),
     customer: z
         .array(z.string().max(255))
         .length(1)
@@ -86,7 +87,7 @@ export async function POST(context: APIContext): Promise<Response> {
         },
     });
 
-    await saveFilesInBox(box, result.data.files);
+    // await saveFilesInBox(box, result.data.files);
 
     return redirectToAdmin("box");
 }
@@ -146,28 +147,31 @@ const fileNameBlacklist = [
     ".well-known",
 ];
 
-export async function saveFilesInBox(folder: Box, files: File[] | null) {
-    if (!files) return [];
+export async function saveFilesInBox(folder: Box, fileNames: string[]) {
+    if (!fileNames) return [];
 
     let fileIds: string[] = [];
 
-    for (const file of files) {
-        let fileName = file.name;
-        while (fileName.includes("/") || fileName.includes("\\")) {
-            // Remove the slashes in the front until there are none left
-            // Go from left to right - leave the part on the right side
+    await fs.mkdir(fileManagerTempFolderPath, { recursive: true });
 
-            fileName = fileName.slice(fileName.indexOf("/") + 1);
-        }
-        fileName = fileName.trim();
+    for (const fileName of fileNames) {
+        const oldFilePath = path.join(fileManagerTempFolderPath, fileName);
+        const exists = await checkFileExists(oldFilePath);
 
-        if (fileName.length === 0) {
-            console.error("File name is empty");
+        if (!exists) {
+            console.error(`File does not exits: ${oldFilePath}`);
             continue;
         }
 
         if (fileNameBlacklist.includes(fileName.toLowerCase())) {
-            console.error(`File name is blacklisted: ${fileName}`);
+            console.error(`File name is blacklisted: ${oldFilePath}`);
+            continue;
+        }
+
+        const mime = lookup(fileName);
+
+        if (!mime) {
+            console.error(`Failed to get mime type for file: ${oldFilePath}`);
             continue;
         }
 
@@ -175,23 +179,24 @@ export async function saveFilesInBox(folder: Box, files: File[] | null) {
         const boxFile = await prismaClient.boxFile.create({
             data: {
                 file_name: fileName,
-                file_name_extension: extname(file.name),
-                mime: file.type,
-                type: getFileTypeByMime(file.type),
+                file_name_extension: extname(oldFilePath),
+                mime: mime,
+                type: getFileTypeByMime(mime),
                 box_id: folder.id,
             },
         });
 
         fileIds.push(boxFile.id);
 
+        const newFilePath = path.join(boxContentFolderPath, boxFile.id);
+
         // Save the file to the database
-        const filePath = await saveSingleFile(
-            file,
-            boxContentFolderPath,
-            boxFile.id,
+        const successfullyOwned = await ownFileManagerFile(
+            oldFilePath,
+            newFilePath,
         );
-        if (filePath === "") {
-            console.error(`Failed to save file: ${file.name} OR ${fileName}`);
+        if (!successfullyOwned) {
+            console.error(`Failed to own file: ${oldFilePath} : ${newFilePath}`);
 
             // Delete the BoxFile record
             await prismaClient.boxFile.delete({
