@@ -18,6 +18,7 @@ const metadataSchema = z.object({
 });
 
 const uploadDir = path.join(process.cwd(), 'uploads');
+const finalDir = path.join(process.cwd(), 'final');
 
 function getChunkPath(uploadDir: string, randomPrefix: string, fileName: string, index: number) {
     return path.join(uploadDir, `PART-${randomPrefix}-${fileName}.part${index}`);
@@ -75,10 +76,14 @@ export async function POST(context: APIContext): Promise<Response> {
     const { combine, randomPrefix, chunkIndex, totalChunks, fileName } = parsedMetadata.data;
     if (!fileName) return errorConditionerHtmlResponse("Filename is invalid!");
 
+    // Ensure upload directory exists
+    await fs.promises.mkdir(uploadDir, { recursive: true });
+    await fs.promises.mkdir(finalDir, { recursive: true }); // Ensure final directory exists
+
     // Handle file combination if `combine` is true
     if (combine) {
         try {
-            await combineChunks(uploadDir, fileName, randomPrefix, totalChunks);
+            await combineChunks(finalDir, fileName, randomPrefix, totalChunks); // Use finalDir for combined file
             return new Response("DONE", { status: 200 });
         } catch {
             return new Response("Failed to combine file chunks", { status: 500 });
@@ -87,9 +92,6 @@ export async function POST(context: APIContext): Promise<Response> {
 
     // Validate chunk index
     if (chunkIndex >= totalChunks) return errorConditionerHtmlResponse("Invalid chunk index");
-
-    // Ensure upload directory exists
-    await fs.promises.mkdir(uploadDir, { recursive: true });
 
     // Save uploaded chunk
     const chunkBuffer = await context.request.arrayBuffer();
