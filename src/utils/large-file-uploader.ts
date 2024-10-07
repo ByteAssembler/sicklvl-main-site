@@ -12,7 +12,23 @@ const metadataSchema = z.object({
     randomPrefix: z.string().min(5),
     chunkIndex: z.number().int().nonnegative().optional(),
     totalChunks: z.number().int().positive(),
-    fileName: z.string().min(3).transform(s => isValidFilename(s) ? s : null),
+    fileName: z.string()
+        .min(3)
+        .transform(s => {
+            while (s.includes("/") || s.includes("\\")) {
+                // Remove the slashes in the front until there are none left
+                // Go from left to right - leave the part on the right side
+
+                s = s.slice(s.indexOf("/") + 1);
+            }
+            s = s.trim();
+            return s;
+        })
+        .transform(s => isValidFilename(s) ? s : null)
+        .refine(s => s !== null, {
+            message: "Invalid filename",
+        })
+        .refine(s => s.length > 3),
     totalFileSize: z.number().positive(),
     mimeType: z.string().min(3),
 });
