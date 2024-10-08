@@ -181,3 +181,26 @@ interface FilesOrFolderUploadProps {
     class?: string;
     id?: string;
 }
+
+type FileChunkUploaderProps = {
+    type?: "file-chunk-uploader";
+    size?: "normal" | "small";
+    name?: string;
+    accept?: string;
+    required?: boolean;
+    class?: string;
+    id?: string;
+
+    reloadAfterSuccessUpload?: boolean;
+
+    chunkSize?: number;
+    urlLocation: string;
+    userCanDecideIfTheyWantToUploadADirectory?: boolean;
+    showProgressBars?: boolean;
+} & (
+        {
+            uploadMultipleFiles: true;
+        } | {
+            uploadMultipleFiles: false;
+        }
+    )

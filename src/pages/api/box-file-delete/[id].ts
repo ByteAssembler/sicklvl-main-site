@@ -35,7 +35,10 @@ export async function POST(context: APIContext): Promise<Response> {
         where: { id },
         select: { id: true },
     });
-    await deleteFileInFolder(boxContentFolderPath, deletedBoxFile.id);
+    const deleted = await deleteFileInFolder(boxContentFolderPath, deletedBoxFile.id);
+
+    if (!deleted)
+        return errorConditionerHtmlResponse("Failed to delete file");
 
     if (boxFile.box.box_files.length === 1) {
         // Delete also the box

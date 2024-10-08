@@ -83,15 +83,17 @@ export async function readBinaryFile(filePath: string): Promise<Buffer> {
 export async function deleteFileInFolder(
     folderPath: string,
     fileName: string,
-): Promise<void> {
+): Promise<boolean> {
     const filePath = path.join(folderPath, fileName);
     try {
         await unlink(filePath);
+        return true;
     } catch (error) {
-        throw new FileSystemError(
+        console.error(
             `Failed to delete file: ${filePath}`,
             (error as NodeJS.ErrnoException).code,
         );
+        return false;
     }
 }
 

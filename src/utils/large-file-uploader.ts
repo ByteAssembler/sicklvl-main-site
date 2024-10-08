@@ -2,9 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { z } from 'astro/zod';
 import type { APIContext } from "astro";
-import { errorConditionerHtmlHttpResponse, errorConditionerHtmlResponse } from "src/utils/error-conditioner";
-import { redirect } from "src/utils/minis";
 import isValidFilename from "valid-filename";
+import { errorConditionerHtmlHttpResponse, errorConditionerHtmlResponse } from "src/utils/error-conditioner";
 
 // Zod schema for metadata validation
 const metadataSchema = z.object({
@@ -108,40 +107,80 @@ export class LargeFileUploader {
         }
     }
 
-    public async handleUpload(context: APIContext): Promise<Response> {
+    public async handleUpload(context: APIContext): Promise<{
+        response: Response;
+    } & (
+            { status: "error", errorMessage: string } |
+            { status: "chunk-uploaded" } |
+            { status: "file-combined", metadata: z.infer<typeof metadataSchema>, filePath: string, folderPath: string }
+        )> {
         // Extract metadata from headers
         const metadata = context.request.headers.get("x-file-metadata");
-        if (!metadata) return errorConditionerHtmlResponse("Missing metadata");
+        if (!metadata) return {
+            response: errorConditionerHtmlResponse("Metadata is required"),
+            status: "error",
+            errorMessage: "Metadata is required",
+        };
 
         // Validate metadata using zod schema
         let parsedMetadata;
         try {
             parsedMetadata = metadataSchema.safeParse(JSON.parse(metadata));
         } catch (error) {
-            return errorConditionerHtmlResponse(`Metadata validation error: ${(error as Error).message}`);
+            return {
+                response: errorConditionerHtmlResponse(`Metadata validation error: ${(error as Error).message}`),
+                status: "error",
+                errorMessage: (error as Error).message,
+            }
         }
 
         const error = errorConditionerHtmlHttpResponse(parsedMetadata, "File Upload");
-        if (error) return error;
-        if (!parsedMetadata.success) return redirect();
+        if (error) return {
+            response: error,
+            status: "error",
+            errorMessage: "Metadata is invalid",
+        }
+        if (!parsedMetadata.success) return {
+            response: errorConditionerHtmlResponse("Metadata is invalid"),
+            status: "error",
+            errorMessage: "Metadata is invalid",
+        };
 
         const { combine, randomPrefix, chunkIndex, totalChunks, fileName } = parsedMetadata.data;
-        if (!fileName) return errorConditionerHtmlResponse("Filename is invalid!");
+        if (!fileName) return {
+            response: errorConditionerHtmlResponse("Filename is invalid"),
+            status: "error",
+            errorMessage: "Filename is invalid",
+        }
 
         // Handle file combination if `combine` is true
         if (combine) {
             try {
                 await this.combineChunks(fileName, randomPrefix, totalChunks);
-                return new Response("DONE", { status: 201 });
+                return {
+                    response: new Response("File combined successfully!", { status: 200 }),
+                    status: "file-combined",
+                    metadata: parsedMetadata.data,
+                    filePath: path.join(this.finalDir, fileName),
+                    folderPath: this.finalDir,
+                };
             } catch (error) {
                 // Delete all chunks if there's an error during combination
                 await this.deleteAllChunks(randomPrefix, fileName, totalChunks);
-                return new Response("Failed to combine file chunks", { status: 500 });
+                return {
+                    response: new Response("Failed to combine file", { status: 500 }),
+                    status: "error",
+                    errorMessage: "Failed to combine file",
+                };
             }
         }
 
         // Validate chunk index
-        if (typeof chunkIndex !== "number" || chunkIndex == null || chunkIndex >= totalChunks) return errorConditionerHtmlResponse("Invalid chunk index");
+        if (typeof chunkIndex !== "number" || chunkIndex == null || chunkIndex >= totalChunks) return {
+            response: errorConditionerHtmlResponse("Invalid chunk index"),
+            status: "error",
+            errorMessage: "Invalid chunk index",
+        }
 
         // Save uploaded chunk
         const chunkBuffer = await context.request.arrayBuffer();
@@ -154,9 +193,16 @@ export class LargeFileUploader {
             console.error("Error writing chunk:", error);
             // Delete all chunks if there's an error while saving the current chunk
             await this.deleteAllChunks(randomPrefix, fileName, totalChunks);
-            return new Response("Failed to upload chunk", { status: 500 });
+            return {
+                response: new Response("Failed to save chunk", { status: 500 }),
+                status: "error",
+                errorMessage: "Failed to save chunk",
+            };
         }
 
-        return new Response("Chunk uploaded successfully!", { status: 200 });
+        return {
+            response: new Response("Chunk uploaded successfully", { status: 200 }),
+            status: "chunk-uploaded",
+        }
     }
 }

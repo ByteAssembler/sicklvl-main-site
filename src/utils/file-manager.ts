@@ -14,6 +14,11 @@ export const fileManagerTempFolderPath = path.join(
     "drive",
     "tmp",
 );
+export const fileManagerFolderPath = path.join(
+    rootFolderPath,
+    "drive",
+    "usable",
+);
 export const blobFolderPath = path.join(rootFolderPath, "drive", "blob");
 export const boxContentFolderPath = path.join(
     rootFolderPath,

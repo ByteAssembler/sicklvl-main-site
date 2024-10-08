@@ -1,7 +1,7 @@
 ---
 import LayoutAdmin from "src/layouts/LayoutAdmin.astro";
 import FunctionalFieldset from "src/components/functional-fieldset.astro";
-import FileUpload from "src/components/file-upload.astro";
+import FileChunkUploader from "src/components/file-chunk-uploader.astro";
 import Button from "src/components/button.astro";
 
 import { prismaClient } from "src/global";
@@ -202,63 +202,15 @@ const [customer, boxes] = await prismaClient.$transaction([
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <div>
-                                <form
-                                    class="flex items-center gap-2"
-                                    method="post"
-                                    action={`/api/box-files-upload/${box.id}`}
-                                    enctype="multipart/form-data"
-                                >
-                                    <span class="italic text-sm">Upload</span>
-                                    <FileUpload
-                                        name="files"
-                                        size="small"
-                                        class="w-min"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            class="lucide lucide-upload"
-                                        >
-                                            <>
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                                <polyline points="17 8 12 3 7 8" />
-                                                <line
-                                                    x1="12"
-                                                    x2="12"
-                                                    y1="3"
-                                                    y2="15"
-                                                />
-                                            </>
-                                        </svg>
-                                    </FileUpload>
-                                    <Button submit size="small" class="w-min">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            class="lucide lucide-send"
-                                        >
-                                            <>
-                                                <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
-                                                <path d="m21.854 2.147-10.94 10.939" />
-                                            </>
-                                        </svg>
-                                    </Button>
-                                </form>
+                            <div class="max-w-[300px]">
+                                <FileChunkUploader
+                                    urlLocation={`/api/box-files-upload/${box.id}`}
+                                    uploadMultipleFiles={true}
+                                    userCanDecideIfTheyWantToUploadADirectory={
+                                        true
+                                    }
+                                    reloadAfterSuccessUpload={true}
+                                />
                             </div>
                             <hr class="border-0 border-l h-full" />
                             <div class="flex gap-2">

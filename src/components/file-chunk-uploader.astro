@@ -1,0 +1,416 @@
+---
+import type { FileChunkUploaderProps } from "src/env";
+import FilesOrFolderUpload from "./files-or-folder-upload.astro";
+import FileUpload from "./file-upload.astro";
+import Button from "./button.astro";
+
+type Props = FileChunkUploaderProps;
+
+const {
+    size = "small",
+    name = "",
+    accept = "*",
+    required = true,
+    class: className = "",
+    id = "",
+
+    reloadAfterSuccessUpload = false,
+
+    chunkSize = 1024 * 1024 * 5, // 5MB
+    urlLocation,
+    uploadMultipleFiles = true,
+    userCanDecideIfTheyWantToUploadADirectory = true,
+    showProgressBars = true,
+} = Astro.props;
+
+const randomIdBase =
+    Math.random().toString(36).substring(7) +
+    Math.random().toString(36).substring(7);
+
+const progressFileInputId = `file-chunk-uploader-file-input-${randomIdBase}`;
+const progressFileUploadButtonId = `file-chunk-uploader-file-upload-btn-${randomIdBase}`;
+const progressFileCountId = `file-chunk-uploader-progress-bar-file-count-${randomIdBase}`;
+const progressFileUploadProgressId = `file-chunk-uploader-progress-bar-file-upload-progress-${randomIdBase}`;
+const progressFileMessageBoxId = `file-chunk-uploader-message-box-${randomIdBase}`;
+---
+
+<div class="flex flex-col">
+    <div class="flex gap-2 items-center">
+        <div class="flex flex-col gap-1">
+            {
+                userCanDecideIfTheyWantToUploadADirectory &&
+                uploadMultipleFiles ? (
+                    <FilesOrFolderUpload
+                        size={size}
+                        name={name}
+                        accept={accept}
+                        required={required}
+                        class={className}
+                        id={[progressFileInputId, id]
+                            .filter((item) => !!item)
+                            .join(" ")}
+                    />
+                ) : (
+                    <FileUpload
+                        size={size}
+                        name={name}
+                        accept={accept}
+                        required={required}
+                        class={className}
+                        id={[progressFileInputId, id]
+                            .filter((item) => !!item)
+                            .join(" ")}
+                        multiple={uploadMultipleFiles}
+                    />
+                )
+            }
+        </div>
+
+        <Button
+            submit
+            size="small"
+            class="w-min"
+            id={progressFileUploadButtonId}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-send"
+            >
+                <>
+                    <path
+                        d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                    ></path>
+                    <path d="m21.854 2.147-10.94 10.939"></path>
+                </>
+            </svg>
+        </Button>
+
+        {
+            showProgressBars && (
+                <div class="flex flex-col gap-1">
+                    <progress
+                        class="w-[100px]"
+                        id={progressFileCountId}
+                        value="0"
+                        max="100"
+                    />
+                    <progress
+                        class="w-[100px]"
+                        id={progressFileUploadProgressId}
+                        value="0"
+                        max="100"
+                    />
+                </div>
+            )
+        }
+    </div>
+    <span class="text-sm italic truncate" id={progressFileMessageBoxId}></span>
+</div>
+
+<script
+    lang="ts"
+    is:inline
+    define:vars={{
+        reloadAfterSuccessUpload,
+        chunkSize,
+        urlLocation,
+        progressFileInputId,
+        progressFileUploadButtonId,
+        progressFileUploadProgressId,
+        progressFileCountId,
+        progressFileMessageBoxId,
+    }}
+>
+    let isUploading = false;
+
+    const fileNameBlacklist = [
+        // Windows
+        "desktop.ini",
+        "thumbs.db",
+        "autorun.inf",
+        "ntuser.ini",
+        "boot.ini",
+        "bootfont.bin",
+        "bootmgr",
+        "bootmgr.efi",
+        "iconcache.db",
+        "ntldr",
+        "ntuser.dat",
+        "ntuser.dat.log",
+
+        // Linux
+        ".bash_history",
+        ".bash_logout",
+        ".bash_profile",
+        ".bashrc",
+        ".cache",
+        ".config",
+        ".local",
+        ".profile",
+        ".ssh",
+        ".viminfo",
+        ".zsh_history",
+        ".zshrc",
+        "authorized_keys",
+        "known_hosts",
+        "passwd",
+        "shadow",
+        "sudoers",
+
+        // MacOS
+        ".DS_Store",
+        ".localized",
+        ".Spotlight-V100",
+        ".Trashes",
+        ".fseventsd",
+        ".hotfiles.btree",
+        ".vol",
+        ".DocumentRevisions-V100",
+        ".PKInstallSandboxManager",
+        ".PKInstallSandboxManager-SystemSoftware",
+        ".bash_sessions", // Additional Mac file often seen
+
+        // Other shared files
+        ".git",
+        ".gitignore",
+        ".htaccess",
+        ".htpasswd",
+        ".well-known",
+    ];
+
+    // Warnung beim Schließen des Tabs, wenn Upload aktiv ist
+    window.addEventListener("beforeunload", (event) => {
+        if (isUploading) {
+            try {
+                event.preventDefault();
+                event.returnValue = "";
+            } catch (error) {
+                console.error("Error while preventing tab close:", error);
+            }
+        }
+    });
+
+    // Helper function to update progress bars
+    function updateProgress(progressElement, value) {
+        progressElement.value = value;
+    }
+
+    // Helper function to display messages in the message box
+    function displayMessage(message, isError = false) {
+        const messageBox = document.getElementById(progressFileMessageBoxId);
+        messageBox.textContent = message;
+        messageBox.style.color = isError ? "red" : "green"; // Red for errors, green for success
+    }
+
+    // Disable all other click events while uploading
+    function disableAllClicks() {
+        document.body.style.pointerEvents = "none";
+    }
+
+    // Re-enable all click events after upload is done
+    function enableAllClicks() {
+        document.body.style.pointerEvents = "auto";
+    }
+
+    // Function to handle chunk upload with error handling
+    async function uploadChunk(url, chunk, metadata) {
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "x-file-metadata": JSON.stringify(metadata),
+                },
+                body: chunk,
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                displayMessage(
+                    `Failed to upload chunk. Status: ${response.status}, Message: ${errorText}`,
+                    true,
+                );
+                throw new Error(
+                    `Failed to upload chunk. Status: ${response.status}, Message: ${errorText}`,
+                );
+            }
+
+            return response;
+        } catch (error) {
+            console.error("Error uploading chunk:", error);
+            displayMessage(
+                "An error occurred while uploading a chunk of the file.",
+                true,
+            );
+            throw error;
+        }
+    }
+
+    // Function to handle the upload of an entire file in chunks
+    async function uploadFile(file, url, progressFileUploadProgress) {
+        const totalChunks = Math.ceil(file.size / chunkSize);
+        const randomPrefix =
+            Math.random().toString(36).substring(7) +
+            Math.random().toString(36).substring(7);
+
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        displayMessage(`Starting uploading file: ${file.name}`);
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
+
+            const metadata = {
+                randomPrefix,
+                chunkIndex,
+                totalChunks,
+                totalFileSize: file.size,
+                mimeType: file.type,
+                fileName: file.name,
+                combine: false,
+            };
+
+            try {
+                await uploadChunk(url, chunk, metadata);
+                updateProgress(
+                    progressFileUploadProgress,
+                    ((chunkIndex + 1) / totalChunks) * 100,
+                );
+            } catch (error) {
+                console.error(
+                    `Error while uploading file: ${file.name}, chunk: ${chunkIndex}`,
+                    error,
+                );
+                displayMessage(
+                    `An error occurred while uploading file: ${file.name}, chunk: ${chunkIndex}`,
+                    true,
+                );
+                throw error;
+            }
+        }
+
+        // Once all chunks are uploaded, combine them
+        const combineMetadata = {
+            randomPrefix,
+            chunkIndex: totalChunks - 1, // Not used but included for consistency
+            totalChunks,
+            totalFileSize: file.size,
+            mimeType: file.type,
+            fileName: file.name,
+            combine: true,
+        };
+
+        const combineResponse = await fetch(url, {
+            method: "POST",
+            headers: { "x-file-metadata": JSON.stringify(combineMetadata) },
+        });
+
+        if (!combineResponse.ok) {
+            const errorText = await combineResponse.text();
+            displayMessage(
+                `Failed to combine file. Status: ${combineResponse.status}, Message: ${errorText}`,
+                true,
+            );
+            throw new Error(
+                `Failed to combine file. Status: ${combineResponse.status}, Message: ${errorText}`,
+            );
+        }
+
+        console.log(`File ${file.name} combined successfully`);
+        displayMessage(`File ${file.name} uploaded successfully.`);
+        updateProgress(progressFileUploadProgress, 100);
+    }
+
+    // Main upload handler function for multiple files with proper error handling
+    async function handleFileUpload() {
+        const fileInput = document.getElementById(progressFileInputId);
+        const progressFileCount = document.getElementById(progressFileCountId);
+        const progressFileUploadProgress = document.getElementById(
+            progressFileUploadProgressId,
+        );
+        const messageBox = document.getElementById(progressFileMessageBoxId);
+
+        // Reset message box and progress bars at the start
+        messageBox.textContent = "";
+        updateProgress(progressFileCount, 0);
+        updateProgress(progressFileUploadProgress, 0);
+
+        const hasFilesToUpload =
+            fileInput.files &&
+            fileInput.files.length > 0 &&
+            fileInput.files.find(
+                (file) => !fileNameBlacklist.includes(file.name),
+            );
+
+        if (hasFilesToUpload) {
+            const files = fileInput.files;
+            isUploading = true; // Set upload state
+            disableAllClicks(); // Disable all clicks during upload
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                updateProgress(
+                    progressFileCount,
+                    ((i + 1) / files.length) * 100,
+                );
+
+                try {
+                    await uploadFile(
+                        file,
+                        urlLocation,
+                        progressFileUploadProgress,
+                    );
+                    displayMessage(`File ${file.name} uploaded successfully.`);
+                } catch (error) {
+                    console.error(`Failed to upload file: ${file.name}`, error);
+                    displayMessage(`Failed to upload file: ${file.name}`, true);
+                    return;
+                }
+
+                // Wait before starting the next file to avoid overwhelming the server
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+            }
+
+            // After all files are uploaded successfully, reset progress bars and show success message
+            updateProgress(progressFileCount, 0);
+            updateProgress(progressFileUploadProgress, 0);
+            displayMessage("All files uploaded successfully.");
+            isUploading = false; // Upload finished
+            enableAllClicks(); // Re-enable clicks after upload
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
+            if (reloadAfterSuccessUpload) {
+                window.location.reload();
+            }
+        } else {
+            displayMessage(
+                "No files selected. Please select files to upload.",
+                true,
+            );
+        }
+    }
+
+    // Attach event listener to upload button
+    const uploadBtn = document.getElementById(progressFileUploadButtonId);
+    uploadBtn?.addEventListener("click", async () => {
+        try {
+            await handleFileUpload();
+        } catch (error) {
+            console.error("Unexpected error during upload:", error);
+            displayMessage(
+                "An error occurred during the upload. Please try again.",
+                true,
+            );
+        }
+    });
+</script>

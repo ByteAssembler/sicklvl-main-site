@@ -5,6 +5,7 @@ import Input from "./input.astro";
 interface Props extends FilesOrFolderUploadProps {}
 
 const randomIdBase =
+    "rand-" +
     Math.random().toString(36).substring(7) +
     Math.random().toString(36).substring(7);
 
@@ -15,13 +16,13 @@ const {
     size = "normal",
     accept = "*",
     required = false,
-    id = "",
+    id: dataId = "",
     class: className = "",
 } = Astro.props;
 
 const onchange = `(() => {
     const isChecked = document.getElementById("${randomIdBase}").checked;
-    const input = document.getElementById("${randomIdInput}");
+    const input = document.querySelector('input[data-id="${randomIdInput}"]');
 
     if (isChecked) { // Folder
         input.setAttribute("webkitdirectory", "true");
@@ -44,8 +45,9 @@ const onchange = `(() => {
     data-size={size}
     name={name}
     accept={accept}
-    id={[id, randomIdInput].filter((item) => !!item).join(" ")}
+    id={dataId}
     required={required}
+    data-id={randomIdInput}
     class:list={[
         "font-inconsolata text-lg font-bold tracking-widest",
         className,

@@ -30,8 +30,13 @@ export async function POST(context: APIContext): Promise<Response> {
         })) || []
     ).map((file) => file.id);
 
+    console.log("Deleted files ids:", deletedFilesIds);
+
     for (const fileId of deletedFilesIds) {
-        await deleteFileInFolder(boxContentFolderPath, fileId);
+        const deleted = await deleteFileInFolder(boxContentFolderPath, fileId);
+        if (!deleted) {
+            return errorConditionerHtmlResponse("Failed to delete file");
+        }
     }
 
     // Delete associated files
