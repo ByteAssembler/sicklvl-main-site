@@ -347,7 +347,7 @@ const progressFileMessageBoxId = `file-chunk-uploader-message-box-${randomIdBase
         const hasFilesToUpload =
             fileInput.files &&
             fileInput.files.length > 0 &&
-            fileInput.files.find(
+            Array.from(fileInput.files).some(
                 (file) => !fileNameBlacklist.includes(file.name),
             );
 
