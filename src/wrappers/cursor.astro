@@ -52,12 +52,15 @@
     setup();
 </script>
 
-<style>
+<style is:global>
     html,
-    body {
+    body,
+    a:-webkit-any-link {
         cursor: none !important;
     }
+</style>
 
+<style>
     #cursor {
         position: fixed;
         top: 0;
