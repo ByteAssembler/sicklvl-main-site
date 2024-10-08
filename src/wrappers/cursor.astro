@@ -1,7 +1,18 @@
 <!-- Cursor Wrapper -->
 <div id="cursor" class="h-12 w-12 relative">
     <!-- Cursor Pointer -->
-    <div class="cursor-pointer h-12 w-12"></div>
+    <svg
+        class="cursor-pointer h-10 w-10"
+        width="300"
+        height="226"
+        viewBox="0 0 300 226"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            d="M13.4563 78.4031C13.4563 78.4031 15.0395 68.8361 22.1635 70.4306C22.1635 70.4306 27.7043 76.0114 44.327 70.4306C60.9497 64.8499 79.1555 136.602 84.6964 168.492L92.612 157.331L110.818 195.599L119.525 151.75L186.807 225.894L171.768 145.372L284.96 195.599L202.638 97.5371L300 113.482L206.596 45.7159C206.596 45.7159 227.968 34.5544 234.301 24.1901C234.301 24.1901 203.43 31.3654 165.435 20.2039C127.441 8.24511 98.9445 -17.2669 45.9102 17.8121C45.9102 17.8121 35.6201 26.5818 27.7045 38.5406C27.7045 38.5406 2.37467 44.1214 0 64.8499C0 64.8499 -0.000145316 75.2141 13.4563 78.4031Z"
+            fill="white"></path>
+    </svg>
 </div>
 
 <script>
@@ -11,6 +22,16 @@
 
         if (!cursor || !cursorPointer) return;
 
+        // Check if the device supports touch
+        const isTouchDevice =
+            "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+        // If it's a touch device, disable custom cursor
+        if (isTouchDevice) {
+            cursor.style.display = "none"; // Hide cursor
+            return; // Exit early
+        }
+
         document.addEventListener("mousemove", (e) => {
             cursor.style.left = e.clientX + "px";
             cursor.style.top = e.clientY + "px";
@@ -18,11 +39,7 @@
 
         // Event: Check if cursor is over a link
         document.addEventListener("mouseover", (e) => {
-            // Closest to a or button or input
-
-            const target = (e.target as HTMLElement)?.closest(
-                "a, button, input",
-            );
+            const target = (e.target as Element)?.closest("a, button, input");
 
             if (target) {
                 cursorPointer.classList.add("cursor-pointer-hover");
@@ -63,8 +80,8 @@
 <style>
     #cursor {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: -100%;
+        left: -100%;
         z-index: 1000;
 
         transform: translate(-50%, -50%);
@@ -84,16 +101,12 @@
     }
 
     #cursor .cursor-pointer {
-        transform: scale(0.2);
+        transform: scale(0.5);
         border-radius: 999999px;
 
         transition: all 0.2s ease-in-out;
 
-        mix-blend-mode: difference;
-        backdrop-filter: invert(1);
-
-        background: white; /* Ensure element has a background */
-        color: black; /* Ensure text color is set */
+        fill: white;
     }
 
     #cursor .cursor-pointer-hover {
