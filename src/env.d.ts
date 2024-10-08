@@ -71,8 +71,9 @@ interface PerfectImageProps {
 
 interface PerfectVideoProps {
     type?: "video";
-    title?: string;
     class?: string;
+    id?: string;
+    title?: string;
 
     width?: number;
     height?: number;

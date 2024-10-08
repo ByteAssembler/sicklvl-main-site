@@ -14,6 +14,11 @@ if (!slug) return redirect(redirectToURL);
 
 const t = await getPortfolioWithInfos(slug);
 if (!t) return redirect(redirectToURL);
+
+const videoId =
+    "rand-bg-video-" +
+    Math.random().toString(36).substring(7) +
+    Math.random().toString(36).substring(7);
 ---
 
 <LayoutExtended tabTitle={t.current.title}>
@@ -243,13 +248,15 @@ if (!t) return redirect(redirectToURL);
     {
         t.current.background_video ? (
             <PerfectVideo
+                id={videoId}
                 inForUrl="portfolio"
-                class="h-full w-full object-cover select-none pointer-events-none"
+                class="perfekt h-full w-full object-cover select-none pointer-events-none"
                 controls={false}
                 muted={true}
                 loop={true}
                 autoplay={true}
                 playsinline={true}
+                disablepictureinpicture={true}
                 poster={
                     getImageWithPreferredWidth(
                         t.current.thumbnail.image_variations,
@@ -263,7 +270,7 @@ if (!t) return redirect(redirectToURL);
         ) : (
             <PerfectImage
                 inForUrl="portfolio"
-                class="h-full w-full object-cover select-none"
+                class="perfekt h-full w-full object-cover select-none"
                 images={t.current.thumbnail.image_variations}
                 alt={t.current.title}
             />
@@ -271,14 +278,12 @@ if (!t) return redirect(redirectToURL);
     }
 </LayoutExtended>
 
-<script>
+<script is:inline define:vars={{ videoId }}>
     const portfolioTaskbar = document.getElementById("portfolio-taskbar");
     const showMoreBtn = document.getElementById(
         "portfolio-taskbar-show-more-btn",
     );
-    const dialog: HTMLDialogElement | null = document.getElementById(
-        "showcase",
-    ) as HTMLDialogElement;
+    const dialog = document.getElementById("showcase");
 
     const navigationTopLeft = document.getElementById("navigation-desktop");
     const navigationTopRight = document.getElementById(
@@ -321,9 +326,27 @@ if (!t) return redirect(redirectToURL);
 
     // On dialog close event
     dialog?.addEventListener("close", closeShowMoreDialog);
+
+    let played = false;
+    document.addEventListener("click", (e) => {
+        if (!played) {
+            const video = document.getElementById(videoId);
+            if (video) {
+                video.play();
+                played = true;
+            }
+        }
+    });
 </script>
 
 <style is:global>
+    .perfekt *::-webkit-media-controls-panel,
+    .perfekt *::-webkit-media-controls-play-button,
+    .perfekt *::-webkit-media-controls-start-playback-button {
+        display: none !important;
+        -webkit-appearance: none;
+    }
+
     main {
         overflow: hidden;
     }
