@@ -25,16 +25,16 @@ let items = await prismaClient.portfolioItem.findMany({
     },
 });
 
-const itemCountX = Math.ceil(Math.sqrt(items.length));
-const itemCountY = Math.ceil(items.length / itemCountX);
+const itemCount = items.length;
+
+const itemCountX = Math.ceil(Math.sqrt(itemCount));
+const itemCountY = Math.ceil(itemCount / itemCountX);
+const itemCountSmallX = Math.min(3, itemCountX);
+const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
 ---
 
 <section id="container-grid" class="select-none">
-    <div
-        id="container-grid-box"
-        data-item-count-x={itemCountX}
-        data-item-count-y={itemCountY}
-    >
+    <div id="container-grid-box">
         {
             items.map((item) => {
                 const image = getImageWithPreferredWidth(
@@ -68,7 +68,16 @@ const itemCountY = Math.ceil(items.length / itemCountX);
     </div>
 </section>
 
-<style scoped define:vars={{ itemCountX, itemCountY }}>
+<style
+    scoped
+    define:vars={{
+        itemCount,
+        itemCountX,
+        itemCountY,
+        itemCountSmallX,
+        itemCountSmallY,
+    }}
+>
     html,
     body,
     main,
@@ -97,6 +106,12 @@ const itemCountY = Math.ceil(items.length / itemCountX);
 
         display: grid;
         gap: 2.5vw 2vw;
+        /*
+        --itemCountX: round(up, sqrt(var(--itemCount)));
+        --itemCountY: round(up, var(--itemCount) / var(--itemCountX));
+        --itemCountSmallX: min(3, var(--itemCountX));
+        --itemCountSmallY: round(up, var(--itemCount) / var(--itemCountSmallX));
+        */
         grid-template-columns: repeat(var(--itemCountX), 32vw);
         grid-template-rows: repeat(var(--itemCountY), 18vw);
     }
@@ -104,8 +119,12 @@ const itemCountY = Math.ceil(items.length / itemCountX);
     @media (max-width: 768px) {
         #container-grid-box {
             padding: 0 50px;
-            grid-template-columns: repeat(var(--itemCountX), calc(16vw * 5));
-            grid-template-rows: repeat(var(--itemCountY), calc(9vw * 5));
+
+            grid-template-columns: repeat(
+                var(--itemCountSmallX),
+                calc(16vw * 5)
+            );
+            grid-template-rows: repeat(var(--itemCountSmallY), calc(9vw * 5));
         }
     }
 
