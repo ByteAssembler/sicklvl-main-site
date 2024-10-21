@@ -45,7 +45,7 @@ let items = await prismaClient.portfolioItem.findMany({
                 items.map((image, i) => (
                     <div class="swiper-slide no-select no-drag">
                         <PerfectImage
-                            class="rounded-lg"
+                            class="rounded-lg block w-full object-cover aspect-video"
                             inForUrl="portfolio"
                             images={image.thumbnail.image_variations}
                             alt={image.title}
@@ -138,13 +138,5 @@ let items = await prismaClient.portfolioItem.findMany({
 
         --swiper-theme-color: #ffd500;
         --swiper-pagination-color: #ffd500;
-    }
-
-    .swiper-slide img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        aspect-ratio: 16/10;
     }
 </style>
