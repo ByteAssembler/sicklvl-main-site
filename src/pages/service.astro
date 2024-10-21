@@ -95,7 +95,9 @@ if (Astro.url.searchParams.has("tooth-fairy")) {
 
     <div style="height: 40px;"></div>
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
         {
             tile_data.map(({ title, image, description }) => (
                 <article class="py-6 px-4 flex flex-col gap-5 items-center">
@@ -107,7 +109,7 @@ if (Astro.url.searchParams.has("tooth-fairy")) {
                         class="w-[250px] h-[250px] shadow-lg object-cover"
                     />
                     <h2 class="text-center text-3xl font-bold">{title}</h2>
-                    <p class="text-center">{description}</p>
+                    <p class="max-w-[65vw] text-center">{description}</p>
                 </article>
             ))
         }
