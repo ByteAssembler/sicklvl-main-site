@@ -27,6 +27,7 @@
         "mime-types": "^2.1.35",
         "pretty-bytes": "^6.1.1",
         "sharp": "^0.33.5",
+        "swiper": "^11.1.14",
         "tailwindcss": "^3.4.13",
         "typescript": "^5.6.2",
         "valid-filename": "^4.0.0"

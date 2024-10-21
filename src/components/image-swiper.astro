@@ -1,0 +1,150 @@
+---
+import { prismaClient } from "src/global";
+import PerfectImage from "./perfect-image.astro";
+
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+let items = await prismaClient.portfolioItem.findMany({
+    orderBy: {
+        order: "asc",
+    },
+    select: {
+        title: true,
+        thumbnail: {
+            select: {
+                id: true,
+                image_variations: true,
+            },
+        },
+    },
+});
+---
+
+<div class="mb-20 mx-auto px-3 wrapper">
+    <div
+        class:list={[
+            "loading-box max-w-screen-sm rounded-lg mx-auto",
+            // "loading",
+            // false && "present",
+        ]}
+        id="swiper-loading-box"
+    >
+    </div>
+    <div class="swiper max-w-screen-sm rounded-lg" id="swiper">
+        <div
+            class:list={[
+                "swiper-wrapper",
+                // "loading",
+                // false && "present"
+            ]}
+            id="swiper-wrapper"
+        >
+            {
+                items.map((image, i) => (
+                    <div class="swiper-slide no-select no-drag">
+                        <PerfectImage
+                            class="rounded-lg"
+                            inForUrl="portfolio"
+                            images={image.thumbnail.image_variations}
+                            alt={image.title}
+                        />
+                    </div>
+                ))
+            }
+        </div>
+        <button class="swiper-button-next" id="swiper-button-next"> </button>
+        <button class="swiper-button-prev" id="swiper-button-prev"> </button>
+        <div
+            style="display: none;"
+            class="swiper-pagination"
+            id="swiper-pagination"
+        >
+        </div>
+    </div>
+</div>
+
+<script>
+    import Swiper from "swiper";
+    import { Navigation, Pagination } from "swiper/modules";
+
+    const swiperRef = document.getElementById("swiper");
+    const swiperPaginationRef = document.getElementById("swiper-pagination");
+    const swiperNextButtonRef = document.getElementById("swiper-button-next");
+    const swiperPrevButtonRef = document.getElementById("swiper-button-prev");
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (
+            !swiperRef ||
+            !swiperPaginationRef ||
+            !swiperNextButtonRef ||
+            !swiperPrevButtonRef
+        ) {
+            return;
+        }
+
+        const swiper = new Swiper(swiperRef, {
+            modules: [Navigation, Pagination],
+
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+
+            pagination: {
+                el: swiperPaginationRef,
+                enabled: true,
+            },
+            navigation: {
+                prevEl: swiperPrevButtonRef,
+                nextEl: swiperNextButtonRef,
+                enabled: true,
+            },
+        });
+    });
+</script>
+
+<style>
+    @keyframes pulse {
+        0% {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        100% {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    .loading-box.loading {
+        display: block;
+        height: 100%;
+        width: 100%;
+        aspect-ratio: 16/10;
+
+        animation: 1s pulse alternate ease-in-out infinite;
+    }
+
+    .loading-box.present {
+        display: none;
+    }
+
+    .swiper-wrapper.loading {
+        display: none;
+    }
+
+    .swiper {
+        width: 100%;
+        height: 100%;
+
+        --swiper-theme-color: #ffd500;
+        --swiper-pagination-color: #ffd500;
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: 16/10;
+    }
+</style>

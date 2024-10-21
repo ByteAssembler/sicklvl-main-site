@@ -4,6 +4,7 @@ export const prerender = true;
 import LayoutContent from "src/layouts/LayoutContent.astro";
 import CompanyInformation from "src/wrappers/company-information.astro";
 import Button from "src/components/button.astro";
+import ImageSwiper from "src/components/image-swiper.astro";
 
 const infos = [
     {
@@ -73,6 +74,8 @@ const partner = [
         unforgettable experiences to our clients. Join us and let us elevate
         your story.
     </p>
+
+    <ImageSwiper />
 
     <div style="height: 40px;"></div>
     <CompanyInformation entries={infos} />
