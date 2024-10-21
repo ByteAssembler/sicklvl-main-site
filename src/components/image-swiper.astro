@@ -42,7 +42,7 @@ let items = await prismaClient.portfolioItem.findMany({
             id="swiper-wrapper"
         >
             {
-                items.map((image, i) => (
+                items.map((image) => (
                     <div class="swiper-slide no-select no-drag">
                         <PerfectImage
                             class="rounded-lg block w-full object-cover aspect-video"
@@ -54,8 +54,8 @@ let items = await prismaClient.portfolioItem.findMany({
                 ))
             }
         </div>
-        <button class="swiper-button-next" id="swiper-button-next"> </button>
         <button class="swiper-button-prev" id="swiper-button-prev"> </button>
+        <button class="swiper-button-next" id="swiper-button-next"> </button>
         <div
             style="display: none;"
             class="swiper-pagination"
