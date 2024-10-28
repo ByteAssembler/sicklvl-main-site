@@ -35,7 +35,7 @@ const [diskUsageRootFolder, diskUsageBlobFolder, diskUsageBoxContentFolder] =
             {
                 !diskUsageBoxContentFolder.errors && (
                     <div
-                        class="bg-sky-500 h-2.5 rounded-full absolute top-0"
+                        class="bg-yellow-500 h-2.5 rounded-full absolute top-0"
                         style={`width: ${(diskUsageBlobFolder.size / diskUsageRootFolder.total + diskUsageBoxContentFolder.size / diskUsageRootFolder.total) * 100}%`}
                     />
                 )
