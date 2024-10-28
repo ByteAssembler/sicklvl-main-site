@@ -1,10 +1,14 @@
 ---
 export const prerender = true;
 
+import { prismaClient } from "src/global";
+
 import LayoutContent from "src/layouts/LayoutContent.astro";
 import CompanyInformation from "src/wrappers/company-information.astro";
 import Button from "src/components/button.astro";
 import ImageSwiper from "src/components/image-swiper.astro";
+
+const bannerEntriesCount = await prismaClient.bannerEntry.count();
 
 const infos = [
     {
@@ -75,7 +79,7 @@ const partner = [
         your story.
     </p>
 
-    <ImageSwiper />
+    {bannerEntriesCount > 0 && <ImageSwiper />}
 
     <div style="height: 40px;"></div>
     <CompanyInformation entries={infos} />
