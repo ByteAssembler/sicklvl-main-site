@@ -66,7 +66,7 @@ interface PerfectImageProps {
     images: SingleImage[];
     forceSizesW?: number[];
 
-    inForUrl: "portfolio" | "box-files";
+    inForUrl: "portfolio" | "banner-entry" | "box-files";
 }
 
 interface PerfectVideoProps {
@@ -93,16 +93,16 @@ interface PerfectVideoProps {
 
 interface InputFieldProps {
     type?:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "tel"
-    | "url"
-    | "checkbox"
-    | "radio"
-    | "submit"
-    | "reset";
+        | "text"
+        | "email"
+        | "password"
+        | "number"
+        | "tel"
+        | "url"
+        | "checkbox"
+        | "radio"
+        | "submit"
+        | "reset";
     class?: string;
     id?: string;
     name?: string;
@@ -124,11 +124,11 @@ interface InputSelectProps {
     multiple?: boolean;
     options: (
         | {
-            text?: string;
-            value: string;
-            selected?: boolean;
-            disabled?: boolean;
-        }
+              text?: string;
+              value: string;
+              selected?: boolean;
+              disabled?: boolean;
+          }
         | string
     )[];
     required?: boolean;
@@ -199,9 +199,10 @@ type FileChunkUploaderProps = {
     userCanDecideIfTheyWantToUploadADirectory?: boolean;
     showProgressBars?: boolean;
 } & (
-        {
-            uploadMultipleFiles: true;
-        } | {
-            uploadMultipleFiles: false;
-        }
-    )
+    | {
+          uploadMultipleFiles: true;
+      }
+    | {
+          uploadMultipleFiles: false;
+      }
+);

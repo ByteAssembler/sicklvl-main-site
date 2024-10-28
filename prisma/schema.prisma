@@ -103,6 +103,25 @@ model PortfolioItem {
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
+model BannerEntry {
+    id          String  @id @default(cuid())
+    title       String
+    description String?
+    content     String?
+
+    file_name_prefix String
+
+    order Int
+
+    image    Image  @relation(fields: [image_id], references: [id])
+    image_id String @unique
+
+    created_at DateTime @default(now())
+}
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
 model ImageGallery {
     id String @id @default(cuid())
 
@@ -122,6 +141,7 @@ model Image {
     portfolio_item  PortfolioItem?
     video_thumbnail SingleVideo?
     // customer_avatar Customer?
+    banner_entry    BannerEntry?
 }
 
 model SingleImage {

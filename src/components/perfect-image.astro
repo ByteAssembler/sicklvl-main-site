@@ -3,6 +3,7 @@ import type { PerfectImageProps } from "src/env";
 import {
     fileNameToBlobUrlPath,
     fileNameToBoxFileUrlPath,
+    fileNameToBannerEntryUrlPath,
 } from "src/utils/file-manager";
 
 interface Props extends PerfectImageProps {}
@@ -23,6 +24,8 @@ const {
 function urlGetter(id: string, name: string) {
     if (inForUrl === "portfolio") {
         return fileNameToBlobUrlPath(name);
+    } else if (inForUrl === "banner-entry") {
+        return fileNameToBannerEntryUrlPath(name);
     } else {
         return fileNameToBoxFileUrlPath(id);
     }

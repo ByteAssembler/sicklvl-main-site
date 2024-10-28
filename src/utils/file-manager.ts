@@ -147,15 +147,13 @@ export async function saveSingleBuffer(
 
 export async function ownFileManagerFile(
     srcFullFilePath: string,
-    destFullFilePath: string
+    destFullFilePath: string,
 ) {
     // const srcFolderPath;
     // const destFolderPath;
 
     // await fs.mkdir(srcFullFilePath, { recursive: true });
     // await fs.mkdir(destFullFilePath, { recursive: true });
-
-
 
     // Move the file / rename it
     try {
@@ -221,6 +219,7 @@ async function saveImageWithFormats(
     name: string,
     fileSizes: number[],
     fileQuality: number,
+    storagePath: string,
 ): Promise<SingleImageMemory[]> {
     // Get the file content
     const fileContent = await file.arrayBuffer();
@@ -266,14 +265,14 @@ async function saveImageWithFormats(
         const result = await saveSingleBuffer(
             imgBuffer,
             newFileName,
-            blobFolderPath,
+            storagePath,
         );
         if (!result) {
-            await revertFileByFileName(newFileName, blobFolderPath);
+            await revertFileByFileName(newFileName, storagePath);
 
             // Revert all saved files
             for (const fn of fileNames) {
-                await revertFileByFileName(fn.file_name, blobFolderPath);
+                await revertFileByFileName(fn.file_name, storagePath);
             }
 
             return fileNames;
@@ -299,12 +298,14 @@ async function saveImageWithFormats(
 export async function saveImageWithFormatsFullHorizontal(
     file: File,
     name: string,
+    storagePath: string = boxContentFolderPath,
 ) {
     return await saveImageWithFormats(
         file,
         name,
         [1920, 1600, 1280, 960, 640],
         75,
+        storagePath,
     );
 }
 
@@ -314,15 +315,15 @@ export async function saveVideo(
     folder_path: string = blobFolderPath,
 ): Promise<
     | {
-        video_mime: string;
-        video_file_name: string;
-        video_file_path_full: string;
-        thumbnail: SingleImageMemory;
-        success: true;
-    }
+          video_mime: string;
+          video_file_name: string;
+          video_file_path_full: string;
+          thumbnail: SingleImageMemory;
+          success: true;
+      }
     | {
-        success: false;
-    }
+          success: false;
+      }
 > {
     const filePath = await saveSingleFile(file, folder_path, file_video_name);
     if (!filePath) return { success: false };
@@ -459,5 +460,9 @@ export function fileNameToBoxFileUrlPath(
 }
 
 export function fileNameToBlobUrlPath(fileName: string) {
+    return `/blob/${encodeURIComponent(fileName)}`;
+}
+
+export function fileNameToBannerEntryUrlPath(fileName: string) {
     return `/blob/${encodeURIComponent(fileName)}`;
 }

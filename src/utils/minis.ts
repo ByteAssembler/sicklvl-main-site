@@ -7,9 +7,12 @@ export function redirect(url = "/") {
     });
 }
 
-export function redirectToAdmin(pos: "root" | "customer" | "box" = "root") {
+export function redirectToAdmin(
+    pos: "root" | "customer" | "box" | "banner" = "root",
+) {
     if (pos === "customer") return redirect("/admin/customer");
     if (pos === "box") return redirect("/admin/box");
+    if (pos === "banner") return redirect("/admin/banner");
     return redirect("/admin");
 }
 

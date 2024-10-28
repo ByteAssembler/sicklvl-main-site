@@ -6,18 +6,19 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-let items = await prismaClient.portfolioItem.findMany({
+const bannerEntries = await prismaClient.bannerEntry.findMany({
     orderBy: {
         order: "asc",
     },
     select: {
         title: true,
-        thumbnail: {
-            select: {
-                id: true,
+        order: true,
+        image: {
+            include: {
                 image_variations: true,
             },
         },
+        created_at: true,
     },
 });
 ---
@@ -42,13 +43,13 @@ let items = await prismaClient.portfolioItem.findMany({
             id="swiper-wrapper"
         >
             {
-                items.map((image) => (
+                bannerEntries.map((bannerEntry) => (
                     <div class="swiper-slide no-select no-drag">
                         <PerfectImage
                             class="rounded-lg block w-full object-cover aspect-video"
-                            inForUrl="portfolio"
-                            images={image.thumbnail.image_variations}
-                            alt={image.title}
+                            inForUrl="banner-entry"
+                            images={bannerEntry.image.image_variations}
+                            alt={bannerEntry.title}
                         />
                     </div>
                 ))
@@ -84,7 +85,7 @@ let items = await prismaClient.portfolioItem.findMany({
             return;
         }
 
-        const swiper = new Swiper(swiperRef, {
+        new Swiper(swiperRef, {
             modules: [Navigation, Pagination],
 
             slidesPerView: 1,
@@ -136,7 +137,7 @@ let items = await prismaClient.portfolioItem.findMany({
         width: 100%;
         height: 100%;
 
-        --swiper-theme-color: #ffd500;
-        --swiper-pagination-color: #ffd500;
+        --swiper-theme-color: #ffd700;
+        --swiper-pagination-color: #ffd700;
     }
 </style>
