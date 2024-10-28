@@ -62,7 +62,7 @@ const customer = await prismaClient.customer.findMany({
         ]}
     />
     <FunctionalFieldset title="Customers">
-        <div class="max-h-[70vh] max-w-80">
+        <div class="max-w-80">
             {
                 customer.map((item) => (
                     <article class="flex !flex-col !gap-3 items-center justify-between p-4 border-2">
