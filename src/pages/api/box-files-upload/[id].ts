@@ -4,18 +4,28 @@ import { lookup } from "mime-types";
 import type { APIContext } from "astro";
 import { LargeFileUploader } from "src/utils/large-file-uploader";
 import { errorConditionerHtmlResponse } from "src/utils/error-conditioner";
-import { boxContentFolderPath, fileManagerFolderPath, fileManagerTempFolderPath, getFileTypeByMime } from "src/utils/file-manager";
+import {
+    boxContentFolderPath,
+    fileManagerFolderPath,
+    fileManagerTempFolderPath,
+    getFileTypeByMime,
+} from "src/utils/file-manager";
 import { prismaClient } from "src/global";
 import { unauthorized } from "src/utils/minis";
 
-const fileUploader = new LargeFileUploader(fileManagerTempFolderPath, fileManagerFolderPath, true);
+const fileUploader = new LargeFileUploader(
+    fileManagerTempFolderPath,
+    fileManagerFolderPath,
+    true,
+);
 
 export async function POST(context: APIContext): Promise<Response> {
     if (!context.locals.admin) return unauthorized();
 
     // Get slug parameter
     const { id } = context.params;
-    if (!id || typeof id !== "string") return errorConditionerHtmlResponse("Slug is required");
+    if (!id || typeof id !== "string")
+        return errorConditionerHtmlResponse("Slug is required");
 
     // Check if box exists
     const box = await prismaClient.box.findUnique({ where: { id } });
@@ -32,7 +42,9 @@ export async function POST(context: APIContext): Promise<Response> {
         if (!mime) {
             console.error(`Failed to get mime type for file: ${oldFilePath}`);
             await fs.unlink(oldFilePath); // Delete the file
-            return errorConditionerHtmlResponse("Failed to get mime type for file");
+            return errorConditionerHtmlResponse(
+                "Failed to get mime type for file",
+            );
         }
 
         // Create a BoxFile record in the database

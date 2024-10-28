@@ -2,7 +2,7 @@
 import path, { extname } from "path";
 import type { APIContext } from "astro";
 import { z } from "astro/zod";
-import { lookup } from 'mime-types';
+import { lookup } from "mime-types";
 import fs from "fs/promises";
 import { prismaClient } from "src/global";
 import type { Box } from "@prisma/client";
@@ -10,9 +10,7 @@ import {
     errorConditionerHtmlHttpResponse,
     errorConditionerHtmlResponse,
 } from "src/utils/error-conditioner";
-import {
-    checkboxBooleanOptDefFalseSchema,
-} from "src/utils/form-validation";
+import { checkboxBooleanOptDefFalseSchema } from "src/utils/form-validation";
 import {
     boxContentFolderPath,
     fileManagerTempFolderPath,
@@ -137,7 +135,7 @@ const fileNameBlacklist = [
     ".DocumentRevisions-V100",
     ".PKInstallSandboxManager",
     ".PKInstallSandboxManager-SystemSoftware",
-    ".bash_sessions",  // Additional Mac file often seen
+    ".bash_sessions", // Additional Mac file often seen
 
     // Other shared files
     ".git",
@@ -196,7 +194,9 @@ export async function saveFilesInBox(folder: Box, fileNames: string[]) {
             newFilePath,
         );
         if (!successfullyOwned) {
-            console.error(`Failed to own file: ${oldFilePath} : ${newFilePath}`);
+            console.error(
+                `Failed to own file: ${oldFilePath} : ${newFilePath}`,
+            );
 
             // Delete the BoxFile record
             await prismaClient.boxFile.delete({
