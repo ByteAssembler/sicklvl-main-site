@@ -1,8 +1,8 @@
 # Use the latest stable Node.js LTS version for the build stage
 FROM node:lts-alpine
 
-# Install necessary build tools for node-gyp and ffmpeg
-RUN apk add --no-cache python3 make g++ ffmpeg
+# Install necessary build tools for node-gyp, ffmpeg, and OpenSSL
+RUN apk add --no-cache python3 make g++ ffmpeg openssl
 
 # Set the working directory
 WORKDIR /usr/src/app
