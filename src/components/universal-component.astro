@@ -38,4 +38,5 @@ const renderOther = [
     )
 }
 
-{!renderOther && <Input {...props} type={props?.type ?? "text"} />}
+{/*!renderOther && <Input {...props} type={props?.type ?? "text"} />*/}
+{!renderOther && <Input {...(props as any)} type={props?.type ?? "text"} />}
