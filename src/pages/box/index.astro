@@ -46,18 +46,18 @@ function getBoxThumbnail(box: any) {
 >
     {
         box.map((item) => (
-            <article class="flex flex-col gap-1 p-2 border-2">
+            <article class="flex flex-col gap-1 border-2 p-2">
                 <a href={`/box/${item.id}`} class="w-full h-40">
                     <img
-                        class="h-full w-full p-4 object-cover filter blur-[8px] brightness-50"
+                        class="brightness-50 blur-[8px] p-4 w-full h-full filter object-cover"
                         src={getBoxThumbnail(item)}
                         alt={`Thumbnail for ${item.name}`}
                     />
                 </a>
 
-                <div class="flex items-center justify-between gap-2">
+                <div class="flex justify-between items-center gap-2">
                     <div class="flex flex-col p-1 overflow-hidden">
-                        <h2 class="text-2xl font-bold truncate">
+                        <h2 class="font-bold text-2xl truncate">
                             <a href={`/box/${item.id}`}>{item.name}</a>
                         </h2>
 
@@ -170,11 +170,9 @@ function getBoxThumbnail(box: any) {
                                 stroke-linejoin="round"
                                 class="lucide lucide-external-link"
                             >
-                                <>
-                                    <path d="M15 3h6v6" />
-                                    <path d="M10 14 21 3" />
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                </>
+                                <path d="M15 3h6v6" />
+                                <path d="M10 14 21 3" />
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                             </svg>
                         </Button>
                         {/*
@@ -199,11 +197,9 @@ function getBoxThumbnail(box: any) {
                                 stroke-linejoin="round"
                                 class="lucide lucide-download"
                             >
-                                <>
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" x2="12" y1="15" y2="3" />
-                                </>
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" x2="12" y1="15" y2="3" />
                             </svg>
                         </Button>
                         {isAdmin && (
@@ -227,7 +223,7 @@ function getBoxThumbnail(box: any) {
                                         stroke-width="2"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        class="lucide lucide-trash-2"
+                                        class="lucide-trash-2 lucide"
                                     >
                                         <path d="M3 6h18" />
                                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />

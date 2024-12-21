@@ -25,22 +25,17 @@ const renderOther = [
 ].includes(props?.type ?? "text");
 ---
 
+{renderOther && props.type === "image" && <PerfectImage {...props} />}
+{renderOther && props.type === "video" && <PerfectVideo {...props} />}
+{renderOther && props.type === "label" && <Label {...props} />}
+{renderOther && props.type === "button" && <Button {...props} />}
+{renderOther && props.type === "fieldset" && <Fieldset {...props} />}
+{renderOther && props.type === "file" && <FileUpload {...props} />}
+{renderOther && props.type === "select" && <Select {...props} />}
 {
-    renderOther ? (
-        <>
-            {props.type === "image" && <PerfectImage {...props} />}
-            {props.type === "video" && <PerfectVideo {...props} />}
-            {props.type === "label" && <Label {...props} />}
-            {props.type === "button" && <Button {...props} />}
-            {props.type === "fieldset" && <Fieldset {...props} />}
-            {props.type === "file" && <FileUpload {...props} />}
-            {props.type === "select" && <Select {...props} />}
-            {props.type === "files-or-folder" && (
-                <FilesOrFolderUpload {...props} />
-            )}
-        </>
-    ) : (
-        // @ts-ignore
-        <Input {...props} type={props?.type ?? "text"} />
+    renderOther && props.type === "files-or-folder" && (
+        <FilesOrFolderUpload {...props} />
     )
 }
+
+{!renderOther && <Input {...props} type={props?.type ?? "text"} />}

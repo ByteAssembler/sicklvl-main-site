@@ -14,25 +14,23 @@ const {
 <select
     name={name}
     multiple={multiple}
-    class="font-inconsolata text-lg font-bold tracking-widest"
+    class="font-bold font-inconsolata text-lg tracking-widest"
     required={required}
 >
     {
-        options.map((option) => (
-            <>
-                {typeof option === "string" ? (
-                    <option value={option}>{option}</option>
-                ) : (
-                    <option
-                        value={option.value}
-                        selected={option.selected}
-                        disabled={option.disabled}
-                    >
-                        {option.text ?? option.value}
-                    </option>
-                )}
-            </>
-        ))
+        options.map((option) =>
+            typeof option === "string" ? (
+                <option value={option}>{option}</option>
+            ) : (
+                <option
+                    value={option.value}
+                    selected={option.selected}
+                    disabled={option.disabled}
+                >
+                    {option.text ?? option.value}
+                </option>
+            ),
+        )
     }
 </select>
 

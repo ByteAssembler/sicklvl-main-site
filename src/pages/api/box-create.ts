@@ -72,7 +72,7 @@ export async function POST(context: APIContext): Promise<Response> {
         owner_id = customer.id;
     }
 
-    const box = await prismaClient.box.create({
+    await prismaClient.box.create({
         data: {
             name: result.data.name,
 
