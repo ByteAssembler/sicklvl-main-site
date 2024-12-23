@@ -51,12 +51,12 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
                         }
                     >
                         <a
-                            class="h-full w-full flex items-center justify-center"
+                            class="flex justify-center items-center w-full h-full"
                             href={`/portfolio/${item.slug}`}
                             draggable="false"
                         >
-                            <div class="overflow-hidden px-[5%]">
-                                <h2 class="drop-shadow font-august text-center text-[calc(1.5vw+2.5rem)] font-bold tracking-wide overflow-hidden transition-transform">
+                            <div class="px-[5%] overflow-hidden">
+                                <h2 class="drop-shadow font-august font-bold text-[calc(1.5vw+2.5rem)] text-center tracking-wide transition-transform overflow-hidden">
                                     {item.title}
                                 </h2>
                             </div>
@@ -118,7 +118,8 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
 
     @media (max-width: 768px) {
         #container-grid-box {
-            padding: 0 50px;
+            padding: 65px;
+            padding: calc(65px + 40px);
 
             grid-template-columns: repeat(
                 var(--itemCountSmallX),
