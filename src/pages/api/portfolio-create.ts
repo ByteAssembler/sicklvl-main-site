@@ -112,6 +112,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const thumbnailImage = await saveImageWithFormatsFullHorizontal(
             result.data.thumbnail,
             randomPrefix + result.data.thumbnail.name,
+            blobFolderPath
         );
 
         const imageGallery: SingleImageMemory[][] = [];
@@ -120,6 +121,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 await saveImageWithFormatsFullHorizontal(
                     image,
                     randomPrefix + image.name,
+                    blobFolderPath
                 ),
             );
         }
@@ -135,6 +137,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             const savedVideo = await saveVideo(
                 video,
                 randomPrefix + video.name,
+                blobFolderPath
             );
             if (savedVideo.success) {
                 videoGallery.push(savedVideo);
@@ -146,6 +149,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const backgroundVideo = await saveVideo(
             result.data.background_video,
             randomPrefix + result.data.background_video.name,
+            blobFolderPath
         );
 
         if (!backgroundVideo.success)
