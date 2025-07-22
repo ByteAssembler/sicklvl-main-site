@@ -199,18 +199,62 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
     /**
      * Berechnet die Grenzen neu und zentriert das Grid im Container.
      * @param {boolean} useTransition - Ob eine sanfte Transition verwendet werden soll.
+     * @param {number} retryCount - Anzahl der Wiederholungsversuche für Safari-Kompatibilität.
      */
-    function centerGrid(useTransition = false) {
-        if (!section || !grid) return;
+    function centerGrid(useTransition = false, retryCount = 0) {
+        if (!section || !grid) return false;
 
         // Grenzen neu berechnen, da sie sich geändert haben könnten (Resize, Load)
         sectionBounds = section.getBoundingClientRect();
         gridBounds = grid.getBoundingClientRect();
 
+        // Validierung: Prüfen ob die Bounds gültige Werte haben (Safari-Fix)
+        const isValidBounds =
+            sectionBounds.width > 0 &&
+            sectionBounds.height > 0 &&
+            gridBounds.width > 0 &&
+            gridBounds.height > 0;
+
+        if (!isValidBounds) {
+            console.warn(
+                `Invalid bounds detected (attempt ${retryCount + 1}). Section: ${sectionBounds.width}x${sectionBounds.height}, Grid: ${gridBounds.width}x${gridBounds.height}`,
+            );
+
+            // Wiederholungsversuch nach kurzer Verzögerung (max. 5 Versuche)
+            if (retryCount < 5) {
+                setTimeout(
+                    () => centerGrid(useTransition, retryCount + 1),
+                    50 * (retryCount + 1),
+                );
+                return false;
+            } else {
+                console.error(
+                    "Failed to center grid after 5 attempts - bounds remain invalid",
+                );
+                return false;
+            }
+        }
+
         // Berechne die Ziel-Offsets für die Zentrierung
         // (halber Unterschied zwischen Grid-Größe und Sektions-Größe)
         const targetOffsetX = (gridBounds.width - sectionBounds.width) / 2;
         const targetOffsetY = (gridBounds.height - sectionBounds.height) / 2;
+
+        // Zusätzliche Validierung: Prüfen ob die berechneten Offsets sinnvoll sind
+        if (
+            isNaN(targetOffsetX) ||
+            isNaN(targetOffsetY) ||
+            !isFinite(targetOffsetX) ||
+            !isFinite(targetOffsetY)
+        ) {
+            console.error("Invalid offset calculations:", {
+                targetOffsetX,
+                targetOffsetY,
+                sectionBounds,
+                gridBounds,
+            });
+            return false;
+        }
 
         // Aktuelle Offsets aktualisieren, damit die Mausbewegung relativ zur Mitte startet
         offsetX = targetOffsetX;
@@ -238,7 +282,13 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
             // die nächste Mausbewegung setzt dann die 180ms Transition.
         });
 
-        console.log("Grid centered."); // Debugging-Ausgabe
+        console.log(`Grid centered successfully (attempt ${retryCount + 1}):`, {
+            offsetX,
+            offsetY,
+            sectionBounds,
+            gridBounds,
+        });
+        return true;
     }
 
     /**
@@ -246,6 +296,15 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
      */
     function handleMouseMove(e: MouseEvent) {
         if (!allowMove || !sectionBounds || !gridBounds || !section) return;
+
+        // Safari-Fix: Prüfen ob Grid korrekt zentriert ist, falls nicht, neu zentrieren
+        if (offsetX === 0 && offsetY === 0) {
+            console.log(
+                "Grid appears uncentered during mouse move, re-centering...",
+            );
+            centerGrid(false);
+            return;
+        }
 
         // Berechne Offset basierend auf Mausposition relativ zur Sektion
         offsetX =
@@ -270,6 +329,15 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
             e.touches.length === 0
         )
             return;
+
+        // Safari-Fix: Prüfen ob Grid korrekt zentriert ist, falls nicht, neu zentrieren
+        if (offsetX === 0 && offsetY === 0) {
+            console.log(
+                "Grid appears uncentered during touch move, re-centering...",
+            );
+            centerGrid(false);
+            return;
+        }
 
         const touch = e.touches[0]; // Ersten Touchpunkt verwenden
 
@@ -318,36 +386,51 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
 
         console.log("Initializing grid...");
 
-        // Initiales Zentrieren (ohne Transition für sofortigen Effekt)
-        // Wichtig: Sicherstellen, dass Layout berechnet wurde (passiert meist implizit, aber rAF kann helfen)
+        // Safari-spezifische Verbesserung: Mehrere requestAnimationFrame für besseres Layout-Timing
+        // Warten auf vollständiges Layout-Rendering
         requestAnimationFrame(() => {
-            centerGrid(false);
+            requestAnimationFrame(() => {
+                // Zusätzliche Verzögerung für Safari, um sicherzustellen dass CSS Grid vollständig gerendert ist
+                setTimeout(() => {
+                    const success = centerGrid(false);
 
-            // Event Listener für Maus- und Touch-Bewegung hinzufügen
-            window.addEventListener("mousemove", handleMouseMove);
-            window.addEventListener("touchmove", handleTouchMove, {
-                passive: true,
-            }); // passive: true für bessere Scroll-Performance
-
-            // Event Listener für Klicks auf Artikel (um Bewegung zu stoppen)
-            allArticlesInGrid.forEach((article) => {
-                article.addEventListener(
-                    "click",
-                    () => {
-                        allowMove = false; // Bewegung stoppen
-                        article.classList.add("focused");
-                        article.classList.remove("not-focused");
-                        document.body.style.pointerEvents = "none"; // Verhindert weitere Klicks während Übergang
-                        document.body.style.cursor = "wait";
-                        // Hinweis: Die Weiterleitung geschieht durch das <a> Tag
-                    },
-                    { capture: true },
-                ); // Capture Phase, um sicherzustellen, dass es vor der Navigation feuert
+                    // Fallback: Wenn die erste Zentrierung fehlschlägt, nochmaligen Versuch nach längerer Verzögerung
+                    if (!success) {
+                        console.warn(
+                            "Initial centering failed, scheduling retry...",
+                        );
+                        setTimeout(() => {
+                            centerGrid(false);
+                        }, 200);
+                    }
+                }, 10);
             });
-
-            // Startet die Animationsschleife nur einmal
-            requestAnimationFrame(animate);
         });
+
+        // Event Listener für Maus- und Touch-Bewegung hinzufügen
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("touchmove", handleTouchMove, {
+            passive: true,
+        }); // passive: true für bessere Scroll-Performance
+
+        // Event Listener für Klicks auf Artikel (um Bewegung zu stoppen)
+        allArticlesInGrid.forEach((article) => {
+            article.addEventListener(
+                "click",
+                () => {
+                    allowMove = false; // Bewegung stoppen
+                    article.classList.add("focused");
+                    article.classList.remove("not-focused");
+                    document.body.style.pointerEvents = "none"; // Verhindert weitere Klicks während Übergang
+                    document.body.style.cursor = "wait";
+                    // Hinweis: Die Weiterleitung geschieht durch das <a> Tag
+                },
+                { capture: true },
+            ); // Capture Phase, um sicherzustellen, dass es vor der Navigation feuert
+        });
+
+        // Startet die Animationsschleife nur einmal
+        requestAnimationFrame(animate);
 
         // Event Listener für Größenänderungen (debounced)
         window.addEventListener("resize", () => {
@@ -374,11 +457,70 @@ const itemCountSmallY = Math.ceil(itemCount / itemCountSmallX);
                 setTimeout(() => centerGrid(false), 50);
             }
         });
+
+        // Safari-spezifischer Fix: Zusätzlicher Event Listener für load-Event
+        // Falls die Seite noch Ressourcen lädt, die das Layout beeinflussen könnten
+        if (document.readyState !== "complete") {
+            window.addEventListener(
+                "load",
+                () => {
+                    console.log(
+                        "Window load event fired, re-centering grid...",
+                    );
+                    setTimeout(() => centerGrid(false), 100);
+                },
+                { once: true },
+            );
+        }
     }
 
     // Initialisierung starten, sobald das DOM bereit ist
     // "astro:page-load" ist oft zuverlässiger in Astro als DOMContentLoaded
     document.addEventListener("astro:page-load", initializeGrid);
+
     // Fallback für reine Client-Navigation oder wenn astro:page-load nicht passt
-    // document.addEventListener("DOMContentLoaded", initializeGrid);
+    document.addEventListener("DOMContentLoaded", initializeGrid);
+
+    // Safari-spezifischer Fallback: Zusätzlicher Event Listener für verschiedene Ladezeiten
+    // Da Safari manchmal Events früher feuert als das Layout vollständig ist
+    if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+        console.log("Safari detected, adding additional fallback listeners");
+
+        // Fallback nach kurzer Verzögerung
+        setTimeout(() => {
+            if (
+                document.getElementById("container-grid") &&
+                !offsetX &&
+                !offsetY
+            ) {
+                console.log(
+                    "Safari fallback: Re-initializing grid after timeout",
+                );
+                initializeGrid();
+            }
+        }, 500);
+
+        // Zusätzlicher Fallback beim ersten User-Interaction
+        let hasInteracted = false;
+        const interactionHandler = () => {
+            if (!hasInteracted && document.getElementById("container-grid")) {
+                hasInteracted = true;
+                console.log(
+                    "Safari fallback: Re-centering grid after first interaction",
+                );
+                setTimeout(() => centerGrid(false), 50);
+                document.removeEventListener("click", interactionHandler);
+                document.removeEventListener("touchstart", interactionHandler);
+                document.removeEventListener("mousemove", interactionHandler);
+            }
+        };
+
+        document.addEventListener("click", interactionHandler, { once: true });
+        document.addEventListener("touchstart", interactionHandler, {
+            once: true,
+        });
+        document.addEventListener("mousemove", interactionHandler, {
+            once: true,
+        });
+    }
 </script>
