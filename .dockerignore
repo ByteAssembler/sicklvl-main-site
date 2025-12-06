@@ -1,0 +1,19 @@
+# Node / package manager
+node_modules
+.pnpm-store
+.pnpm-debug.log
+pnpm-lock.yaml
+bun.lockb
+package-lock.json
+yarn.lock
+
+# OS / IDE
+.vscode
+.DS_Store
+*.log
+
+# Devcontainer / build artifacts
+.devcontainer/**/Dockerfile-with-features
+/tmp
+dist
+.build

@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ request, params }) => {
     const cachedBlob = getFromCache(src);
     if (cachedBlob) {
         // Return the cached file if it exists
-        return new Response(cachedBlob.buffer, {
+        return new Response(cachedBlob.buffer as BufferSource, {
             status: 200,
             headers: {
                 "Content-Length": cachedBlob.size.toString(),
@@ -77,7 +77,7 @@ export const GET: APIRoute = async ({ request, params }) => {
         };
 
         // Return the cached file response
-        return new Response(buffer, {
+        return new Response(buffer as BufferSource, {
             status: 200,
             headers: {
                 "Content-Length": fileSize.toString(),
