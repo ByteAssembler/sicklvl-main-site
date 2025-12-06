@@ -1,6 +1,8 @@
 import { Lucia } from "lucia";
-import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 
 export const prismaClient = new PrismaClient();
 export const luciaAdapter = new PrismaAdapter(
