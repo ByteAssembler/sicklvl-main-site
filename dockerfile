@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvips-dev \
     libjpeg-dev \
     libpng-dev \
+    wget \
   && rm -rf /var/lib/apt/lists/*
 
 # Enable pnpm via corepack
