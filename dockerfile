@@ -4,7 +4,7 @@
 ############################
 # 1) BASE DEPENDENCIES
 ############################
-FROM node:lts-slim AS base
+FROM oven/bun:1.1.29-slim AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -24,9 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
   && rm -rf /var/lib/apt/lists/*
 
-# Enable pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /usr/src/app
 
 
@@ -38,9 +35,9 @@ FROM base AS deps
 
 # Only package files first (better cache)
 COPY package.json ./
-COPY pnpm-lock.yaml* ./
+COPY bun.lock* ./
 
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN bun install
 
 
 
@@ -57,21 +54,23 @@ WORKDIR /usr/src/app
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
-RUN pnpm exec prisma generate
-RUN pnpm run build
+# ✅ Prisma Client mit Bun generieren
+RUN bunx prisma generate
+
+# ✅ Astro Build mit Bun
+RUN bun run build
 
 
 
 ############################
 # 4) PRODUCTION RUNTIME
 ############################
-FROM node:lts-slim AS production
+FROM oven/bun:1.1.29-slim AS production
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=4321
 
-# Only minimal runtime deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
@@ -80,12 +79,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /usr/src/app
 
-# Copy built app + prod deps only
+# ✅ WICHTIG: node_modules AUS DEM BUILDER (MIT GENERIERTEM PRISMA CLIENT)
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/prisma ./prisma
 
 EXPOSE 4321
 
-CMD ["node", "dist/server/entry.mjs"]
+# ✅ Server mit Bun starten (kein Node mehr!)
+CMD ["bun", "dist/server/entry.mjs"]
