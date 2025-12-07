@@ -1,3 +1,6 @@
+# HOW TO BUILD THIS DOCKER IMAGE:
+# DATABASE_URL="..." PORT=3000 STORAGE_FOLDER_PATH="/STORAGE/" docker build --build-arg DATABASE_URL="..." -t sicklvl-prod .
+
 ############################
 # 1) BASE DEPENDENCIES
 ############################
@@ -46,15 +49,15 @@ RUN pnpm install --frozen-lockfile || pnpm install
 ############################
 FROM base AS builder
 
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 WORKDIR /usr/src/app
 
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
-# Prisma Client
 RUN pnpm exec prisma generate
-
-# Build Astro
 RUN pnpm run build
 
 
