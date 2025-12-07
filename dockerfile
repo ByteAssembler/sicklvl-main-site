@@ -1,14 +1,11 @@
-# HOW TO BUILD THIS DOCKER IMAGE:
-# DATABASE_URL="..." PORT=3000 STORAGE_FOLDER_PATH="/STORAGE/" docker build --build-arg DATABASE_URL="..." -t sicklvl-prod .
+# Wir nutzen Node 20 (LTS) als Basis. Slim Version für weniger Müll, aber Debian-basiert.
+FROM node:20-slim
 
-############################
-# 1) BASE DEPENDENCIES
-############################
-FROM oven/bun:1.1.29-slim AS base
-
+# Umgebungsvariablen für das System
 ENV DEBIAN_FRONTEND=noninteractive
 
-# System dependencies for sharp, prisma, ffmpeg, argon2 etc.
+# 1) System-Abhängigkeiten installieren
+# Wir behalten die Libs für Sharp, Prisma und FFmpeg bei.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -18,74 +15,38 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     openssl \
     pkg-config \
+    # Abhängigkeiten für Bildverarbeitung (Sharp)
     libvips-dev \
     libjpeg-dev \
     libpng-dev \
     wget \
   && rm -rf /var/lib/apt/lists/*
 
+# Arbeitsverzeichnis setzen
 WORKDIR /usr/src/app
 
-
-
-############################
-# 2) DEPENDENCIES STAGE
-############################
-FROM base AS deps
-
-# Only package files first (better cache)
-COPY package.json ./
-COPY bun.lock* ./
-
-RUN bun install
-
-
-
-############################
-# 3) BUILD STAGE
-############################
-FROM base AS builder
-
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
-WORKDIR /usr/src/app
-
-COPY --from=deps /usr/src/app/node_modules ./node_modules
+# 2) Alles kopieren (Single Stage Ansatz)
+# Wir kopieren einfach alles sofort rein.
 COPY . .
 
-# ✅ Prisma Client mit Bun generieren
-RUN bunx prisma generate
+# 3) Abhängigkeiten mit NPM installieren
+RUN npm install
 
-# ✅ Astro Build mit Bun
-RUN bun run build
+# 4) Prisma Client generieren
+# Das geht jetzt ohne echte DB-Verbindung, da wir nur die Dateien generieren.
+RUN npx prisma generate
 
+# 5) Astro bauen
+RUN npm run build
 
-
-############################
-# 4) PRODUCTION RUNTIME
-############################
-FROM oven/bun:1.1.29-slim AS production
-
+# 6) Runtime Konfiguration
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
-ENV PORT=4321
+ENV PORT=3000
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    ffmpeg \
-    openssl \
-  && rm -rf /var/lib/apt/lists/*
+# Port freigeben (Standard Astro/Node Port ist oft 3000 oder 4321, hier auf 3000 genormt)
+EXPOSE 3000
 
-WORKDIR /usr/src/app
-
-# ✅ WICHTIG: node_modules AUS DEM BUILDER (MIT GENERIERTEM PRISMA CLIENT)
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=builder /usr/src/app/prisma ./prisma
-
-EXPOSE 4321
-
-# ✅ Server mit Bun starten (kein Node mehr!)
-CMD ["bun", "dist/server/entry.mjs"]
+# 7) Server starten
+# Hier greifen dann deine Environment Variablen aus Coolify (DATABASE_URL etc.)
+CMD ["node", "dist/server/entry.mjs"]
