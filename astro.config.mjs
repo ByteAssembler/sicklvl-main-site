@@ -20,9 +20,9 @@ export default defineConfig({
         // → Origin-Mismatch mit dem Browser-Origin https://sicklevel.com → 403.
         allowedDomains: [
             { hostname: "sicklevel.com", protocol: "https" },
-            { hostname: "localhost", protocol: "http" },
-            { hostname: "127.0.0.1", protocol: "http" },
-            { hostname: "0.0.0.0", protocol: "http" },
+            // { hostname: "localhost", protocol: "http" },
+            // { hostname: "127.0.0.1", protocol: "http" },
+            // { hostname: "0.0.0.0", protocol: "http" },
         ],
         checkOrigin: true,
     },
