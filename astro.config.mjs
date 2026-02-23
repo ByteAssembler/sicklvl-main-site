@@ -14,10 +14,17 @@ export default defineConfig({
 
     site: "https://sicklevel.com",
     security: {
-        // checkOrigin ist deaktiviert, da die App hinter einem Reverse Proxy (Coolify/Traefik)
-        // läuft. Der Container sieht intern http://172.18.x.x, der Browser sendet aber
-        // Origin: https://sicklevel.com → Astro würde das als Cross-Site werten → 403.
-        checkOrigin: false,
+        // allowedDomains teilt Astro mit, welchen X-Forwarded-Host/Proto-Headern
+        // von Coolify/Traefik vertraut werden darf. Ohne diese Einstellung ignoriert
+        // Astro v5 die Forwarded-Header und baut die URL intern als http://localhost:3000
+        // → Origin-Mismatch mit dem Browser-Origin https://sicklevel.com → 403.
+        allowedDomains: [
+            { hostname: "sicklevel.com", protocol: "https" },
+            { hostname: "localhost", protocol: "http" },
+            { hostname: "127.0.0.1", protocol: "http" },
+            { hostname: "0.0.0.0", protocol: "http" },
+        ],
+        checkOrigin: true,
     },
 
     adapter: node({
